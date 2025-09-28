@@ -12,8 +12,7 @@ namespace FEA_Program
     {
         private StressProblem P;
 
-        public CoordinateSystem Coord = new CoordinateSystem(50);
-        public CoordinateSystem Coord2 = new CoordinateSystem(25);
+        public CoordinateSystem Coord = new([0,0,0], 10);
         public GLControlDraggable GlCont;
 
         public Mainform()

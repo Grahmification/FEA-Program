@@ -1,30 +1,32 @@
-﻿using FEA_Program.Graphics;
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
-namespace FEA_Program.Models
+namespace FEA_Program.Drawable
 {
     internal class CoordinateSystem
     {
-        private double originX = 0d;
-        private double originY = 0d;
-        private double originZ = 0d;
-        private int _scale = 1;
-        private Color SysColor = Color.Teal;
+        public double OriginX { get; set; } = 0d;
+        public double OriginY { get; set; } = 0d;
+        public double OriginZ { get; set; } = 0d;
+        private double Scale { get; set; } = 1;
+        public Color Color { get; set; } = Color.Teal;
 
-        public CoordinateSystem(double Scale)
+        public CoordinateSystem(double[] position, double scale)
         {
-            _scale = (int)Math.Round(Scale);
+            OriginX = position[0];
+            OriginY = position[1];
+            OriginZ = position[2];
+            Scale = scale;
         }
 
-        public void Draw(bool ThreeDimensional)
+        public void Draw(bool threeDimensional)
         {
-            Matrix4 xform = Matrix4.CreateTranslation(new Vector3((float)(originX / _scale), (float)(originY / _scale), (float)(originZ / _scale)));
-            xform = Matrix4.Mult(xform, Matrix4.CreateScale(_scale, _scale, _scale));
+            Matrix4 xform = Matrix4.CreateTranslation(Vector3.One * (float)(OriginX / Scale));
+            xform = Matrix4.Mult(xform, Matrix4.CreateScale((float)Scale));
             GL.MultMatrix(ref xform);
 
             // X Axis
-            GL.Color3(SysColor);
+            GL.Color3(Color);
             GL.Begin(PrimitiveType.Lines);
             GL.Vertex3(0, 0, 0);
             GL.Vertex3(1, 0, 0);
@@ -58,7 +60,7 @@ namespace FEA_Program.Models
             GL.Vertex3(0.25d, 0.9d, 0);
             GL.Vertex3(0.25d, 0.8d, 0);
 
-            if (ThreeDimensional)
+            if (threeDimensional)
             {
                 // Z Axis
                 GL.Vertex3(0, 0, 0);
@@ -80,8 +82,8 @@ namespace FEA_Program.Models
             GL.End();
 
             xform = Matrix4.Identity;
-            xform = Matrix4.Mult(xform, Matrix4.CreateScale(1f / _scale, 1f / _scale, 1f / _scale));
-            xform = Matrix4.Mult(xform, Matrix4.CreateTranslation(new Vector3((float)(-originX / _scale), (float)(-originY / _scale), (float)(-originZ / _scale))));
+            xform = Matrix4.Mult(xform, Matrix4.CreateScale((float)(1f / Scale)));
+            xform = Matrix4.Mult(xform, Matrix4.CreateTranslation(Vector3.One * (float)(-OriginX / Scale)));
             GL.MultMatrix(ref xform);
         }
     }
