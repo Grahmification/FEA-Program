@@ -1,4 +1,5 @@
 using FEA_Program.Controls;
+using FEA_Program.Drawable;
 using FEA_Program.Graphics;
 using FEA_Program.Models;
 using FEA_Program.UserControls;
@@ -51,8 +52,8 @@ namespace FEA_Program
         {
             Coord.Draw(threeDimensional);
 
-            foreach (Node N in P.Nodes.Nodelist)
-                N.DrawNode(N.Coords_mm);
+            foreach (NodeDrawable N in P.Nodes.Nodelist)
+                N.Draw();
 
             foreach (IElement E in P.Elements.Elemlist)
             {
@@ -227,8 +228,7 @@ namespace FEA_Program
                 foreach (Type ElemType in P.AvailableElements)
                     ElementArgsList.Add(ElementMgr.ElementArgs(ElemType));
 
-
-                var UC = new AddElementControl(P.AvailableElements, ElementArgsList, P.Materials.MatList, P.Nodes.Nodelist);
+                var UC = new AddElementControl(P.AvailableElements, ElementArgsList, P.Materials.MatList, P.Nodes.BaseNodelist);
                 UC.ElementAddFormSuccess += ElemAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
                 AddUserControlToSplitCont(UC, SplitContainer_Main, 1);
@@ -253,7 +253,7 @@ namespace FEA_Program
             try
             {
 
-                var UC = new AddNodeForceControl(P.AvailableNodeDOFs, P.Nodes.Nodelist);
+                var UC = new AddNodeForceControl(P.AvailableNodeDOFs, P.Nodes.BaseNodelist);
                 UC.NodeForceAddFormSuccess += NodeForceAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
                 AddUserControlToSplitCont(UC, SplitContainer_Main, 1);

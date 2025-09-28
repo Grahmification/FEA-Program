@@ -1,4 +1,5 @@
-﻿using MathNet.Numerics.LinearAlgebra.Double;
+﻿using FEA_Program.Drawable;
+using MathNet.Numerics.LinearAlgebra.Double;
 using System.Reflection;
 
 
@@ -6,11 +7,11 @@ namespace FEA_Program.Models
 {
     internal class NodeMgr
     {
-        private Dictionary<int, Node> _Nodes = new Dictionary<int, Node>(); // reference nodes by ID
+        private Dictionary<int, NodeDrawable> _Nodes = new Dictionary<int, NodeDrawable>(); // reference nodes by ID
 
         public event NodeListChangedEventHandler NodeListChanged;
 
-        public delegate void NodeListChangedEventHandler(Dictionary<int, Node> NodeList); // Length of nodelist has changed
+        public delegate void NodeListChangedEventHandler(Dictionary<int, NodeDrawable> NodeList); // Length of nodelist has changed
         public event NodeChangedEventHandler NodeChanged;
 
         public delegate void NodeChangedEventHandler(List<int> IDs); // Node has changed such that list needs to be updated & screen redrawn
@@ -24,13 +25,9 @@ namespace FEA_Program.Models
 
         public delegate void NodeDeletedEventHandler(int NodeID, int Dimension); // dont use for redrawing lists or screen
 
-        public List<Node> Nodelist
-        {
-            get
-            {
-                return _Nodes.Values.ToList();
-            }
-        }
+        public List<NodeDrawable> Nodelist => _Nodes.Values.ToList();
+        public List<Node> BaseNodelist => Nodelist.Cast<Node>().ToList();
+
         public List<int> AllIDs
         {
             get
@@ -137,7 +134,7 @@ namespace FEA_Program.Models
                     throw new Exception("Tried to create node at location where one already exists. Nodes cannot be in identical locations.");
                 }
 
-                var newnode = new Node(Coords[i], Fixity[i], CreateNodeId(), Dimensions[i]);
+                var newnode = new NodeDrawable(Coords[i], Fixity[i], CreateNodeId(), Dimensions[i]);
                 _Nodes.Add(newnode.ID, newnode);
                 NodeAdded?.Invoke(newnode.ID, newnode.Dimension);
             }
