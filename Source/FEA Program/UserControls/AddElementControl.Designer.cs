@@ -60,6 +60,7 @@
             _Button_Accept.TabIndex = 1;
             _Button_Accept.Text = "Y";
             _Button_Accept.UseVisualStyleBackColor = true;
+            _Button_Accept.Click += ButtonAccept_Click;
             // 
             // _Button_Cancel
             // 
@@ -72,6 +73,7 @@
             _Button_Cancel.TabIndex = 2;
             _Button_Cancel.Text = "N";
             _Button_Cancel.UseVisualStyleBackColor = true;
+            _Button_Cancel.Click += ButtonAccept_Click;
             // 
             // _Label2
             // 
@@ -95,6 +97,7 @@
             _ComboBox_ElemType.Name = "_ComboBox_ElemType";
             _ComboBox_ElemType.Size = new Size(228, 23);
             _ComboBox_ElemType.TabIndex = 4;
+            _ComboBox_ElemType.SelectedIndexChanged += ComboBox_ElemType_SelectedIndexChanged;
             // 
             // _ComboBox_Material
             // 
@@ -133,6 +136,7 @@
             Margin = new Padding(4, 3, 4, 3);
             Name = "AddElementControl";
             Size = new Size(245, 493);
+            KeyDown += UserControl_AddElement_KeyDown;
             ResumeLayout(false);
             PerformLayout();
         }

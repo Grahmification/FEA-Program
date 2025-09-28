@@ -68,8 +68,7 @@ namespace FEA_Program.UserControls
                 _FirstLabelPos[1] += _YIncrement;
             }
 
-            this.KeyDown += UserControl_AddElement_KeyDown;
-
+            ValidateEntry();
         }
 
         private void ButtonAccept_Click(object? sender, EventArgs e)
@@ -98,7 +97,7 @@ namespace FEA_Program.UserControls
                 MessageBox.Show("Error adding material: " + ex.Message);
             }
         }
-        private void ValidateEntry(object sender, EventArgs e)
+        private void ValidateEntry()
         {
             try
             {
@@ -127,5 +126,9 @@ namespace FEA_Program.UserControls
             }
         }
 
+        private void TextBox_Name_TextChanged(object sender, EventArgs e)
+        {
+            ValidateEntry();
+        }
     }
 }

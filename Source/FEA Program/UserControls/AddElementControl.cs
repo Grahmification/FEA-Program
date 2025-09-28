@@ -1,6 +1,5 @@
 ﻿using FEA_Program.Controls;
 using FEA_Program.Models;
-using Microsoft.VisualBasic;
 
 namespace FEA_Program.UserControls
 {
@@ -31,9 +30,10 @@ namespace FEA_Program.UserControls
 
         public AddElementControl(Type[] AvailableElemTypes, List<Dictionary<string, Units.DataUnitType>> ElementArgs, List<MaterialClass> Mats, List<Node> Nodes)
         {
-            _FirstLabelPos = new[] { 8, 96 + _YIncrement };
-            _FirstComboBoxPos = new[] { 7, 115 + _YIncrement };
-            _FirstTextBoxPos = new[] { 7, 115 + _YIncrement };
+            int startingY = 120;
+            _FirstLabelPos = new[] { 8, startingY + _YIncrement };
+            _FirstComboBoxPos = new[] { 7, 20 + startingY + _YIncrement };
+            _FirstTextBoxPos = new[] { 7, 20 + startingY + _YIncrement };
 
             InitializeComponent();
 
@@ -70,7 +70,7 @@ namespace FEA_Program.UserControls
                 }
             }
 
-            this.KeyDown += UserControl_AddElement_KeyDown;
+            ValidateEntry();
         }
 
         private void ButtonAccept_Click(object? sender, EventArgs e)
@@ -108,7 +108,12 @@ namespace FEA_Program.UserControls
             }
         }
 
-        private void ValidateEntry(object sender, EventArgs e)
+        private void ComboBoxSelectionChanged(object? sender, EventArgs e)
+        {
+            ValidateEntry();
+        }
+
+        private void ValidateEntry()
         {
             try
             {
@@ -120,7 +125,13 @@ namespace FEA_Program.UserControls
                 var NodeCBoxIndexes = new List<int>();
 
                 foreach (ComboBox Cbox in _ComboBoxes)
+                {
                     NodeCBoxIndexes.Add(Cbox.SelectedIndex);
+
+                    if (Cbox.SelectedItem == null)
+                        throw new Exception();
+                }
+                    
 
                 if (AllIndexesDifferent(NodeCBoxIndexes) == false)
                 {
@@ -130,7 +141,7 @@ namespace FEA_Program.UserControls
 
                 _Button_Accept.Enabled = true; // if this works for all then everything is ok
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _Button_Accept.Enabled = false;
             }
@@ -150,8 +161,8 @@ namespace FEA_Program.UserControls
 
             foreach (ComboBox CB in _ComboBoxes)
             {
-                CB.SelectedIndexChanged -= ValidateEntry;
-                CB.SelectedIndexChanged -= NodeComboBoxSelectionChanged; // for node selection event
+                CB.SelectionChangeCommitted -= ComboBoxSelectionChanged;
+                CB.SelectionChangeCommitted -= NodeComboBoxSelectionChanged; // for node selection event
                 CB.Dispose();
             }
             _ComboBoxes.Clear();
@@ -180,7 +191,7 @@ namespace FEA_Program.UserControls
                 CBox.Location = new Point(_FirstComboBoxPos[0], _FirstComboBoxPos[1]);
                 CBox.Tag = I;
                 CBox.AutoCompleteCustomSource = nodeCollection;
-                CBox.SelectedIndexChanged += ValidateEntry;
+                CBox.SelectionChangeCommitted += ComboBoxSelectionChanged;
 
                 _ComboBoxes.Add(CBox);
                 this.Controls.Add(CBox);
@@ -264,7 +275,7 @@ namespace FEA_Program.UserControls
 
                 foreach (ComboBox CB in _ComboBoxes)
                 {
-                    string Data = CB.SelectedItem.ToString();
+                    string? Data = CB.SelectedItem?.ToString();
 
                     if (Data is not null) // no selection in combobox
                     {

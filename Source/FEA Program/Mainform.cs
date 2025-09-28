@@ -9,7 +9,7 @@ namespace FEA_Program
 {
     internal partial class Mainform : Form
     {
-        private StressProblem P = default;
+        private StressProblem P;
 
         public CoordinateSystem Coord = new CoordinateSystem(50);
         public CoordinateSystem Coord2 = new CoordinateSystem(25);
@@ -18,16 +18,19 @@ namespace FEA_Program
         public Mainform()
         {
             Load += Mainform_Load;
-            
+
             InitializeComponent();
 
-            GlCont = new(glControl_main, Color.Black, true);
+            P = new(this, ProblemTypes.Bar_1D);
         }
 
         private void Mainform_Load(object sender, EventArgs e)
         {
             try
             {
+                // Must initialize after class is created, or will get a context error
+                GlCont = new(glControl_main, Color.Black, true);
+
                 PopulateProblemTypeBox(ref ToolStripComboBox_ProblemMode, typeof(ProblemTypes));
 
                 var tmp = new CodeInputComboBox(P.CommandList);
@@ -42,7 +45,7 @@ namespace FEA_Program
 
             catch (Exception ex)
             {
-
+                MessageBox.Show($"An error occurred: {ex}");
             }
         }
 
@@ -280,8 +283,6 @@ namespace FEA_Program
 
             P.Nodes.Addforce(Forces, NodeIDs);
         }
-
-
         private void FeatureAddFormNodeSelectionChanged(object sender, List<int> SelectedNodeIDs)
         {
             P.Nodes.SelectNodes(P.Nodes.AllIDs.ToArray(), false);
@@ -309,11 +310,11 @@ namespace FEA_Program
             UC.Dock = DockStyle.Fill;
         }
 
-        private void TreeView_Main_NodeMouseClick(object sender, TreeViewEventArgs e)
+        private void TreeView_Main_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             TreeView Tree = (TreeView)sender;
 
-            if (Input.buttonPress(System.Windows.Forms.MouseButtons.Left))
+            if (Input.buttonPress(MouseButtons.Left))
             {
                 // If e.Node.Level = 1 Then
                 // Dim FirstLevel As String = e.Node.FullPath.Split("\").First()
@@ -345,10 +346,9 @@ namespace FEA_Program
             }
 
             // End If
-            else if (Input.buttonDown(System.Windows.Forms.MouseButtons.Right))
+            else if (Input.buttonDown(MouseButtons.Right))
             {
             }
-
         }
 
         private void ToolStripMenuItem2_Click(object sender, EventArgs e)
@@ -359,7 +359,7 @@ namespace FEA_Program
         }
 
 
-        private void ToolStripButton1_Click(object sender, EventArgs e)
+        private void ToolStripButtonSolve_Click(object sender, EventArgs e)
         {
 
             var NodeDOFS = new Dictionary<int, int>();
@@ -388,5 +388,7 @@ namespace FEA_Program
             MessageBox.Show(string.Join(",", outputstr1));
             MessageBox.Show(string.Join(",", outputstr2));
         }
+
+
     }
 }

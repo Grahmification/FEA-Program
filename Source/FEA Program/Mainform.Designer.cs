@@ -40,7 +40,7 @@
             ToolStripButton_AddMaterial = new ToolStripButton();
             ToolStripButton_AddElement = new ToolStripButton();
             ToolStripButton_AddNodeForce = new ToolStripButton();
-            ToolStripButton1 = new ToolStripButton();
+            ToolStripButton_Solve = new ToolStripButton();
             StatusStrip_Lower = new StatusStrip();
             ToolStripStatusLabel_Trans = new ToolStripStatusLabel();
             ToolStripStatusLabel_Rot = new ToolStripStatusLabel();
@@ -50,10 +50,10 @@
             TabPage1 = new TabPage();
             TreeView_Main = new TreeView();
             TabPage2 = new TabPage();
+            glControl_main = new OpenTK.GLControl.GLControl();
             ContextMenuStrip_TreeView = new ContextMenuStrip(components);
             ToolStripMenuItem1 = new ToolStripMenuItem();
             ToolStripMenuItem2 = new ToolStripMenuItem();
-            glControl_main = new OpenTK.GLControl.GLControl();
             ToolStrip_Upper.SuspendLayout();
             StatusStrip_Lower.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SplitContainer_Main).BeginInit();
@@ -67,7 +67,7 @@
             // 
             // ToolStrip_Upper
             // 
-            ToolStrip_Upper.Items.AddRange(new ToolStripItem[] { ToolStripDropDownButton_File, ToolStripButton_Addnode, ToolStripComboBox_ProblemMode, ToolStripButton_AddMaterial, ToolStripButton_AddElement, ToolStripButton_AddNodeForce, ToolStripButton1 });
+            ToolStrip_Upper.Items.AddRange(new ToolStripItem[] { ToolStripDropDownButton_File, ToolStripButton_Addnode, ToolStripComboBox_ProblemMode, ToolStripButton_AddMaterial, ToolStripButton_AddElement, ToolStripButton_AddNodeForce, ToolStripButton_Solve });
             ToolStrip_Upper.Location = new Point(0, 0);
             ToolStrip_Upper.Name = "ToolStrip_Upper";
             ToolStrip_Upper.Size = new Size(968, 25);
@@ -87,6 +87,7 @@
             ToolStripButton_Addnode.Name = "ToolStripButton_Addnode";
             ToolStripButton_Addnode.Size = new Size(65, 22);
             ToolStripButton_Addnode.Text = "Add Node";
+            ToolStripButton_Addnode.Click += ToolStripButton_Addnode_Click;
             // 
             // ToolStripComboBox_ProblemMode
             // 
@@ -94,6 +95,7 @@
             ToolStripComboBox_ProblemMode.DropDownStyle = ComboBoxStyle.DropDownList;
             ToolStripComboBox_ProblemMode.Name = "ToolStripComboBox_ProblemMode";
             ToolStripComboBox_ProblemMode.Size = new Size(140, 25);
+            ToolStripComboBox_ProblemMode.SelectedIndexChanged += ToolStripComboBox_ProblemMode_SelectedIndexChanged;
             // 
             // ToolStripButton_AddMaterial
             // 
@@ -101,6 +103,7 @@
             ToolStripButton_AddMaterial.Name = "ToolStripButton_AddMaterial";
             ToolStripButton_AddMaterial.Size = new Size(79, 22);
             ToolStripButton_AddMaterial.Text = "Add Material";
+            ToolStripButton_AddMaterial.Click += ToolStripButton_AddMaterial_Click;
             // 
             // ToolStripButton_AddElement
             // 
@@ -108,6 +111,7 @@
             ToolStripButton_AddElement.Name = "ToolStripButton_AddElement";
             ToolStripButton_AddElement.Size = new Size(79, 22);
             ToolStripButton_AddElement.Text = "Add Element";
+            ToolStripButton_AddElement.Click += ToolStripButton_AddElement_Click;
             // 
             // ToolStripButton_AddNodeForce
             // 
@@ -115,14 +119,16 @@
             ToolStripButton_AddNodeForce.Name = "ToolStripButton_AddNodeForce";
             ToolStripButton_AddNodeForce.Size = new Size(65, 22);
             ToolStripButton_AddNodeForce.Text = "Add Force";
+            ToolStripButton_AddNodeForce.Click += ToolStripButton_AddNodeForce_Click;
             // 
-            // ToolStripButton1
+            // ToolStripButton_Solve
             // 
-            ToolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            ToolStripButton1.ImageTransparentColor = Color.Magenta;
-            ToolStripButton1.Name = "ToolStripButton1";
-            ToolStripButton1.Size = new Size(23, 22);
-            ToolStripButton1.Text = "ToolStripButton1";
+            ToolStripButton_Solve.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            ToolStripButton_Solve.ImageTransparentColor = Color.Magenta;
+            ToolStripButton_Solve.Name = "ToolStripButton_Solve";
+            ToolStripButton_Solve.Size = new Size(23, 22);
+            ToolStripButton_Solve.Text = "ToolStripButton1";
+            ToolStripButton_Solve.Click += ToolStripButtonSolve_Click;
             // 
             // StatusStrip_Lower
             // 
@@ -215,6 +221,7 @@
             TreeView_Main.Nodes.AddRange(new TreeNode[] { treeNode5, treeNode6, treeNode7, treeNode8 });
             TreeView_Main.Size = new Size(174, 379);
             TreeView_Main.TabIndex = 1;
+            TreeView_Main.NodeMouseClick += TreeView_Main_NodeMouseClick;
             // 
             // TabPage2
             // 
@@ -226,6 +233,20 @@
             TabPage2.TabIndex = 1;
             TabPage2.Text = "TabPage2";
             TabPage2.UseVisualStyleBackColor = true;
+            // 
+            // glControl_main
+            // 
+            glControl_main.API = OpenTK.Windowing.Common.ContextAPI.OpenGL;
+            glControl_main.APIVersion = new Version(2, 1, 0, 0);
+            glControl_main.Dock = DockStyle.Fill;
+            glControl_main.Flags = OpenTK.Windowing.Common.ContextFlags.Default;
+            glControl_main.IsEventDriven = true;
+            glControl_main.Location = new Point(0, 0);
+            glControl_main.Name = "glControl_main";
+            glControl_main.Profile = OpenTK.Windowing.Common.ContextProfile.Any;
+            glControl_main.SharedContext = null;
+            glControl_main.Size = new Size(773, 407);
+            glControl_main.TabIndex = 0;
             // 
             // ContextMenuStrip_TreeView
             // 
@@ -244,20 +265,6 @@
             ToolStripMenuItem2.Name = "ToolStripMenuItem2";
             ToolStripMenuItem2.Size = new Size(107, 22);
             ToolStripMenuItem2.Text = "Delete";
-            // 
-            // glControl_main
-            // 
-            glControl_main.API = OpenTK.Windowing.Common.ContextAPI.OpenGL;
-            glControl_main.APIVersion = new Version(2, 1, 0, 0);
-            glControl_main.Dock = DockStyle.Fill;
-            glControl_main.Flags = OpenTK.Windowing.Common.ContextFlags.Default;
-            glControl_main.IsEventDriven = true;
-            glControl_main.Location = new Point(0, 0);
-            glControl_main.Name = "glControl_main";
-            glControl_main.Profile = OpenTK.Windowing.Common.ContextProfile.Any;
-            glControl_main.SharedContext = null;
-            glControl_main.Size = new Size(773, 407);
-            glControl_main.TabIndex = 0;
             // 
             // Mainform
             // 
@@ -306,7 +313,7 @@
         internal ToolStripMenuItem ToolStripMenuItem1;
         internal ToolStripMenuItem ToolStripMenuItem2;
         internal ToolStripButton ToolStripButton_AddNodeForce;
-        internal ToolStripButton ToolStripButton1;
+        internal ToolStripButton ToolStripButton_Solve;
         private OpenTK.GLControl.GLControl glControl_main;
     }
 }

@@ -58,6 +58,7 @@
             Button_Accept.TabIndex = 1;
             Button_Accept.Text = "Y";
             Button_Accept.UseVisualStyleBackColor = true;
+            Button_Accept.Click += ButtonAccept_Click;
             // 
             // Button_Cancel
             // 
@@ -70,6 +71,7 @@
             Button_Cancel.TabIndex = 2;
             Button_Cancel.Text = "N";
             Button_Cancel.UseVisualStyleBackColor = true;
+            Button_Cancel.Click += ButtonAccept_Click;
             // 
             // Label2
             // 
@@ -93,6 +95,7 @@
             CheckedListBox_ApplyNodes.Name = "CheckedListBox_ApplyNodes";
             CheckedListBox_ApplyNodes.Size = new Size(248, 400);
             CheckedListBox_ApplyNodes.TabIndex = 4;
+            CheckedListBox_ApplyNodes.MouseUp += CheckedListBox_ApplyNodes_MouseUp;
             // 
             // AddNodeForceControl
             // 
@@ -106,6 +109,7 @@
             Margin = new Padding(4, 3, 4, 3);
             Name = "AddNodeForceControl";
             Size = new Size(265, 493);
+            KeyDown += UserControl_AddElement_KeyDown;
             ResumeLayout(false);
             PerformLayout();
         }

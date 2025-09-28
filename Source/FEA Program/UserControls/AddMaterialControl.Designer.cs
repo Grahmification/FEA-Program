@@ -61,6 +61,7 @@
             Button_Accept.TabIndex = 1;
             Button_Accept.Text = "Y";
             Button_Accept.UseVisualStyleBackColor = true;
+            Button_Accept.Click += ButtonAccept_Click;
             // 
             // Button_Cancel
             // 
@@ -73,6 +74,7 @@
             Button_Cancel.TabIndex = 2;
             Button_Cancel.Text = "N";
             Button_Cancel.UseVisualStyleBackColor = true;
+            Button_Cancel.Click += ButtonAccept_Click;
             // 
             // Label2
             // 
@@ -94,6 +96,7 @@
             TextBox_Name.Name = "TextBox_Name";
             TextBox_Name.Size = new Size(163, 23);
             TextBox_Name.TabIndex = 5;
+            TextBox_Name.TextChanged += TextBox_Name_TextChanged;
             // 
             // Label5
             // 
@@ -131,6 +134,7 @@
             Margin = new Padding(4, 3, 4, 3);
             Name = "AddMaterialControl";
             Size = new Size(227, 436);
+            KeyDown += UserControl_AddElement_KeyDown;
             ResumeLayout(false);
             PerformLayout();
         }

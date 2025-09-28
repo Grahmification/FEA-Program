@@ -6,15 +6,16 @@ namespace FEA_Program.UserControls
     internal partial class AddNodeForceControl : UserControl
     {
         private int _DOFs = -1;
-        private string[] _DOFNames = new[] { "X", "Y", "Z" };
+        private string[] _DOFNames = ["X", "Y", "Z"];
         private List<Node> _Nodes;
 
-        private int _YIncrement = 50;
-        private int[] _FirstLabelPos = new[] { 4, 46 };
-        private int[] _FirstTextBoxPos = new[] { 6, 66 };
+        private const int _YIncrement = 40;
+        private const int _YStart = 46;
+        private int[] _FirstLabelPos = [4, _YStart];
+        private int[] _FirstTextBoxPos = [6, _YStart + 20];
 
-        private List<Label> _Labels = new List<Label>();
-        private List<NumericalInputTextBox> _TxtBoxes = new List<NumericalInputTextBox>();
+        private List<Label> _Labels = [];
+        private List<NumericalInputTextBox> _TxtBoxes = [];
 
 
         public event NodeForceAddFormSuccessEventHandler? NodeForceAddFormSuccess;
@@ -35,36 +36,46 @@ namespace FEA_Program.UserControls
 
             // -------------------- add force component textboxes ------------------
 
-            for (int I = 0, loopTo = NodeDOFs - 1; I <= loopTo; I++)
+            for (int i = 0; i <= NodeDOFs - 1; i++)
             {
                 // -------------------- add label ------------------
                 var LB = new Label();
 
-                if (I < _DOFNames.Length)
-                {
-                    LB.Text = _DOFNames[I] + " Component (N)";
-                }
-                else
-                {
-                    LB.Text = "#";
-                } // handles potential error case where names run out
-
+                // handles potential error case where names run out
+                LB.Text = (i < _DOFNames.Length) ? $"{_DOFNames[i]} Component (N)" : "#";
                 LB.Width = 100;
                 LB.Height = 13;
                 LB.Anchor = AnchorStyles.Left | AnchorStyles.Top;
-                LB.Location = new Point(_FirstLabelPos[0], _FirstLabelPos[1] + _YIncrement * I);
+                LB.Location = new Point(_FirstLabelPos[0], _FirstLabelPos[1] + _YIncrement * i);
 
                 _Labels.Add(LB);
                 this.Controls.Add(LB);
 
                 // -------------------- add textbox ------------------
 
-                var txt = new NumericalInputTextBox(100, new Point(_FirstTextBoxPos[0], _FirstTextBoxPos[1] + _YIncrement * I), Units.DataUnitType.Force, Units.AllUnits.N);
+                var txt = new NumericalInputTextBox(100, new Point(_FirstTextBoxPos[0], _FirstTextBoxPos[1] + _YIncrement * i), Units.DataUnitType.Force, Units.AllUnits.N);
 
-                txt.Tag = I;
+                txt.Tag = i;
                 _TxtBoxes.Add(txt);
                 this.Controls.Add(txt);
             }
+
+            // ----------------- Move Checklist down -----------------------
+
+            CheckedListBox_ApplyNodes.Location = new Point(CheckedListBox_ApplyNodes.Location.X, CheckedListBox_ApplyNodes.Location.Y + _YIncrement * _DOFs);
+            CheckedListBox_ApplyNodes.Height -= _YIncrement * _DOFs;
+
+            Label2.Location = new Point(Label2.Location.X, Label2.Location.Y + _YIncrement * _DOFs);
+
+            // ------------------ populate node checklist --------------------
+
+            foreach (Node Node in _Nodes)
+            {
+                string text = $"{Node.ID} - ({string.Join(",", Node.Coords_mm)})";
+                CheckedListBox_ApplyNodes.Items.Add(text);
+            }
+
+            ValidateEntry();
         }
 
         private void ButtonAccept_Click(object sender, EventArgs e)
@@ -97,36 +108,29 @@ namespace FEA_Program.UserControls
                 MessageBox.Show("Error adding force: " + ex.Message);
             }
         }
-        private void ValidateEntry(object sender, EventArgs e)
+        private void UserControl_AddElement_KeyDown(object sender, KeyEventArgs e)
         {
-            try
+            if (e.KeyData == Keys.Enter & Button_Accept.Enabled)
             {
-                if (CheckedListBox_ApplyNodes.CheckedItems.Count == 0) // need to select at least 1 node to add
-                {
-                    throw new Exception();
-                }
-
-                Button_Accept.Enabled = true; // if this works for all then everything is ok
-            }
-            catch (Exception)
-            {
-                Button_Accept.Enabled = false;
+                Button_Accept.PerformClick();
             }
         }
-
-        private void CheckedListBox_ApplyNodes_Click(object sender, EventArgs e)
+        private void CheckedListBox_ApplyNodes_MouseUp(object sender, MouseEventArgs e)
         {
             try
             {
                 var SelectedNodeIDs = GetCheckedListBoxNodeIds();
 
                 NodeSelectionUpdated?.Invoke(this, SelectedNodeIDs);
+
+                ValidateEntry();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error occurred when attempting to highlight selected node.");
             }
         }
+
         private List<int> GetCheckedListBoxNodeIds()
         {
             var SelectedNodeIDs = new List<int>();
@@ -142,12 +146,20 @@ namespace FEA_Program.UserControls
 
             return SelectedNodeIDs;
         }
-
-        private void UserControl_AddElement_KeyDown(object sender, KeyEventArgs e)
+        private void ValidateEntry()
         {
-            if (e.KeyData == Keys.Enter & Button_Accept.Enabled)
+            try
             {
-                Button_Accept.PerformClick();
+                if (CheckedListBox_ApplyNodes.CheckedItems.Count == 0) // need to select at least 1 node to add
+                {
+                    throw new Exception();
+                }
+
+                Button_Accept.Enabled = true; // if this works for all then everything is ok
+            }
+            catch (Exception)
+            {
+                Button_Accept.Enabled = false;
             }
         }
     }

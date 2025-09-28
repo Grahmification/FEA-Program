@@ -60,6 +60,7 @@
             Button_Accept.TabIndex = 1;
             Button_Accept.Text = "Y";
             Button_Accept.UseVisualStyleBackColor = true;
+            Button_Accept.Click += ButtonAccept_Click;
             // 
             // Button_Cancel
             // 
@@ -72,6 +73,7 @@
             Button_Cancel.TabIndex = 2;
             Button_Cancel.Text = "N";
             Button_Cancel.UseVisualStyleBackColor = true;
+            Button_Cancel.Click += ButtonAccept_Click;
             // 
             // Label2
             // 
@@ -107,6 +109,7 @@
             Button_FixAll.TabIndex = 6;
             Button_FixAll.Text = "Fix All";
             Button_FixAll.UseVisualStyleBackColor = true;
+            Button_FixAll.Click += Button_FixFloat_Click;
             // 
             // Button_UnfixAll
             // 
@@ -118,6 +121,7 @@
             Button_UnfixAll.TabIndex = 7;
             Button_UnfixAll.Text = "Unfix All";
             Button_UnfixAll.UseVisualStyleBackColor = true;
+            Button_UnfixAll.Click += Button_FixFloat_Click;
             // 
             // AddNodeControl
             // 

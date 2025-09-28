@@ -6,15 +6,15 @@ namespace FEA_Program.UserControls
     internal partial class AddNodeControl : UserControl
     {
         private int _DOFs = -1;
-        private string[] _DOFNames = new[] { "X", "Y", "Z" };
+        private string[] _DOFNames = ["X", "Y", "Z"];
 
         private int _YIncrement = 25;
         private int[] _FirstLabelPos;
         private int[] _FirstTextBoxPos;
         private int[] _FirstCheckBoxPos;
 
-        private List<NumericalInputTextBox> _TxtBoxes = new List<NumericalInputTextBox>();
-        private List<CheckBox> _ChkBoxes = new List<CheckBox>();
+        private List<NumericalInputTextBox> _TxtBoxes = [];
+        private List<CheckBox> _ChkBoxes = [];
 
         public event NodeAddFormSuccessEventHandler? NodeAddFormSuccess;
 
@@ -52,12 +52,11 @@ namespace FEA_Program.UserControls
 
                 // ---------------- add textbox ---------------------
                 var txt = new NumericalInputTextBox(100, new Point(_FirstTextBoxPos[0], _FirstTextBoxPos[1] + _YIncrement * I), Units.DataUnitType.Length, Units.AllUnits.mm);
-                // txt.Text = "0.000"
-                // txt.Anchor = AnchorStyles.Left Or AnchorStyles.Top Or AnchorStyles.Right
-                // txt.Location = New Point(_FirstTextBoxPos(0), _FirstTextBoxPos(1) + _YIncrement * I)
                 this.Controls.Add(txt);
                 txt.Tag = I;
+                txt.TextChanged += OnTextFieldChanged;
                 _TxtBoxes.Add(txt);
+
 
                 // AddHandler txt.TextChanged, AddressOf ValidateEntry
                 // AddHandler txt.MouseClick, AddressOf TextBox_MouseClick
@@ -77,6 +76,7 @@ namespace FEA_Program.UserControls
                 Button_FixAll.Location = new Point(Button_FixAll.Location.X, Button_FixAll.Location.Y + _YIncrement);
                 Button_UnfixAll.Location = new Point(Button_UnfixAll.Location.X, Button_UnfixAll.Location.Y + _YIncrement);
 
+                ValidateEntry();
             }
         }
 
@@ -165,42 +165,35 @@ namespace FEA_Program.UserControls
             }
             this.Dispose();
         }
-
         private void Button_FixFloat_Click(object sender, EventArgs e)
         {
             try
             {
-                Button btn = (Button)sender;
+                // The boolean condition determines the value to assign to Ck.Checked.
+                bool isFixAll = object.ReferenceEquals((Button)sender, Button_FixAll);
 
-                if (object.ReferenceEquals(sender, Button_FixAll))
+                foreach (CheckBox Ck in _ChkBoxes)
                 {
-                    foreach (CheckBox Ck in _ChkBoxes)
-                        Ck.Checked = true;
-                }
-                else
-                {
-                    foreach (CheckBox Ck in _ChkBoxes)
-                        Ck.Checked = false;
+                    Ck.Checked = isFixAll;
                 }
             }
             catch (Exception ex)
             {
-
+                
             }
         }
+        private void OnTextFieldChanged(object? sender, EventArgs e)
+        {
+            ValidateEntry();
+        }
 
-        // Private Sub TextBox_MouseClick(sender As Object, e As MouseEventArgs)
-        // Dim sendtxt As TextBox = sender
-        // sendtxt.SelectAll()
-        // End Sub
-
-        private void ValidateEntry(object sender, EventArgs e)
+        private void ValidateEntry()
         {
             try
             {
-                foreach (TextBox txt in _TxtBoxes)
+                foreach (NumericalInputTextBox txt in _TxtBoxes)
                 {
-                    double tmp = double.Parse(txt.Text);
+                    double value = txt.Value;
                 }
 
                 Button_Accept.Enabled = true; // if this works for all then everything is ok
