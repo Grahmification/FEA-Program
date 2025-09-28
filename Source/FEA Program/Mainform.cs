@@ -55,7 +55,7 @@ namespace FEA_Program
             foreach (NodeDrawable N in P.Nodes.Nodelist)
                 N.Draw();
 
-            foreach (IElement E in P.Elements.Elemlist)
+            foreach (IElementDrawable E in P.Elements.Elemlist)
             {
                 var nodeCoords = new List<double[]>();
                 foreach (int NodeID in P.Connect.ElementNodes(E.ID))

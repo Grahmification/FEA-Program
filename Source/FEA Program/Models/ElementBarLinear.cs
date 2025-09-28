@@ -1,6 +1,5 @@
 ﻿using MathNet.Numerics.LinearAlgebra.Double;
 using System.Reflection;
-using OpenTK.Graphics.OpenGL;
 
 namespace FEA_Program.Models
 {
@@ -123,9 +122,8 @@ namespace FEA_Program.Models
             return output;
         }
 
-        public ElementBarLinear(double Area, int ID, int Mat = -1) : base(System.Drawing.Color.Green, ID, Mat)
+        public ElementBarLinear(double Area, int ID, int Mat = -1) : base(ID, Mat)
         {
-
             _Area = Area;
         }
 
@@ -171,47 +169,5 @@ namespace FEA_Program.Models
             _BodyForce = ForcePerLength[0, 0];
             InvalidateSolution();
         }
-        public void Draw(List<double[]> GblNodeCoords)
-        {
-
-            if (GblNodeCoords.Count != NumOfNodes)
-            {
-                throw new Exception("Wrong number of Nodes input to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
-
-            GL.LineWidth(2);
-
-            GL.Begin(PrimitiveType.Lines);
-
-            if (NodeDOFs == 1)
-            {
-                for (int i = 0, loopTo = NumOfNodes - 1; i <= loopTo; i++)
-                {
-                    GL.Color3(_Color[i]);
-                    GL.Vertex3(GblNodeCoords[i][0], 0, 0);
-                }
-            }
-            else if (NodeDOFs == 2)
-            {
-                for (int i = 0, loopTo2 = NumOfNodes - 1; i <= loopTo2; i++)
-                {
-                    GL.Color3(_Color[i]);
-                    GL.Vertex3(GblNodeCoords[i][0], GblNodeCoords[i][1], 0);
-                }
-            }
-            else
-            {
-                for (int i = 0, loopTo1 = NumOfNodes - 1; i <= loopTo1; i++)
-                {
-                    GL.Color3(_Color[i]);
-                    GL.Vertex3(GblNodeCoords[i][0], GblNodeCoords[i][1], GblNodeCoords[i][2]);
-                }
-            }
-
-            GL.End();
-
-            GL.LineWidth(1);
-        }
-
     }
 }

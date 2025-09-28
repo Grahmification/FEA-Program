@@ -18,6 +18,5 @@ namespace FEA_Program.Models
         void SortNodeOrder(ref List<int> NodeIDs, List<double[]> NodeCoords);
         void SetBodyForce(DenseMatrix ForcePerVol);
         void SetTractionForce(DenseMatrix ForcePerLength);
-        void Draw(List<double[]> GblNodeCoords);
     }
 }

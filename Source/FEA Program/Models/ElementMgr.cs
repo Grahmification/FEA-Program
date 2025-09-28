@@ -1,14 +1,15 @@
-﻿using MathNet.Numerics.LinearAlgebra.Double;
+﻿using FEA_Program.Drawable;
+using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
 {
     internal class ElementMgr
     {
-        private Dictionary<int, IElement> _Bar1Elements = new Dictionary<int, IElement>(); // reference elements by ID
+        private Dictionary<int, IElementDrawable> _Bar1Elements = new(); // reference elements by ID
 
         public event ElementListChangedEventHandler? ElementListChanged;
 
-        public delegate void ElementListChangedEventHandler(Dictionary<int, IElement> ElemList); // Length of Elementlist has changed
+        public delegate void ElementListChangedEventHandler(Dictionary<int, IElementDrawable> ElemList); // Length of Elementlist has changed
         public event ElementChangedEventHandler? ElementChanged;
 
         public delegate void ElementChangedEventHandler(int ID); // Element has changed such that list needs to be updated & screen redrawn
@@ -20,7 +21,7 @@ namespace FEA_Program.Models
         public delegate void ElementAddedEventHandler(int ElemID, List<int> NodeIDs, Type Type); // dont use for redrawing lists or screen
         public event ElementDeletedEventHandler? ElementDeleted;
 
-        public delegate void ElementDeletedEventHandler(int ElemID, IElement Type); // dont use for redrawing lists or screen
+        public delegate void ElementDeletedEventHandler(int ElemID, IElementDrawable Type); // dont use for redrawing lists or screen
 
         public static int NumOfNodes(Type ElemType)
         {
@@ -31,7 +32,11 @@ namespace FEA_Program.Models
                         return 2;
                         break;
                     }
-
+                case var @case when @case == typeof(ElementBarLinearDrawable):
+                    {
+                        return 2;
+                        break;
+                    }
                 default:
                     {
                         return default;
@@ -47,7 +52,11 @@ namespace FEA_Program.Models
                         return 1;
                         break;
                     }
-
+                case var @case when @case == typeof(ElementBarLinearDrawable):
+                    {
+                        return 1;
+                        break;
+                    }
                 default:
                     {
                         return default;
@@ -63,7 +72,11 @@ namespace FEA_Program.Models
                         return "Bar_Linear";
                         break;
                     }
-
+                case var @case when @case == typeof(ElementBarLinearDrawable):
+                    {
+                        return "Bar_Linear";
+                        break;
+                    }
                 default:
                     {
                         return null;
@@ -98,7 +111,7 @@ namespace FEA_Program.Models
         }
 
 
-        public List<IElement> Elemlist => _Bar1Elements.Values.ToList();
+        public List<IElementDrawable> Elemlist => _Bar1Elements.Values.ToList();
         public List<int> AllIDs
         {
             get
@@ -134,7 +147,7 @@ namespace FEA_Program.Models
 
         public void Add(Type Type, List<int> NodeIDs, double[] ElementArgs, int Mat = -1)
         {
-            IElement newElem = null;
+            IElementDrawable newElem = null;
             int newElemID = CreateId();
 
             // ------------------ Determine type of element ----------------------
@@ -144,7 +157,7 @@ namespace FEA_Program.Models
 
                 if (ElementArgs[0] > 0d)
                 {
-                    newElem = new ElementBarLinear(ElementArgs[0], newElemID, Mat);
+                    newElem = new ElementBarLinearDrawable(ElementArgs[0], newElemID, Mat);
                 }
 
                 else
@@ -186,7 +199,7 @@ namespace FEA_Program.Models
             {
                 var tmp = _Bar1Elements[IDs[i]]; // save temporarily so we can raise event after deletion
                 _Bar1Elements.Remove(IDs[i]);
-                ElementDeleted?.Invoke(tmp.ID, (IElement)tmp.GetType());
+                ElementDeleted?.Invoke(tmp.ID, (IElementDrawable)tmp.GetType());
             }
 
             if (IDs.Count > 0)
