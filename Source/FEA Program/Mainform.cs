@@ -29,7 +29,9 @@ namespace FEA_Program
             try
             {
                 // Must initialize after class is created, or will get a context error
-                GlCont = new(glControl_main, Color.Black, true);
+                GlCont = new(glControl_main, true);
+                GlCont.DrawStuff += OnViewDrawStuff;
+                GlCont.ViewUpdated += ViewUpdated;
 
                 PopulateProblemTypeBox(ref ToolStripComboBox_ProblemMode, typeof(ProblemTypes));
 
@@ -37,10 +39,6 @@ namespace FEA_Program
                 SplitContainer_Main.Panel2.Controls.Add(tmp);
                 tmp.Show();
                 tmp.Dock = DockStyle.Bottom;
-
-                this.GlCont.DrawStuffAfterOrientation += DrawStuff;
-                this.GlCont.DrawStuffBeforeOrientation += DrawStuffBefore;
-                this.GlCont.ViewUpdated += ViewUpdated;
             }
 
             catch (Exception ex)
@@ -49,10 +47,9 @@ namespace FEA_Program
             }
         }
 
-        public void DrawStuff(bool ThreeDimensional)
+        public void OnViewDrawStuff(object? sender, bool threeDimensional)
         {
-
-            Coord.Draw(ThreeDimensional);
+            Coord.Draw(threeDimensional);
 
             foreach (Node N in P.Nodes.Nodelist)
                 N.DrawNode(N.Coords_mm);
@@ -65,35 +62,26 @@ namespace FEA_Program
 
                 E.Draw(nodeCoords);
             }
-
-            // SpriteBatch.DrawArrow(10, New Vector3(1, 1, 1), New Vector3(1, 1, 1), True, Color.Green, 3)
-            // GL.LoadMatrix(GlCont.Orientation)
-            // Coord2.Draw(ThreeDimensional)
         }
-
-        public void DrawStuffBefore(bool ThreeDimensional)
+        public void ViewUpdated(object? sender, GLControlViewUpdatedEventArgs e)
         {
 
-        }
-
-        public void ViewUpdated(Vector3 Trans, Matrix4 rot, Vector3 zoom, bool ThreeDimensional)
-        {
-
+            var rot = e.Rotation;
             var rotationAngles = new Vector3((float)Math.Atan2(rot.M23, rot.M33), (float)Math.Atan2(-1 * rot.M31, Math.Sqrt(rot.M23 * rot.M23 + rot.M33 * rot.M33)), (float)Math.Atan2(rot.M21, rot.M11));
             rotationAngles *= (float)(180f / Math.PI);
 
-            if (ThreeDimensional)
+            if (e.ThreeDimensional)
             {
-                ToolStripStatusLabel_Trans.Text = "(X: " + Math.Round(Trans.X, 1) + ", Y:" + Math.Round(Trans.Y, 1) + ", Z:" + Math.Round(Trans.Z, 1) + ")";
-                ToolStripStatusLabel_Rot.Text = "(RX: " + Math.Round(rotationAngles.X, 1) + ", RY:" + Math.Round(rotationAngles.Y, 1) + ", RZ:" + Math.Round(rotationAngles.Z, 1) + ")";
-                ToolStripStatusLabel_Zoom.Text = "(Zoom: " + Math.Round(zoom.X, 1) + ")";
+                ToolStripStatusLabel_Trans.Text = $"(X: {e.Translation.X:F1}, Y: {e.Translation.Y:F1}, Z: {e.Translation.Z:F1})";
+                ToolStripStatusLabel_Rot.Text = $"(RX: {rotationAngles.X:F1}, RY: {rotationAngles.Y:F1}, RZ: {rotationAngles.Z:F1})";
             }
             else
             {
-                ToolStripStatusLabel_Trans.Text = "(X: " + Math.Round(Trans.X, 1) + ", Y:" + Math.Round(Trans.Y, 1) + ")";
+                ToolStripStatusLabel_Trans.Text = $"(X: {e.Translation.X:F1}, Y: {e.Translation.Y:F1})";
                 ToolStripStatusLabel_Rot.Text = "";
-                ToolStripStatusLabel_Zoom.Text = "(Zoom: " + Math.Round(zoom.X, 1) + ")";
             }
+
+            ToolStripStatusLabel_Zoom.Text = $"(Zoom: {e.Zoom:F1})";
         }
 
 
@@ -314,7 +302,7 @@ namespace FEA_Program
         {
             TreeView Tree = (TreeView)sender;
 
-            if (Input.buttonPress(MouseButtons.Left))
+            if (InputManager.ButtonPressOccurred(MouseButtons.Left))
             {
                 // If e.Node.Level = 1 Then
                 // Dim FirstLevel As String = e.Node.FullPath.Split("\").First()
@@ -346,7 +334,7 @@ namespace FEA_Program
             }
 
             // End If
-            else if (Input.buttonDown(MouseButtons.Right))
+            else if (InputManager.IsButtonDown(MouseButtons.Right))
             {
             }
         }
@@ -388,7 +376,5 @@ namespace FEA_Program
             MessageBox.Show(string.Join(",", outputstr1));
             MessageBox.Show(string.Join(",", outputstr2));
         }
-
-
     }
 }

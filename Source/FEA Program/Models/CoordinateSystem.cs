@@ -21,7 +21,7 @@ namespace FEA_Program.Models
         {
             Matrix4 xform = Matrix4.CreateTranslation(new Vector3((float)(originX / _scale), (float)(originY / _scale), (float)(originZ / _scale)));
             xform = Matrix4.Mult(xform, Matrix4.CreateScale(_scale, _scale, _scale));
-            GL.MultMatrix(SpriteBatch.MatrixToArray(xform));
+            GL.MultMatrix(ref xform);
 
             // X Axis
             GL.Color3(SysColor);
@@ -82,7 +82,7 @@ namespace FEA_Program.Models
             xform = Matrix4.Identity;
             xform = Matrix4.Mult(xform, Matrix4.CreateScale(1f / _scale, 1f / _scale, 1f / _scale));
             xform = Matrix4.Mult(xform, Matrix4.CreateTranslation(new Vector3((float)(-originX / _scale), (float)(-originY / _scale), (float)(-originZ / _scale))));
-            GL.MultMatrix(SpriteBatch.MatrixToArray(xform));
+            GL.MultMatrix(ref xform);
         }
     }
 }

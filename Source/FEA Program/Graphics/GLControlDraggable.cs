@@ -5,26 +5,17 @@ namespace FEA_Program.Graphics
 {
     internal class GLControlDraggable
     {
-
-        private Color _backcolor;
-        private Graphics.View _view = new();
-        private Matrix4 _Orientation = Matrix4.Identity;
-
-        public event DrawStuffBeforeOrientationEventHandler? DrawStuffBeforeOrientation;
-
-        public delegate void DrawStuffBeforeOrientationEventHandler(bool ThreeDimensional);
-        public event ViewUpdatedEventHandler? ViewUpdated;
-
-        public delegate void ViewUpdatedEventHandler(Vector3 Trans, Matrix4 rot, Vector3 zoom, bool ThreeDimensional);
-        public event DrawStuffAfterOrientationEventHandler? DrawStuffAfterOrientation;
-
-        public delegate void DrawStuffAfterOrientationEventHandler(bool ThreeDimensional);
+        private GLView _cameraView = new();
 
         private double _MouseRotMultiplier = 0.05d;
         private double _MouseTransMultiplier = 0.3d;
         private double _MouseZoomMultiplier = 0.05d;
 
         private bool _ThreeDimensional = false; // if false sets viewing to 2D style
+
+
+        public event EventHandler<GLControlViewUpdatedEventArgs>? ViewUpdated;
+        public event EventHandler<bool>? DrawStuff;
 
         /// <summary>
         /// The control managed by this class
@@ -40,75 +31,66 @@ namespace FEA_Program.Graphics
             set
             {
                 _ThreeDimensional = value;
-                _view = new(); // reset the view
+                _cameraView = new(); // reset the view
                 SubControl.Invalidate();
             }
         }
 
-        public GLControlDraggable(GLControl subControl, Color BackColor, bool ThreeDimensional)
+        public GLControlDraggable(GLControl subControl, bool threeDimensional)
         {
-            _backcolor = BackColor;
-            _ThreeDimensional = ThreeDimensional;
+            _ThreeDimensional = threeDimensional;
 
             SubControl = subControl;
-            Input.Initialize(SubControl);
+            InputManager.Initialize(SubControl);
 
             SubControl.MouseMove += OnMouseMove;
             SubControl.MouseWheel += OnMouseWheel;
             SubControl.Paint += OnPaint;
-
-            OnPaint(this, default);
+            SubControl.Resize += OnResize;
         }
 
         private void OnMouseMove(object? sender, MouseEventArgs e)
         {
-            if (Input.buttonDown(System.Windows.Forms.MouseButtons.Left)) // screen translation
+            if (InputManager.IsButtonDown(MouseButtons.Left)) // screen translation
             {
-                var mousevector = Input.MouseLastVector(e.X, e.Y);
-                _view.SetOrientation_Relative(new Vector3((float)(mousevector.X * _MouseTransMultiplier), (float)(mousevector.Y * -_MouseTransMultiplier), 0), Matrix4.Identity, Vector3.Zero, true);
-
-                SubControl.Invalidate();
+                var mousevector = InputManager.MouseLastVector(e.X, e.Y);
+                _cameraView.SetOrientationRelative(new Vector3((float)(mousevector.X * _MouseTransMultiplier), (float)(mousevector.Y * -_MouseTransMultiplier), 0), Matrix4.Identity, Vector3.Zero, true);
             }
-
-            else if (Input.buttonDown(System.Windows.Forms.MouseButtons.Right) & _ThreeDimensional) // only rotate in 3D mode
+            else if (InputManager.IsButtonDown(MouseButtons.Right) & _ThreeDimensional) // only rotate in 3D mode
             {
-                var MouseRotVector = Input.MouseLastRotationVector(e.X, e.Y);
+                var MouseRotVector = InputManager.MouseLastRotationVector(e.X, e.Y);
                 Matrix4 RotInput = Matrix4.CreateFromAxisAngle(new Vector3(MouseRotVector.Y, MouseRotVector.X, 0), (float)_MouseRotMultiplier);
-                _view.SetOrientation_Relative(Vector3.Zero, RotInput, Vector3.Zero, true);
-
-                SubControl.Invalidate();
-            }
-
-            Input.update(e.X, e.Y);
-        }
-        private void OnMouseWheel(object? sender, MouseEventArgs e)
-        {
-
-            if (e.Delta > 0)
-            {
-                _view.SetOrientation_Relative(Vector3.Zero, Matrix4.Identity, new Vector3((float)_MouseZoomMultiplier, (float)_MouseZoomMultiplier, (float)_MouseZoomMultiplier), true);
-            }
-            else
-            {
-                _view.SetOrientation_Relative(Vector3.Zero, Matrix4.Identity, new Vector3((float)-_MouseZoomMultiplier, (float)-_MouseZoomMultiplier, (float)-_MouseZoomMultiplier), true);
+                _cameraView.SetOrientationRelative(Vector3.Zero, RotInput, Vector3.Zero, true);
             }
 
             SubControl.Invalidate();
+            InputManager.Update(e.X, e.Y);
         }
+        private void OnMouseWheel(object? sender, MouseEventArgs e)
+        {
+            float zoom = (e.Delta > 0) ? 1 : -1; // Set the direction
+            zoom *= (float)_MouseZoomMultiplier;
 
+            _cameraView.SetOrientationRelative(Vector3.Zero, Matrix4.Identity, new Vector3(zoom, zoom, zoom), true);
+            SubControl.Invalidate();
+        }
         private void OnPaint(object? sender, PaintEventArgs e)
         {
-            _view.PrepCamera(SubControl.Width, SubControl.Height, _backcolor, _ThreeDimensional);
-            DrawStuffBeforeOrientation?.Invoke(_ThreeDimensional);
+            GLView.PrepCamera(SubControl.Width, SubControl.Height, ThreeDimensional);
 
-            _Orientation = _view.ApplyView();
-            ViewUpdated?.Invoke(_view.CurrentTransLation, _view.CurrentRotation, _view.CurrentZoom, _ThreeDimensional);
-            DrawStuffAfterOrientation?.Invoke(_ThreeDimensional);
+            _cameraView.ApplyView();
+
+            DrawStuff?.Invoke(this, ThreeDimensional);
+            ViewUpdated?.Invoke(this, new(_cameraView.CurrentTransLation, _cameraView.CurrentRotation, _cameraView.CurrentZoom.X, ThreeDimensional));
 
             //Finally...
             if (SubControl.Context != null)
                 SubControl.Context.SwapInterval = 1;
             SubControl.SwapBuffers(); //Takes from the 'GL' and puts into control 
+        }
+        private void OnResize(object? Sender, EventArgs e)
+        {
+            SubControl.Invalidate(); // Refresh the view
         }
     }
 }
