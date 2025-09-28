@@ -112,6 +112,9 @@ namespace FEA_Program.Models
 
         public Node(double[] coords, int[] fixity, int id, int dimension)
         {
+            ID = id;
+            Dimension = dimension;
+
             if (!ValidDimensions.Contains(dimension))
             {
                 throw new Exception($"Attempted to create element, ID <{id}> with invalid number of dimensions: {dimension}.");
@@ -120,8 +123,6 @@ namespace FEA_Program.Models
             ValidateDimension<double>(coords, MethodBase.GetCurrentMethod()?.Name ?? "");
             ValidateDimension<int>(fixity, MethodBase.GetCurrentMethod()?.Name ?? "");
 
-            ID = id;
-            Dimension = dimension;
             _Coords = coords;
             _Fixity = fixity;
             Displacement = new double[dimension];
