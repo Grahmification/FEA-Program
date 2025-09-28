@@ -125,6 +125,7 @@ namespace FEA_Program.Models
 
             _Coords = coords;
             _Fixity = fixity;
+            _Force = new double[dimension];
             Displacement = new double[dimension];
             ReactionForce = new double[dimension];
         }

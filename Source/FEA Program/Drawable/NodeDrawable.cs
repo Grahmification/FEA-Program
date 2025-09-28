@@ -32,16 +32,13 @@ namespace FEA_Program.Drawable
 
         public static void DrawNode(Node node, Color color)
         {
-            var coords = node.Coords_mm; // Always draw as mm input
+            var nodeCoords = node.Coords_mm; // Always draw as mm input
+            double[] coords = [0, 0, 0];
 
-            if (node.Dimension == 1)
+            // nodeCoords may have less than 3 items 
+            for(int i = 0; i < Math.Min(nodeCoords.Length, 3); i++)
             {
-                coords[1] = 0;
-                coords[2] = 0;
-            }
-            else if (node.Dimension == 2)
-            {
-                coords[2] = 0;
+                coords[i] = nodeCoords[i];
             }
 
             if (node.Dimension == 1 | node.Dimension == 2)
@@ -63,8 +60,18 @@ namespace FEA_Program.Drawable
         }
         public static void DrawNodeForce(Node node, Color color, bool reaction = false)
         {
-            var coords = node.Coords_mm; // Always draw as mm input
-            var force = reaction ? node.ReactionForce : node.Force;
+            var nodeCoords = node.Coords_mm; // Always draw as mm input
+            var nodeForce = reaction ? node.ReactionForce : node.Force;
+            double[] coords = [0, 0, 0];
+            double[] force = [0, 0, 0];
+
+            // nodeCoords may have less than 3 items 
+            for (int i = 0; i < Math.Min(nodeCoords.Length, 3); i++)
+            {
+                coords[i] = nodeCoords[i];
+                force[i] = nodeForce[i];
+            }
+
             double forcelength = 10.0d;
 
             if (node.Dimension == 1)
@@ -85,17 +92,18 @@ namespace FEA_Program.Drawable
         public static void DrawNodeFixity(Node node, Color color)
         {
             double squareoffset = 1.5d;
-            double[] coords = node.Coords_mm;
-            int[] fixity = node.Fixity;
 
-            if (node.Dimension == 1)
+
+            var nodeCoords = node.Coords_mm; // Always draw as mm input
+            var nodeFixity = node.Fixity;
+            double[] coords = [0, 0, 0];
+            int[] fixity = [0, 0, 0];
+
+            // nodeCoords may have less than 3 items 
+            for (int i = 0; i < Math.Min(nodeCoords.Length, 3); i++)
             {
-                coords[1] = 0;
-                coords[2] = 0;
-            }
-            else if (node.Dimension == 2)
-            {
-                coords[2] = 0;
+                coords[i] = nodeCoords[i];
+                fixity[i] = nodeFixity[i];
             }
 
             GL.Color4(color); // set drawing color
