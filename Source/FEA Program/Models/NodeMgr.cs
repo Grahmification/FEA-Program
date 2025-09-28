@@ -7,22 +7,21 @@ namespace FEA_Program.Models
 {
     internal class NodeMgr
     {
-        private Dictionary<int, NodeDrawable> _Nodes = new Dictionary<int, NodeDrawable>(); // reference nodes by ID
+        private readonly Dictionary<int, NodeDrawable> _Nodes = []; // reference nodes by ID
 
-        public event NodeListChangedEventHandler NodeListChanged;
-
+        public event NodeListChangedEventHandler? NodeListChanged;
         public delegate void NodeListChangedEventHandler(Dictionary<int, NodeDrawable> NodeList); // Length of nodelist has changed
-        public event NodeChangedEventHandler NodeChanged;
-
+        
+        public event NodeChangedEventHandler? NodeChanged;
         public delegate void NodeChangedEventHandler(List<int> IDs); // Node has changed such that list needs to be updated & screen redrawn
-        public event NodeChanged_RedrawOnlyEventHandler NodeChanged_RedrawOnly;
-
+        
+        public event NodeChanged_RedrawOnlyEventHandler? NodeChanged_RedrawOnly;
         public delegate void NodeChanged_RedrawOnlyEventHandler(); // Node has changed such that screen only needs to be redrawn
-        public event NodeAddedEventHandler NodeAdded;
-
+        
+        public event NodeAddedEventHandler? NodeAdded;
         public delegate void NodeAddedEventHandler(int NodeID, int Dimension); // dont use for redrawing lists or screen
-        public event NodeDeletedEventHandler NodeDeleted;
-
+        
+        public event NodeDeletedEventHandler? NodeDeleted;
         public delegate void NodeDeletedEventHandler(int NodeID, int Dimension); // dont use for redrawing lists or screen
 
         public List<NodeDrawable> Nodelist => _Nodes.Values.ToList();
@@ -158,7 +157,6 @@ namespace FEA_Program.Models
         }
         public void Delete(List<int> IDs)
         {
-
             foreach (int NodeID in IDs) // remove node from list
             {
                 var tmp = _Nodes[NodeID]; // needed to raise event
