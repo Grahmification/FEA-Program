@@ -181,6 +181,36 @@ namespace FEA_Program
             }
         }
 
+        private void ToolStripButtonSolve_Click(object sender, EventArgs e)
+        {
+
+            var NodeDOFS = new Dictionary<int, int>();
+            foreach (int NodeID in P.Nodes.AllIDs)
+                NodeDOFS.Add(NodeID, P.Nodes.NodeObj(NodeID).Dimension);
+
+            SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoords), NodeDOFS);
+            DenseMatrix[] output = P.Connect.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx);
+
+
+            var outputstr1 = new List<string>();
+            var outputstr2 = new List<string>();
+
+            for (int i = 0, loopTo = output[0].RowCount - 1; i <= loopTo; i++)
+            {
+                for (int j = 0, loopTo1 = output[0].ColumnCount - 1; j <= loopTo1; j++)
+                    outputstr1.Add(output[0][i, j].ToString());
+            }
+
+            for (int i = 0, loopTo2 = output[0].RowCount - 1; i <= loopTo2; i++)
+            {
+                for (int j = 0, loopTo3 = output[0].ColumnCount - 1; j <= loopTo3; j++)
+                    outputstr2.Add(output[1][i, j].ToString());
+            }
+
+            MessageBox.Show(string.Join(",", outputstr1));
+            MessageBox.Show(string.Join(",", outputstr2));
+        }
+
         private void ToolStripButton_Addnode_Click(object sender, EventArgs e)
         {
             try
@@ -188,7 +218,7 @@ namespace FEA_Program
                 var uc = new AddNodeControl(P.AvailableNodeDOFs);
                 uc.NodeAddFormSuccess += NodeAddFormSuccess;
 
-                AddUserControlToSplitCont(uc, SplitContainer_Main, 1);
+                DisplaySideBarMenuControl(uc);
             }
             catch (Exception ex)
             {
@@ -208,7 +238,7 @@ namespace FEA_Program
                 var UC = new AddMaterialControl(typeof(MaterialType));
                 UC.MatlAddFormSuccess += MatlAddFormSuccess;
 
-                AddUserControlToSplitCont(UC, SplitContainer_Main, 1);
+                DisplaySideBarMenuControl(UC);
             }
             catch (Exception ex)
             {
@@ -233,7 +263,7 @@ namespace FEA_Program
                 var UC = new AddElementControl(P.AvailableElements, ElementArgsList, P.Materials.MaterialList, P.Nodes.BaseNodelist);
                 UC.ElementAddFormSuccess += ElemAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
-                AddUserControlToSplitCont(UC, SplitContainer_Main, 1);
+                DisplaySideBarMenuControl(UC);
             }
             catch (Exception ex)
             {
@@ -259,7 +289,7 @@ namespace FEA_Program
                 var UC = new AddNodeForceControl(P.AvailableNodeDOFs, P.Nodes.BaseNodelist);
                 UC.NodeForceAddFormSuccess += NodeForceAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
-                AddUserControlToSplitCont(UC, SplitContainer_Main, 1);
+                DisplaySideBarMenuControl(UC);
             }
             catch (Exception ex)
             {
@@ -283,23 +313,20 @@ namespace FEA_Program
             }
         }
 
-        private void AddUserControlToSplitCont(UserControl UC, SplitContainer SCont, int SPanel)
+        /// <summary>
+        /// Displays a user control on the sidebar overlaying everything else
+        /// </summary>
+        /// <param name="uc"></param>
+        private void DisplaySideBarMenuControl(UserControl uc)
         {
 
-            if (SPanel == 1)
-            {
-                SCont.Panel1.Controls.Add(UC);
-                SCont.Panel1MinSize = UC.Width;
-            }
-            else // panel 2
-            {
-                SCont.Panel2.Controls.Add(UC);
-                SCont.Panel2MinSize = UC.Width;
-            }
-
-            UC.BringToFront();
-            UC.Dock = DockStyle.Fill;
+            SplitContainer_Main.Panel1.Controls.Add(uc);
+            SplitContainer_Main.Panel1MinSize = uc.Width;
+            uc.BringToFront();
+            uc.Dock = DockStyle.Fill;
         }
+
+        // ------------------------------ Misc Events ---------------------------------
 
         private void TreeView_Main_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
@@ -339,44 +366,6 @@ namespace FEA_Program
             else if (InputManager.IsButtonDown(MouseButtons.Right))
             {
             }
-        }
-
-        private void ToolStripMenuItem2_Click(object sender, EventArgs e)
-        {
-            TreeNode Node = (TreeNode)sender;
-
-            MessageBox.Show(Node.FullPath);
-        }
-
-
-        private void ToolStripButtonSolve_Click(object sender, EventArgs e)
-        {
-
-            var NodeDOFS = new Dictionary<int, int>();
-            foreach (int NodeID in P.Nodes.AllIDs)
-                NodeDOFS.Add(NodeID, P.Nodes.NodeObj(NodeID).Dimension);
-
-            SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoords), NodeDOFS);
-            DenseMatrix[] output = P.Connect.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx);
-
-
-            var outputstr1 = new List<string>();
-            var outputstr2 = new List<string>();
-
-            for (int i = 0, loopTo = output[0].RowCount - 1; i <= loopTo; i++)
-            {
-                for (int j = 0, loopTo1 = output[0].ColumnCount - 1; j <= loopTo1; j++)
-                    outputstr1.Add(output[0][i, j].ToString());
-            }
-
-            for (int i = 0, loopTo2 = output[0].RowCount - 1; i <= loopTo2; i++)
-            {
-                for (int j = 0, loopTo3 = output[0].ColumnCount - 1; j <= loopTo3; j++)
-                    outputstr2.Add(output[1][i, j].ToString());
-            }
-
-            MessageBox.Show(string.Join(",", outputstr1));
-            MessageBox.Show(string.Join(",", outputstr2));
         }
     }
 }

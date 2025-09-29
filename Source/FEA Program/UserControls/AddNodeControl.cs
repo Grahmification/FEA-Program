@@ -3,76 +3,67 @@ using FEA_Program.Models;
 
 namespace FEA_Program.UserControls
 {
+    /// <summary>
+    /// Menu for adding new nodes. Will resize for the node DOFs
+    /// </summary>
     internal partial class AddNodeControl : UserControl
     {
-        private int _DOFs = -1;
-        private string[] _DOFNames = ["X", "Y", "Z"];
+        private readonly int _DOFs = 0;
+        private readonly string[] _DOFNames = ["X", "Y", "Z"];
 
-        private int _YIncrement = 25;
-        private int[] _FirstLabelPos;
-        private int[] _FirstTextBoxPos;
-        private int[] _FirstCheckBoxPos;
+        private readonly int _labelX = 6;
+        private readonly int _labelY = 60;
+        private readonly int _YIncrement = 25;
 
-        private List<NumericalInputTextBox> _TxtBoxes = [];
-        private List<CheckBox> _ChkBoxes = [];
+        private readonly List<NumericalInputTextBox> _TextBoxes = [];
+        private readonly List<CheckBox> _CheckBoxes = [];
 
         public event NodeAddFormSuccessEventHandler? NodeAddFormSuccess;
-
         public delegate void NodeAddFormSuccessEventHandler(AddNodeControl sender, List<double[]> Coords, List<int[]> Fixity, List<int> Dimensions);
 
-        public AddNodeControl(int NodeDOFs)
+        public AddNodeControl(int nodeDOFs)
         {
-            _FirstLabelPos = new[] { 6, 36 + _YIncrement };
-            _FirstTextBoxPos = new[] { 30, 34 + _YIncrement };
-            _FirstCheckBoxPos = new[] { 145, 32 + _YIncrement };
+            int[] _FirstLabelPos = [_labelX, _labelY];
+            int[] _FirstTextBoxPos = [_labelX + 26, _labelY - 2];
+            int[] _FirstCheckBoxPos = [_labelX + 140, _labelY - 4];
 
             InitializeComponent();
 
-            _DOFs = NodeDOFs;
+            _DOFs = nodeDOFs;
 
-            for (int I = 0, loopTo = NodeDOFs - 1; I <= loopTo; I++)
+            for (int i = 0; i < nodeDOFs; i++)
             {
                 // -------------------- add label ------------------
-                var LB = new Label();
-
-                if (I < _DOFNames.Length)
+                var LB = new Label
                 {
-                    LB.Text = _DOFNames[I];
-                }
-                else
-                {
-                    LB.Text = "#";
-                }
-
-                LB.Width = 10;
-                LB.Anchor = AnchorStyles.Left | AnchorStyles.Top;
-                LB.Location = new Point(_FirstLabelPos[0], _FirstLabelPos[1] + _YIncrement * I);
-                this.Controls.Add(LB);
-
+                    Text = i < _DOFNames.Length ? _DOFNames[i] : "#",
+                    Width = 10,
+                    Anchor = AnchorStyles.Left | AnchorStyles.Top,
+                    Location = new Point(_FirstLabelPos[0], _FirstLabelPos[1] + _YIncrement * i)
+                };
+                Controls.Add(LB);
 
                 // ---------------- add textbox ---------------------
-                var txt = new NumericalInputTextBox(100, new Point(_FirstTextBoxPos[0], _FirstTextBoxPos[1] + _YIncrement * I), Units.DataUnitType.Length, Units.AllUnits.mm);
-                this.Controls.Add(txt);
-                txt.Tag = I;
+                var txt = new NumericalInputTextBox(100, new Point(_FirstTextBoxPos[0], _FirstTextBoxPos[1] + _YIncrement * i), Units.DataUnitType.Length, Units.AllUnits.mm)
+                {
+                    Tag = i
+                };
                 txt.TextChanged += OnTextFieldChanged;
-                _TxtBoxes.Add(txt);
-
-
-                // AddHandler txt.TextChanged, AddressOf ValidateEntry
-                // AddHandler txt.MouseClick, AddressOf TextBox_MouseClick
+                _TextBoxes.Add(txt);
+                Controls.Add(txt);
 
                 // -------------- add checkbox -------------------
+                var CK = new CheckBox
+                {
+                    Checked = false,
+                    Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                    Location = new Point(_FirstCheckBoxPos[0], _FirstCheckBoxPos[1] + _YIncrement * i),
+                    Tag = i
+                };
+                _CheckBoxes.Add(CK);
+                Controls.Add(CK);
 
-                var CK = new CheckBox();
-                CK.Checked = false;
-                CK.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-                CK.Location = new Point(_FirstCheckBoxPos[0], _FirstCheckBoxPos[1] + _YIncrement * I);
-                this.Controls.Add(CK);
-                CK.Tag = I;
-                _ChkBoxes.Add(CK);
-
-                // ------------ move buttons
-
+                // ------------ move buttons down ----------------
                 Button_FixAll.Location = new Point(Button_FixAll.Location.X, Button_FixAll.Location.Y + _YIncrement);
                 Button_UnfixAll.Location = new Point(Button_UnfixAll.Location.X, Button_UnfixAll.Location.Y + _YIncrement);
 
@@ -86,34 +77,18 @@ namespace FEA_Program.UserControls
             {
                 Button sendbtn = (Button)sender;
 
-                if (object.ReferenceEquals(sendbtn, Button_Accept))
+                if (ReferenceEquals(sendbtn, Button_Accept))
                 {
                     var coords = new double[_DOFs];
                     var fixity = new int[_DOFs];
 
-                    for (int i = 0, loopTo = _DOFs - 1; i <= loopTo; i++)
+                    for (int i = 0; i < _DOFs; i++)
                     {
-                        coords[i] = _TxtBoxes[i].Value;
-
-                        if (_ChkBoxes[i].Checked)
-                        {
-                            fixity[i] = 1;
-                        }
-                        else
-                        {
-                            fixity[i] = 0;
-                        }
+                        coords[i] = _TextBoxes[i].Value;
+                        fixity[i] = _CheckBoxes[i].Checked ? 1 : 0;
                     }
 
-                    var tmpCoords = new List<double[]>();
-                    var tmpfixity = new List<int[]>();
-                    var tmpDim = new List<int>();
-
-                    tmpCoords.Add(coords);
-                    tmpfixity.Add(fixity);
-                    tmpDim.Add(_DOFs);
-
-                    NodeAddFormSuccess?.Invoke(this, tmpCoords, tmpfixity, tmpDim);
+                    NodeAddFormSuccess?.Invoke(this, [coords], [fixity], [_DOFs]);
                 }
 
                 this.Dispose();
@@ -122,62 +97,20 @@ namespace FEA_Program.UserControls
             {
                 MessageBox.Show("Error adding node: " + ex.Message);
             }
-        }
-        private void ButtonAccept_Click_OLD(object sender, EventArgs e)
-        {
-            try
-            {
-                Button sendbtn = (Button)sender;
-
-                if (object.ReferenceEquals(sendbtn, Button_Accept))
-                {
-                    var coords = new double[_DOFs];
-                    var fixity = new int[_DOFs];
-
-                    for (int i = 0, loopTo = _DOFs - 1; i <= loopTo; i++)
-                    {
-                        coords[i] = double.Parse(_TxtBoxes[i].Text) / 1000.0; // convert to m
-
-                        if (_ChkBoxes[i].Checked)
-                        {
-                            fixity[i] = 1;
-                        }
-                        else
-                        {
-                            fixity[i] = 0;
-                        }
-                    }
-
-                    var tmpCoords = new List<double[]>();
-                    var tmpfixity = new List<int[]>();
-                    var tmpDim = new List<int>();
-
-                    tmpCoords.Add(coords);
-                    tmpfixity.Add(fixity);
-                    tmpDim.Add(_DOFs);
-
-                    NodeAddFormSuccess?.Invoke(this, tmpCoords, tmpfixity, tmpDim);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error adding node:" + ex.Message);
-            }
-            this.Dispose();
-        }
+        }    
         private void Button_FixFloat_Click(object sender, EventArgs e)
         {
             try
             {
                 // The boolean condition determines the value to assign to Ck.Checked.
-                bool isFixAll = object.ReferenceEquals((Button)sender, Button_FixAll);
+                bool isFixAll = ReferenceEquals((Button)sender, Button_FixAll);
 
-                foreach (CheckBox Ck in _ChkBoxes)
+                foreach (CheckBox Ck in _CheckBoxes)
                 {
                     Ck.Checked = isFixAll;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 
             }
@@ -191,7 +124,7 @@ namespace FEA_Program.UserControls
         {
             try
             {
-                foreach (NumericalInputTextBox txt in _TxtBoxes)
+                foreach (NumericalInputTextBox txt in _TextBoxes)
                 {
                     double value = txt.Value;
                 }
@@ -203,6 +136,5 @@ namespace FEA_Program.UserControls
                 Button_Accept.Enabled = false;
             }
         }
-
     }
 }
