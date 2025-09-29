@@ -56,6 +56,11 @@
 
             MatlListChanged?.Invoke(_Materials);
         }
+        public void AddDefaultMaterials()
+        {
+            Add("Aluminum 6061-T6", 69, 0.3, 276, 210, MaterialType.Aluminum_Alloy);
+        }
+
 
         private int CreateMatlId()
         {

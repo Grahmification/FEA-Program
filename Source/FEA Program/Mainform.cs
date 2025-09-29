@@ -39,6 +39,8 @@ namespace FEA_Program
                 SplitContainer_Main.Panel2.Controls.Add(tmp);
                 tmp.Show();
                 tmp.Dock = DockStyle.Bottom;
+
+                P.Materials.AddDefaultMaterials();
             }
 
             catch (Exception ex)
