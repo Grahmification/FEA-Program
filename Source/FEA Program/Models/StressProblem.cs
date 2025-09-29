@@ -1,228 +1,116 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace FEA_Program.Models
+﻿namespace FEA_Program.Models
 {
     internal class StressProblem
     {
-        private NodeManager _Nodes;
+        public Mainform Loadedform { get; private set; }
+        public ProblemTypes ProblemType { get; private set; }
+        public NodeManager Nodes { get; private set; }
+        public ElementManager Elements { get; private set; }
+        public MaterialManager Materials { get; private set; }
+        public Connectivity Connect { get; private set; }
 
-        public virtual NodeManager Nodes
+        /// <summary>
+        /// which elements are available depending on problem type
+        /// </summary>
+        public Type[]? AvailableElements => ProblemType switch
         {
-            get { return _Nodes; }
-            set
-            {
-                if (_Nodes != null)
-                {
-                    _Nodes.NodeListChanged -= (s, e) => OnListRedrawNeeded();
-                    _Nodes.NodesChanged -= (s, e) => OnListRedrawNeeded();
-                    _Nodes.NodeChanged_RedrawOnly -= OnScreenRedrawOnlyNeeded;
-                    _Nodes.NodeDeleted -= OnNodeDeletion;
-                }
+            ProblemTypes.Bar_1D => new[] { typeof(ElementBarLinear) },
 
-                _Nodes = value;
-                if (_Nodes != null)
-                {
-                    _Nodes.NodeListChanged += (s, e) => OnListRedrawNeeded();
-                    _Nodes.NodesChanged += (s, e) => OnListRedrawNeeded();
-                    _Nodes.NodeChanged_RedrawOnly += OnScreenRedrawOnlyNeeded;
-                    _Nodes.NodeDeleted += OnNodeDeletion;
-                }
-            }
-        }
-        private ElementManager _Elements;
+            // Default case: return null
+            _ => null
+        };
 
-        public virtual ElementManager Elements
+        /// <summary>
+        /// Which node DOF should be used for given problem type
+        /// </summary>
+        public int AvailableNodeDOFs => ProblemType switch
         {
-            get { return _Elements; }
-            set
-            {
-                if (_Elements != null)
-                {
-                    _Elements.ElementListChanged -= (s, e) => OnListRedrawNeeded();
-                    _Elements.ElementChanged -= (s, e) => OnListRedrawNeeded();
-                    _Elements.ElementChanged_RedrawOnly -= OnScreenRedrawOnlyNeeded;
-                    _Elements.ElementAdded -= OnElementCreation;
-                    _Elements.ElementDeleted -= OnElementDeletion;
-                }
+            // Case for 1 DOFs
+            ProblemTypes.Bar_1D or ProblemTypes.Beam_1D => 1,
 
-                _Elements = value;
-                if (_Elements != null)
-                {
-                    _Elements.ElementListChanged += (s, e) => OnListRedrawNeeded();
-                    _Elements.ElementChanged += (s, e) => OnListRedrawNeeded();
-                    _Elements.ElementChanged_RedrawOnly += OnScreenRedrawOnlyNeeded;
-                    _Elements.ElementAdded += OnElementCreation;
-                    _Elements.ElementDeleted += OnElementDeletion;
-                }
-            }
-        }
-        private MaterialManager _Materials;
+            // Case for 3 DOFs
+            ProblemTypes.Truss_3D => 3,
 
-        public virtual MaterialManager Materials
+            // Default case (return 0)
+            _ => 0
+        };
+
+        /// <summary>
+        /// Whether the screen should be 3D based on the problem type
+        /// </summary>
+        public bool ThreeDimensional => ProblemType switch
         {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _Materials;
-            }
+            // Combine cases that return false using the 'or' pattern
+            ProblemTypes.Bar_1D or ProblemTypes.Beam_1D => false,
 
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                if (_Materials != null)
-                {
-                    _Materials.MaterialListChanged -= (s, e) => OnListRedrawNeeded();
-                }
+            // Case for true
+            ProblemTypes.Truss_3D => true,
 
-                _Materials = value;
-                if (_Materials != null)
-                {
-                    _Materials.MaterialListChanged += (s, e) => OnListRedrawNeeded();
-                }
-            }
-        }
-        private Connectivity _Connect;
+            // Default case (return false)
+            _ => false
+        };
 
-        public virtual Connectivity Connect
-        {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _Connect;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            set
-            {
-                _Connect = value;
-            }
-        }
-        public Mainform Loadedform = default;
-
-        private ProblemTypes _Type;
-
-        public Type[] AvailableElements
-        {
-            get
-            {
-                switch (_Type)
-                {
-                    case ProblemTypes.Bar_1D:
-                        {
-                            return new[] { typeof(ElementBarLinear) };
-                            break;
-                        }
-
-                    default:
-                        {
-                            return null;
-                        }
-                }
-            }
-        } // which elements are available depending on problem type
-        public int AvailableNodeDOFs
-        {
-            get
-            {
-
-                switch (_Type)
-                {
-                    case ProblemTypes.Bar_1D:
-                        {
-                            return 1;
-                            break;
-                        }
-
-                    case ProblemTypes.Beam_1D:
-                        {
-                            return 1;
-                            break;
-                        }
-                    case ProblemTypes.Truss_3D:
-                        {
-                            return 3;
-                            break;
-                        }
-
-                    default:
-                        {
-                            return default;
-                        }
-                }
-            }
-        } // which node DOF should be used for given problem type
-        public bool ThreeDimensional
-        {
-            get
-            {
-                switch (_Type)
-                {
-                    case ProblemTypes.Bar_1D:
-                        {
-                            return false;
-                        }
-
-                    case ProblemTypes.Beam_1D:
-                        {
-                            return false;
-                        }
-
-                    case ProblemTypes.Truss_3D:
-                        {
-                            return true;
-                        }
-
-                    default:
-                        {
-                            return default;
-                        }
-                }
-            }
-        } // whether the screen should be 3D based on the problem type
+        /// <summary>
+        /// Gets available command line commands
+        /// </summary>
         public Dictionary<string, List<Type>> CommandList
         {
             get
             {
-                var output = new Dictionary<string, List<Type>>();
-
                 // ------------- Add Node Command-------------
-                var tmp = new List<Type>();
+                var addNodeArgs = new List<Type>();
 
-                for (int i = 1, loopTo = AvailableNodeDOFs; i <= loopTo; i++)
-                    tmp.Add(typeof(double)); // node position
+                for (int i = 0; i < AvailableNodeDOFs; i++)
+                    addNodeArgs.Add(typeof(double)); // node position
 
-                for (int i = 1, loopTo1 = AvailableNodeDOFs; i <= loopTo1; i++)
-                    tmp.Add(typeof(bool)); // node fixity
-
-                output.Add("AddNode", tmp);
+                for (int i = 0; i < AvailableNodeDOFs; i++)
+                    addNodeArgs.Add(typeof(bool)); // node fixity
 
                 // ------------- Add Material Command-------------
-                var tmp2 = new List<Type>();
+                var addMaterialArgs = new List<Type>
+                {
+                    typeof(string),
+                    typeof(double),
+                    typeof(double),
+                    typeof(double),
+                    typeof(double),
+                    typeof(int)
+                };
 
-                tmp2.Add(typeof(string));
-                tmp2.Add(typeof(double));
-                tmp2.Add(typeof(double));
-                tmp2.Add(typeof(double));
-                tmp2.Add(typeof(double));
-                tmp2.Add(typeof(int));
-
-                output.Add("AddMaterial", tmp);
-
-                // ------------- Add Element Command-------------
-
-                return output;
+                return new Dictionary<string, List<Type>>
+                {
+                    { "AddNode", addNodeArgs },
+                    { "AddMaterial", addMaterialArgs },
+                };
             }
         }
 
         public StressProblem(Mainform form, ProblemTypes Type)
         {
             Nodes = new NodeManager();
+            Nodes.NodeListChanged += (s, e) => OnListRedrawNeeded();
+            Nodes.NodesChanged += (s, e) => OnListRedrawNeeded();
+            Nodes.NodeChanged_RedrawOnly += OnScreenRedrawOnlyNeeded;
+            Nodes.NodeDeleted += OnNodeDeletion;
+
+
             Elements = new ElementManager();
+            Elements.ElementListChanged += (s, e) => OnListRedrawNeeded();
+            Elements.ElementChanged += (s, e) => OnListRedrawNeeded();
+            Elements.ElementChanged_RedrawOnly += OnScreenRedrawOnlyNeeded;
+            Elements.ElementAdded += OnElementCreation;
+            Elements.ElementDeleted += OnElementDeletion;
+
             Materials = new MaterialManager();
+            Materials.MaterialListChanged += (s, e) => OnListRedrawNeeded();
+
             Connect = new Connectivity();
+
             Loadedform = form;
-            _Type = Type;
+            ProblemType = Type;
         }
+
+        // ---------------------- Event Handlers ----------------------------
 
         private void OnListRedrawNeeded()
         {
@@ -235,19 +123,18 @@ namespace FEA_Program.Models
         }
 
 
-        private void OnElementCreation(int ElemID, List<int> NodeIDs)
+        private void OnElementCreation(int elementID, List<int> nodeIDs)
         {
-
-            // Sort the node IDs accordingly for the given element type
             var nodes = new List<INode>();
 
-            foreach (int ID in NodeIDs)
+            foreach (int ID in nodeIDs)
                 nodes.Add(Nodes.GetNode(ID));
 
-            Elements.GetElement(ElemID).SortNodeOrder(ref nodes);
+            // Sort the node IDs accordingly for the given element type
+            Elements.GetElement(elementID).SortNodeOrder(ref nodes);
             var sortedIDs = nodes.Select(node => node.ID).ToList();
 
-            Connect.AddConnection(ElemID, sortedIDs);
+            Connect.AddConnection(elementID, sortedIDs);
         }
         private void OnElementDeletion(object? sender, IElement e)
         {
@@ -258,6 +145,8 @@ namespace FEA_Program.Models
             RemoveHangingElements(e.ID);
         }
 
+        // ---------------------- Private Helpers ----------------------------
+
         /// <summary>
         /// Deletes elements if a node is deleted and leaves one hanging
         /// </summary>
@@ -267,8 +156,6 @@ namespace FEA_Program.Models
             var ElementsToDelete = Connect.NodeElements(nodeID);
             Elements.Delete(ElementsToDelete);
         }
-
-
     }
 
     public enum ProblemTypes
