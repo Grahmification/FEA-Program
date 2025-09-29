@@ -1,4 +1,4 @@
-﻿using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
 {
@@ -144,16 +144,19 @@ namespace FEA_Program.Models
         /// Solves the FEA Problem
         /// </summary>
         /// <param name="K">The global stiffness matrix</param>
-        /// <param name="F">The global force matrix</param>
-        /// <param name="Q">The global fixity matrix</param>
+        /// <param name="F">The global force vector</param>
+        /// <param name="Q">The global fixity vector</param>
         /// <returns>The global [Displacement Vector, Reaction Force Vector]</returns>
-        public static DenseVector[] Solve(SparseMatrix K, DenseMatrix F, DenseMatrix Q)
+        public static DenseVector[] Solve(SparseMatrix K, DenseVector F, DenseVector Q)
         {
-            int problemSize = Q.RowCount;
+            // Convert to matrix so we can use .RemoveRow
+            DenseMatrix Fm = (DenseMatrix)F.ToColumnMatrix();
+
+            int problemSize = Q.Count;
 
             // get indicies of each fixed displacement
-            // If Q[i, 0] == 1 then fixed
-            var fixedIndicies = Enumerable.Range(0, problemSize).Where(i => Q[i, 0] == 1).ToList();
+            // If Q[i] == 1 then fixed
+            var fixedIndicies = Enumerable.Range(0, problemSize).Where(i => Q[i] == 1).ToList();
             fixedIndicies.Reverse(); // need to remove rows with highest index first
 
             // first remove columns - they will be multiplied by 0 anyway - rows are still needed for reaction forces
@@ -162,23 +165,23 @@ namespace FEA_Program.Models
 
             // Keep removed rows to calculate reaction forces
             var Reaction_K_Mtx = new DenseMatrix(fixedIndicies.Count, K.ColumnCount); 
-            var Reaction_F_Mtx = new DenseMatrix(fixedIndicies.Count, 1);
+            var Reaction_F_Mtx = new DenseVector(fixedIndicies.Count);
 
             for (int i = 0; i < fixedIndicies.Count; i++)
             {
                 Reaction_K_Mtx.SetRow(fixedIndicies.Count - i - 1, K.Row(fixedIndicies[i])); // save values which are going to be removed from K
-                Reaction_F_Mtx[fixedIndicies.Count - i - 1, 0] -= F[fixedIndicies[i], 0]; // adds any forces that are pointed against the direction of reaction forces
+                Reaction_F_Mtx[fixedIndicies.Count - i - 1] -= Fm[fixedIndicies[i], 0]; // adds any forces that are pointed against the direction of reaction forces
             }
 
             // Now that we've stored the rows, remove rows not needed for solving displacements
-            foreach (int Val in fixedIndicies)
+            foreach (int index in fixedIndicies)
             {
-                K = (SparseMatrix)K.RemoveRow(Val);
-                F = (DenseMatrix)F.RemoveRow(Val);
+                K = (SparseMatrix)K.RemoveRow(index);
+                Fm = (DenseMatrix)Fm.RemoveRow(index);
             }
 
-            SparseMatrix Q_Solved = (SparseMatrix)K.Solve(F); // solve displacements
-            Reaction_F_Mtx += (DenseMatrix)Reaction_K_Mtx.Multiply(Q_Solved); // add reactions due to displacements
+            SparseVector Q_Solved = (SparseVector)K.Solve(Fm).Column(0); // solve displacements
+            Reaction_F_Mtx += (DenseVector)Reaction_K_Mtx.Multiply(Q_Solved); // add reactions due to displacements
 
             var Q_output = new DenseVector(problemSize);
             var R_output = new DenseVector(problemSize);
@@ -191,12 +194,12 @@ namespace FEA_Program.Models
                 if (fixedIndicies.Contains(i)) // this row has been fixed
                 {
                     Q_output[i] = 0;
-                    R_output[i] = Reaction_F_Mtx[fixedRow, 0];
+                    R_output[i] = Reaction_F_Mtx[fixedRow];
                     fixedRow += 1;
                 }
                 else // floating row
                 {
-                    Q_output[i] = Q_Solved[floatingRow, 0];
+                    Q_output[i] = Q_Solved[floatingRow];
                     R_output[i] = 0; // Reaction must be 0 for a floating displacement
                     floatingRow += 1;
                 }

@@ -41,11 +41,11 @@ namespace FEA_Program.Models
         /// <summary>
         /// Gets the global force vector, sorted from smallest to largest node ID
         /// </summary>
-        public DenseMatrix F_Mtx
+        public DenseVector F_Mtx
         {
             get
             {
-                var output = new DenseMatrix(ProblemSize, 1);
+                var output = new DenseVector(ProblemSize);
                 int currentRow = 0;
 
                 foreach (Node node in Nodelist) // iterate through each node
@@ -53,7 +53,7 @@ namespace FEA_Program.Models
                     // iterate through each dimension of the node
                     for (int i = 0; i < node.Dimension; i++)
                     {
-                        output[currentRow, 0] = node.Force[i];
+                        output[currentRow] = node.Force[i];
                         currentRow++;
                     }
                 }
@@ -65,11 +65,11 @@ namespace FEA_Program.Models
         /// <summary>
         /// Gets the global fixity vector, sorted from smallest to largest node ID
         /// </summary>
-        public DenseMatrix Q_Mtx
+        public DenseVector Q_Mtx
         {
             get
             {
-                var output = new DenseMatrix(ProblemSize, 1);
+                var output = new DenseVector(ProblemSize);
                 int currentRow = 0;
 
                 foreach (Node node in Nodelist) // iterate through each node
@@ -77,7 +77,7 @@ namespace FEA_Program.Models
                     // iterate through each dimension of the node
                     for (int i = 0; i < node.Dimension; i++)
                     {
-                        output[currentRow, 0] = node.Fixity[i];
+                        output[currentRow] = node.Fixity[i];
                         currentRow++;
                     }
                 }
