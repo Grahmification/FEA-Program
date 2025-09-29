@@ -93,66 +93,92 @@ namespace FEA_Program
 
             // ---------------------- Add base level ------------------------
 
-            string[] Baselevel = new[] { "Nodes", "Elements", "Forces", "Materials" };
+            string[] baseLevel = ["Nodes", "Elements", "Forces", "Materials"];
 
-
-            for (int i = 0, loopTo = Baselevel.Length - 1; i <= loopTo; i++)
+            for (int i = 0; i < baseLevel.Length; i++)
             {
-                var N = new TreeNode(Baselevel[i]);
-                TreeView_Main.Nodes.Add(N);
+                TreeView_Main.Nodes.Add(new TreeNode(baseLevel[i]));
             }
 
             // ------------------ Add nodes --------------------
 
-            for (int i = 0, loopTo1 = P.Nodes.Nodelist.Count - 1; i <= loopTo1; i++)
+            var baseNode = TreeView_Main.Nodes[0];
+
+            foreach (Node node in P.Nodes.Nodelist)
             {
-                Node tmpNode = P.Nodes.Nodelist[i];
-                var N = new TreeNode("Node " + tmpNode.ID);
-                N.Tag = tmpNode.ID;
-                N.ContextMenuStrip = ContextMenuStrip_TreeView;
-
-                TreeView_Main.Nodes[0].Nodes.Add(N);
-                TreeView_Main.Nodes[0].Nodes[i].Nodes.Add(new TreeNode("Pos: " + string.Join(",", tmpNode.Coords_mm.ToArray())));
-                TreeView_Main.Nodes[0].Nodes[i].Nodes.Add(new TreeNode("Fixity: " + string.Join(",", tmpNode.Fixity.ToArray())));
-            }
-
-            // ------------------ Add Materials --------------------
-
-            foreach(Material mat in P.Materials.MaterialList)
-            {
-                var n = new TreeNode(mat.Name)
+                var newNode = new TreeNode($"Node {node.ID}")
                 {
-                    Tag = mat.ID
+                    Tag = node.ID,
+                    ContextMenuStrip = ContextMenuStrip_TreeView
                 };
 
-                int i = TreeView_Main.Nodes[3].Nodes.Add(n);
-                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode($"E (GPa): {mat.E_GPa}"));
-                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode($"V : {mat.V}"));
-                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode($"Sy (MPa) : {mat.Sy_MPa}"));
-                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode($"Sut (MPa) {mat.Sut_MPa}: "));
-                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode($"Type : {Enum.GetName(typeof(MaterialType), mat.Subtype)}"));
+                newNode.Nodes.Add(new TreeNode($"Pos: {string.Join(",", node.Coords_mm)}"));
+                newNode.Nodes.Add(new TreeNode($"Fixity: {string.Join(",", node.Fixity)}"));
+                baseNode.Nodes.Add(newNode);
             }
 
             // ------------------ Add Elements --------------------
 
-            for (int i = 0, loopTo3 = P.Elements.Elemlist.Count - 1; i <= loopTo3; i++)
+            baseNode = TreeView_Main.Nodes[1];
+
+            foreach (IElement element in P.Elements.Elemlist)
             {
-                IElement tmpElem = P.Elements.Elemlist[i];
-                var N = new TreeNode("Element " + tmpElem.ID);
-                N.Tag = tmpElem.ID;
+                var nodeCoords = P.Connect.ElementNodes(element.ID).Select(NodeID => P.Nodes.NodeObj(NodeID).Coords).ToList();
 
-                TreeView_Main.Nodes[1].Nodes.Add(N);
-                TreeView_Main.Nodes[1].Nodes[i].Nodes.Add(new TreeNode("Type: " + tmpElem.Name));
-                // TreeView_Main.Nodes(1).Nodes(i).Nodes.Add(New TreeNode("Area: " & CStr(Units.Convert(Units.AllUnits.m_squared, tmpElem.a, Units.AllUnits.mm_squared)) & Units.UnitStrings(Units.AllUnits.mm_squared)(0)))
-                TreeView_Main.Nodes[1].Nodes[i].Nodes.Add(new TreeNode($"Material: {tmpElem.Material.Name}"));
+                var newNode = new TreeNode($"Element {element.ID}")
+                {
+                    Tag = element.ID
+                };
 
-                var nodeCoords = new List<double[]>();
-                foreach (int NodeID in P.Connect.ElementNodes(tmpElem.ID))
-                    nodeCoords.Add(P.Nodes.NodeObj(NodeID).Coords);
-
-                TreeView_Main.Nodes[1].Nodes[i].Nodes.Add(new TreeNode("Length: " + tmpElem.Length(nodeCoords)));
+                newNode.Nodes.Add(new TreeNode($"Type: {element.Name}"));
+                //newNode.Nodes.Add(new TreeNode("Area: " & (Units.Convert(Units.AllUnits.m_squared, element.Ar, Units.AllUnits.mm_squared)) & Units.UnitStrings(Units.AllUnits.mm_squared)(0)))
+                newNode.Nodes.Add(new TreeNode($"Material: {element.Material.Name}"));
+                newNode.Nodes.Add(new TreeNode($"Length: {element.Length(nodeCoords)}"));
+                baseNode.Nodes.Add(newNode);
             }
 
+            // ------------------ Add forces --------------------
+
+            baseNode = TreeView_Main.Nodes[2];
+
+            foreach (Node node in P.Nodes.Nodelist)
+            {
+                if(node.ForceMagnitude > 0)
+                {
+                    var newNode = new TreeNode($"Force (Node {node.ID})")
+                    {
+                        Tag = node.ID,
+                        ContextMenuStrip = ContextMenuStrip_TreeView
+                    };
+
+                    newNode.Nodes.Add(new TreeNode($"Magnitude [N]: {node.ForceMagnitude}"));
+                    newNode.Nodes.Add(new TreeNode($"Components [N]: {string.Join(",", node.Force)}"));
+                    baseNode.Nodes.Add(newNode);
+                }
+            }
+
+            // ------------------ Add Materials --------------------
+
+            baseNode = TreeView_Main.Nodes[3];
+
+            foreach (Material mat in P.Materials.MaterialList)
+            {
+                var newNode = new TreeNode(mat.Name)
+                {
+                    Tag = mat.ID
+                };
+
+                newNode.Nodes.Add(new TreeNode($"E (GPa): {mat.E_GPa}"));
+                newNode.Nodes.Add(new TreeNode($"V : {mat.V}"));
+                newNode.Nodes.Add(new TreeNode($"Sy (MPa) : {mat.Sy_MPa}"));
+                newNode.Nodes.Add(new TreeNode($"Sut (MPa) {mat.Sut_MPa}: "));
+                newNode.Nodes.Add(new TreeNode($"Type : {Enum.GetName(typeof(MaterialType), mat.Subtype)}"));
+                baseNode.Nodes.Add(newNode);
+            }
+
+            // Expand base level nodes
+            foreach (TreeNode node in TreeView_Main.Nodes)
+                node.Expand();
         }
 
         // -------------------- Upper Toolstrip --------------------------
@@ -191,24 +217,36 @@ namespace FEA_Program
             SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoords), NodeDOFS);
             DenseMatrix[] output = P.Connect.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx);
 
+            DenseMatrix displacements = output[0];
+            DenseMatrix reactionForces = output[1];
 
-            var outputstr1 = new List<string>();
-            var outputstr2 = new List<string>();
+            // Note: These will only ever have one column
+            var displacementValues = displacements.Values;
+            var reactionValues = reactionForces.Values;
 
-            for (int i = 0, loopTo = output[0].RowCount - 1; i <= loopTo; i++)
+            MessageBox.Show(string.Join(",", displacementValues), "Displacements");
+            MessageBox.Show(string.Join(",", reactionValues), "Reaction Forces");
+
+            // Temporary code to update nodes
+            // TODO: Ensure sorting between nodes and results is correct!!!
+            int index = 0;
+
+            foreach(Node node in P.Nodes.Nodelist)
             {
-                for (int j = 0, loopTo1 = output[0].ColumnCount - 1; j <= loopTo1; j++)
-                    outputstr1.Add(output[0][i, j].ToString());
+                var nodeDisplacements = new double[node.Dimension];
+                var nodeReactions = new double[node.Dimension];
+
+                for (int i = 0; i < node.Dimension; i++)
+                {
+                    nodeDisplacements[i] = displacementValues[index];
+                    nodeReactions[i] = reactionValues[index];
+                    index++;
+                }
+
+                node.Solve(nodeDisplacements, nodeReactions);
             }
 
-            for (int i = 0, loopTo2 = output[0].RowCount - 1; i <= loopTo2; i++)
-            {
-                for (int j = 0, loopTo3 = output[0].ColumnCount - 1; j <= loopTo3; j++)
-                    outputstr2.Add(output[1][i, j].ToString());
-            }
-
-            MessageBox.Show(string.Join(",", outputstr1));
-            MessageBox.Show(string.Join(",", outputstr2));
+            resultsTreeControl_main.DrawSolution(P);
         }
 
         private void ToolStripButton_Addnode_Click(object sender, EventArgs e)

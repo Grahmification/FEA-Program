@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            TreeNode treeNode5 = new TreeNode("Nodes");
-            TreeNode treeNode6 = new TreeNode("Elements");
-            TreeNode treeNode7 = new TreeNode("Forces");
-            TreeNode treeNode8 = new TreeNode("Materials");
+            TreeNode treeNode1 = new TreeNode("Nodes");
+            TreeNode treeNode2 = new TreeNode("Elements");
+            TreeNode treeNode3 = new TreeNode("Forces");
+            TreeNode treeNode4 = new TreeNode("Materials");
             ToolStrip_Upper = new ToolStrip();
             ToolStripDropDownButton_File = new ToolStripDropDownButton();
             ToolStripButton_Addnode = new ToolStripButton();
@@ -54,6 +54,7 @@
             ContextMenuStrip_TreeView = new ContextMenuStrip(components);
             ToolStripMenuItem1 = new ToolStripMenuItem();
             ToolStripMenuItem2 = new ToolStripMenuItem();
+            resultsTreeControl_main = new UserControls.ResultsTreeControl();
             ToolStrip_Upper.SuspendLayout();
             StatusStrip_Lower.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SplitContainer_Main).BeginInit();
@@ -62,6 +63,7 @@
             SplitContainer_Main.SuspendLayout();
             TabControl_Main.SuspendLayout();
             TabPage1.SuspendLayout();
+            TabPage2.SuspendLayout();
             ContextMenuStrip_TreeView.SuspendLayout();
             SuspendLayout();
             // 
@@ -210,21 +212,22 @@
             TreeView_Main.Location = new Point(0, 0);
             TreeView_Main.Margin = new Padding(4, 3, 4, 3);
             TreeView_Main.Name = "TreeView_Main";
-            treeNode5.Name = "Nodes";
-            treeNode5.Text = "Nodes";
-            treeNode6.Name = "Elements";
-            treeNode6.Text = "Elements";
-            treeNode7.Name = "Forces";
-            treeNode7.Text = "Forces";
-            treeNode8.Name = "Materials";
-            treeNode8.Text = "Materials";
-            TreeView_Main.Nodes.AddRange(new TreeNode[] { treeNode5, treeNode6, treeNode7, treeNode8 });
+            treeNode1.Name = "Nodes";
+            treeNode1.Text = "Nodes";
+            treeNode2.Name = "Elements";
+            treeNode2.Text = "Elements";
+            treeNode3.Name = "Forces";
+            treeNode3.Text = "Forces";
+            treeNode4.Name = "Materials";
+            treeNode4.Text = "Materials";
+            TreeView_Main.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2, treeNode3, treeNode4 });
             TreeView_Main.Size = new Size(174, 379);
             TreeView_Main.TabIndex = 1;
             TreeView_Main.NodeMouseClick += TreeView_Main_NodeMouseClick;
             // 
             // TabPage2
             // 
+            TabPage2.Controls.Add(resultsTreeControl_main);
             TabPage2.Location = new Point(4, 24);
             TabPage2.Margin = new Padding(4, 3, 4, 3);
             TabPage2.Name = "TabPage2";
@@ -266,6 +269,14 @@
             ToolStripMenuItem2.Size = new Size(107, 22);
             ToolStripMenuItem2.Text = "Delete";
             // 
+            // resultsTreeControl_main
+            // 
+            resultsTreeControl_main.Dock = DockStyle.Fill;
+            resultsTreeControl_main.Location = new Point(4, 3);
+            resultsTreeControl_main.Name = "resultsTreeControl_main";
+            resultsTreeControl_main.Size = new Size(166, 373);
+            resultsTreeControl_main.TabIndex = 0;
+            // 
             // Mainform
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -287,6 +298,7 @@
             SplitContainer_Main.ResumeLayout(false);
             TabControl_Main.ResumeLayout(false);
             TabPage1.ResumeLayout(false);
+            TabPage2.ResumeLayout(false);
             ContextMenuStrip_TreeView.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
@@ -315,5 +327,6 @@
         internal ToolStripButton ToolStripButton_AddNodeForce;
         internal ToolStripButton ToolStripButton_Solve;
         private OpenTK.GLControl.GLControl glControl_main;
+        private UserControls.ResultsTreeControl resultsTreeControl_main;
     }
 }
