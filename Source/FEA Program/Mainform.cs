@@ -215,17 +215,13 @@ namespace FEA_Program
                 NodeDOFS.Add(NodeID, P.Nodes.NodeObj(NodeID).Dimension);
 
             SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoords), NodeDOFS);
-            DenseMatrix[] output = P.Connect.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx);
+            DenseVector[] output = Connectivity.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx);
 
-            DenseMatrix displacements = output[0];
-            DenseMatrix reactionForces = output[1];
+            var displacements = output[0].Values;
+            var reactionForces = output[1].Values;
 
-            // Note: These will only ever have one column
-            var displacementValues = displacements.Values;
-            var reactionValues = reactionForces.Values;
-
-            MessageBox.Show(string.Join(",", displacementValues), "Displacements");
-            MessageBox.Show(string.Join(",", reactionValues), "Reaction Forces");
+            MessageBox.Show(string.Join(",", displacements), "Displacements");
+            MessageBox.Show(string.Join(",", reactionForces), "Reaction Forces");
 
             // Temporary code to update nodes
             // TODO: Ensure sorting between nodes and results is correct!!!
@@ -238,8 +234,8 @@ namespace FEA_Program
 
                 for (int i = 0; i < node.Dimension; i++)
                 {
-                    nodeDisplacements[i] = displacementValues[index];
-                    nodeReactions[i] = reactionValues[index];
+                    nodeDisplacements[i] = displacements[index];
+                    nodeReactions[i] = reactionForces[index];
                     index++;
                 }
 
