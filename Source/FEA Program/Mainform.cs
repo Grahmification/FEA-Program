@@ -60,7 +60,7 @@ namespace FEA_Program
             {
                 var nodeCoords = new List<double[]>();
                 foreach (int NodeID in P.Connect.ElementNodes(E.ID))
-                    nodeCoords.Add(P.Nodes.NodeObj(NodeID).Coords_mm);
+                    nodeCoords.Add(P.Nodes.GetNode(NodeID).Coords_mm);
 
                 E.Draw(nodeCoords);
             }
@@ -123,7 +123,7 @@ namespace FEA_Program
 
             foreach (IElement element in P.Elements.Elemlist)
             {
-                var nodeCoords = P.Connect.ElementNodes(element.ID).Select(NodeID => P.Nodes.NodeObj(NodeID).Coords).ToList();
+                var nodeCoords = P.Connect.ElementNodes(element.ID).Select(NodeID => P.Nodes.GetNode(NodeID).Coords).ToList();
 
                 var newNode = new TreeNode($"Element {element.ID}")
                 {
@@ -209,12 +209,11 @@ namespace FEA_Program
 
         private void ToolStripButtonSolve_Click(object sender, EventArgs e)
         {
+            var nodeDOFS = new Dictionary<int, int>();
+            foreach (INode node in P.Nodes.Nodelist)
+                nodeDOFS.Add(node.ID, node.Dimension);
 
-            var NodeDOFS = new Dictionary<int, int>();
-            foreach (int NodeID in P.Nodes.AllIDs)
-                NodeDOFS.Add(NodeID, P.Nodes.NodeObj(NodeID).Dimension);
-
-            SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoords), NodeDOFS);
+            SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoordinates), nodeDOFS);
             DenseVector[] output = Connectivity.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx);
 
             var displacements = output[0].Values;
@@ -223,25 +222,9 @@ namespace FEA_Program
             MessageBox.Show(string.Join(",", displacements), "Displacements");
             MessageBox.Show(string.Join(",", reactionForces), "Reaction Forces");
 
-            // Temporary code to update nodes
             // TODO: Ensure sorting between nodes and results is correct!!!
-            int index = 0;
-
-            foreach(Node node in P.Nodes.Nodelist)
-            {
-                var nodeDisplacements = new double[node.Dimension];
-                var nodeReactions = new double[node.Dimension];
-
-                for (int i = 0; i < node.Dimension; i++)
-                {
-                    nodeDisplacements[i] = displacements[index];
-                    nodeReactions[i] = reactionForces[index];
-                    index++;
-                }
-
-                node.Solve(nodeDisplacements, nodeReactions);
-            }
-
+            P.Nodes.SetSolution(output[0], output[1]);
+ 
             resultsTreeControl_main.DrawSolution(P);
         }
 
@@ -336,14 +319,14 @@ namespace FEA_Program
             sender.NodeForceAddFormSuccess -= NodeForceAddFormSuccess;
             sender.NodeSelectionUpdated -= FeatureAddFormNodeSelectionChanged;
 
-            P.Nodes.Addforce(Forces, NodeIDs);
+            P.Nodes.SetNodeForces(Forces, NodeIDs);
         }
-        private void FeatureAddFormNodeSelectionChanged(object sender, List<int> SelectedNodeIDs)
+        private void FeatureAddFormNodeSelectionChanged(object sender, List<int> selectedNodeIDs)
         {
-            P.Nodes.SelectNodes(P.Nodes.AllIDs.ToArray(), false);
-            if (SelectedNodeIDs.Count > 0)
+            P.Nodes.SelectNodes(false); // Deselect all
+            if (selectedNodeIDs.Count > 0)
             {
-                P.Nodes.SelectNodes(SelectedNodeIDs.ToArray(), true);
+                P.Nodes.SelectNodes(true, selectedNodeIDs.ToArray());
             }
         }
 
@@ -389,10 +372,10 @@ namespace FEA_Program
                     }
                 }
 
-                P.Nodes.SelectNodes(P.Nodes.AllIDs.ToArray(), false);
+                P.Nodes.SelectNodes(false); // De-Select all
                 P.Elements.SelectElements(false); // De-Select all
 
-                P.Nodes.SelectNodes(NodeIDs.ToArray(), true);
+                P.Nodes.SelectNodes(true, [.. NodeIDs]);
                 P.Elements.SelectElements(true, [.. ElemIDs]);
             }
 

@@ -1,232 +1,214 @@
 ﻿using FEA_Program.Drawable;
 using MathNet.Numerics.LinearAlgebra.Double;
-using System.Reflection;
-
 
 namespace FEA_Program.Models
 {
     internal class NodeMgr
     {
-        private readonly Dictionary<int, NodeDrawable> _Nodes = []; // reference nodes by ID
+        private readonly SortedDictionary<int, NodeDrawable> _Nodes = []; // reference nodes by ID, always sorting from smallest to largest ID
 
-        public event NodeListChangedEventHandler? NodeListChanged;
-        public delegate void NodeListChangedEventHandler(Dictionary<int, NodeDrawable> NodeList); // Length of nodelist has changed
-        
-        public event NodeChangedEventHandler? NodeChanged;
-        public delegate void NodeChangedEventHandler(List<int> IDs); // Node has changed such that list needs to be updated & screen redrawn
-        
+        public event EventHandler<SortedDictionary<int, NodeDrawable>>? NodeListChanged;  // Length of nodelist has changed
+        public event EventHandler<List<int>>? NodesChanged; // Node has changed such that list needs to be updated & screen redrawn
         public event EventHandler? NodeChanged_RedrawOnly; // Node has changed such that screen only needs to be redrawn
- 
-        public event NodeAddedEventHandler? NodeAdded;
-        public delegate void NodeAddedEventHandler(int NodeID, int Dimension); // dont use for redrawing lists or screen
-        
-        public event NodeDeletedEventHandler? NodeDeleted;
-        public delegate void NodeDeletedEventHandler(int NodeID, int Dimension); // dont use for redrawing lists or screen
+        public event EventHandler<INode>? NodeAdded; // dont use for redrawing lists or screen
+        public event EventHandler<INode>? NodeDeleted; // dont use for redrawing lists or screen
 
+        // ---------------------- Public Properties ----------------------------
+
+        /// <summary>
+        /// Gets all nodes, sorted from smallest to largest ID
+        /// </summary>
         public List<NodeDrawable> Nodelist => _Nodes.Values.ToList();
+
+        /// <summary>
+        /// Gets all base nodes, sorted from smallest to largest ID
+        /// </summary>
         public List<Node> BaseNodelist => Nodelist.Cast<Node>().ToList();
 
-        public List<int> AllIDs
-        {
-            get
-            {
-                var output = _Nodes.Keys.ToList();
-                output.Sort();
-                return output;
-            }
-        } // all node ids
-        public Node NodeObj(int ID)
-        {
-            return _Nodes[ID];
-        }
+        /// <summary>
+        /// Gets coords of all nodes sorted by ID
+        /// </summary>
+        public Dictionary<int, double[]> NodeCoordinates => _Nodes.Values.ToDictionary(
+            node => node.ID,    // Key selector: The ID of the Node object
+            node => node.Coords // Value selector: The Coords property of the Node object
+        );
 
-        public Dictionary<int, double[]> NodeCoords // gets coords of all nodes sorted by ID
-        {
-            get
-            {
-                var output = new Dictionary<int, double[]>();
-
-                foreach (Node N in _Nodes.Values)
-                    output.Add(N.ID, N.Coords);
-
-                return output;
-            }
-        } // gets all coords referenced by ID
-        public int ProblemSize
-        {
-            get
-            {
-                int output = 0;
-
-                foreach (Node Val in _Nodes.Values)
-                    output += Val.Dimension;
-
-                return output;
-            }
-        } // overall number of node dimensions in the list
+        /// <summary>
+        /// The overall number of node dimensions
+        /// </summary>
+        public int ProblemSize => _Nodes.Values.Sum(node => node.Dimension);
+ 
+        /// <summary>
+        /// Gets the global force vector, sorted from smallest to largest node ID
+        /// </summary>
         public DenseMatrix F_Mtx
         {
             get
             {
                 var output = new DenseMatrix(ProblemSize, 1);
-                var ids = AllIDs;
-                ids.Sort();
+                int currentRow = 0;
 
-                int currentrow = 0;
-
-                for (int i = 0, loopTo = ids.Count - 1; i <= loopTo; i++) // iterate through each node
+                foreach (Node node in Nodelist) // iterate through each node
                 {
-                    for (int j = 0, loopTo1 = _Nodes[ids[i]].Dimension - 1; j <= loopTo1; j++) // iterate through each dimension of the node
+                    // iterate through each dimension of the node
+                    for (int i = 0; i < node.Dimension; i++)
                     {
-
-                        output[currentrow, 0] = _Nodes[ids[i]].Force[j];
-                        currentrow += 1;
+                        output[currentRow, 0] = node.Force[i];
+                        currentRow++;
                     }
-
                 }
 
                 return output;
             }
-        } // output sorted by node ID
+        }
+
+        /// <summary>
+        /// Gets the global fixity vector, sorted from smallest to largest node ID
+        /// </summary>
         public DenseMatrix Q_Mtx
         {
             get
             {
                 var output = new DenseMatrix(ProblemSize, 1);
-                var ids = AllIDs;
-                ids.Sort();
+                int currentRow = 0;
 
-                int currentrow = 0;
-
-                for (int i = 0, loopTo = ids.Count - 1; i <= loopTo; i++) // iterate through each node
+                foreach (Node node in Nodelist) // iterate through each node
                 {
-                    for (int j = 0, loopTo1 = _Nodes[ids[i]].Dimension - 1; j <= loopTo1; j++) // iterate through each dimension of the node
+                    // iterate through each dimension of the node
+                    for (int i = 0; i < node.Dimension; i++)
                     {
-
-                        output[currentrow, 0] = _Nodes[ids[i]].Fixity[j];
-                        currentrow += 1;
+                        output[currentRow, 0] = node.Fixity[i];
+                        currentRow++;
                     }
                 }
 
                 return output;
             }
-        } // output sorted by node ID
+        }
 
-        public void SelectNodes(int[] IDs, bool selected)
+        // ---------------------- Public Methods ----------------------------
+
+        public Node GetNode(int ID) => _Nodes[ID];
+        public void SelectNodes(bool selected, int[]? ids = null)
         {
-            foreach (int item in IDs)
+            // If IDs isn't specified, select all elements
+            ids ??= [.. _Nodes.Keys];
+
+            foreach (int item in ids)
                 _Nodes[item].Selected = selected;
             NodeChanged_RedrawOnly?.Invoke(this, new());
         }
-        public void AddNodes(List<double[]> Coords, List<int[]> Fixity, List<int> Dimensions)
+        public void AddNodes(List<double[]> coords, List<int[]> fixity, List<int> dimensions)
         {
-            if (Coords.Count != Fixity.Count | Coords.Count != Dimensions.Count)
+            if (coords.Count != fixity.Count | coords.Count != dimensions.Count)
             {
-                throw new Exception("Tried to run sub <" + MethodBase.GetCurrentMethod().Name + "> with unmatched lengths of input values.");
+                throw new ArgumentException("Tried to create node with unmatched lengths of input values.");
             }
 
-            for (int i = 0, loopTo = Coords.Count - 1; i <= loopTo; i++)
+            for (int i = 0; i < coords.Count; i++)
             {
-                if (ExistsAtLocation(Coords[i])) // dont want to create node where one already is
+                if (ExistsAtLocation(coords[i])) // dont want to create node where one already is
                 {
                     throw new Exception("Tried to create node at location where one already exists. Nodes cannot be in identical locations.");
                 }
 
-                var newnode = new NodeDrawable(Coords[i], Fixity[i], CreateNodeId(), Dimensions[i]);
+                var newnode = new NodeDrawable(coords[i], fixity[i], CreateNodeId(), dimensions[i]);
                 _Nodes.Add(newnode.ID, newnode);
-                NodeAdded?.Invoke(newnode.ID, newnode.Dimension);
+                NodeAdded?.Invoke(this, newnode);
             }
 
-            NodeListChanged?.Invoke(_Nodes); // this will redraw so leave it until all have been updated
+            NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
         }
-        public void EditNode(List<double[]> Coords, List<int[]> fixity, List<int> IDs)
+        public void EditNode(List<double[]> coords, List<int[]> fixity, List<int> ids)
         {
-            if (Coords.Count != fixity.Count | Coords.Count != IDs.Count)
+            if (coords.Count != fixity.Count | coords.Count != ids.Count)
             {
-                throw new Exception("Tried to run sub <" + MethodBase.GetCurrentMethod().Name + "> with unmatched lengths of input values.");
+                throw new ArgumentException("Tried to apply node edits with unmatched lengths of input values.");
             }
 
-            for (int i = 0, loopTo = IDs.Count - 1; i <= loopTo; i++)
+            for (int i = 0; i < ids.Count; i++)
             {
-                _Nodes[IDs[i]].Coords = Coords[i];
-                _Nodes[IDs[i]].Fixity = fixity[i];
+                _Nodes[ids[i]].Coords = coords[i];
+                _Nodes[ids[i]].Fixity = fixity[i];
             }
 
-            NodeChanged?.Invoke(IDs);
+            NodesChanged?.Invoke(this, ids);
         }
-        public void Delete(List<int> IDs)
+        
+        /// <summary>
+        /// Sets node forces
+        /// </summary>
+        /// <param name="forces">The list of forces for each node</param>
+        /// <param name="IDs">The accompanying IDs for the nodes</param>
+        /// <exception cref="ArgumentException"></exception>
+        public void SetNodeForces(List<double[]> forces, List<int> IDs)
         {
-            foreach (int NodeID in IDs) // remove node from list
+            if (forces.Count != IDs.Count)
             {
-                var tmp = _Nodes[NodeID]; // needed to raise event
+                throw new ArgumentException("Tried to add node forces with unmatched lengths of input values.");
+            }
+
+            for (int i = 0; i < IDs.Count; i++)
+                _Nodes[IDs[i]].Force = forces[i];
+
+            NodesChanged?.Invoke(this, IDs);
+        }
+        public void Delete(List<int> ids)
+        {
+            foreach (int NodeID in ids) // remove node from list
+            {
+                var node = _Nodes[NodeID];
                 _Nodes.Remove(NodeID);
-
-                NodeDeleted?.Invoke(NodeID, tmp.Dimension);
+                NodeDeleted?.Invoke(this, node);
             }
 
-            if (IDs.Count > 0)
+            if (ids.Count > 0)
             {
-                NodeListChanged?.Invoke(_Nodes);
+                NodeListChanged?.Invoke(this, _Nodes);
             }
         }
-        public void SetSolution(DenseMatrix Q, DenseMatrix R)
+
+        /// <summary>
+        /// Sets the solution for all nodes
+        /// </summary>
+        /// <param name="Q">The global displacement vector</param>
+        /// <param name="R">The global reaction force vector</param>
+        public void SetSolution(DenseVector Q, DenseVector R)
         {
-            var Ids = AllIDs;
-            int currentRow = 0; // tracks the current row being used from the input matrix
+            int index = 0;
 
-            for (int i = 0, loopTo = AllIDs.Count - 1; i <= loopTo; i++) // iterate through each node
+            foreach (Node node in Nodelist)
             {
-                var reactions = new List<double>();
-                var displacements = new List<double>();
+                var nodeDisplacements = new double[node.Dimension];
+                var nodeReactions = new double[node.Dimension];
 
-                for (int j = 0, loopTo1 = _Nodes[Ids[i]].Dimension - 1; j <= loopTo1; j++) // iterate through each dimension
+                for (int i = 0; i < node.Dimension; i++)
                 {
-                    reactions.Add(R[currentRow, 0]);
-                    displacements.Add(Q[currentRow, 0]);
-
-                    currentRow += 1;
+                    nodeDisplacements[i] = Q[index];
+                    nodeReactions[i] = R[index];
+                    index++;
                 }
 
-                _Nodes[Ids[i]].Solve(displacements.ToArray(), reactions.ToArray());
-                currentRow += 1;
-            }
-            NodeChanged?.Invoke(Ids);
-        }
-        public void Addforce(List<double[]> force, List<int> IDs)
-        {
-            if (force.Count != IDs.Count)
-            {
-                throw new Exception("Tried to run sub <" + MethodBase.GetCurrentMethod().Name + "> with unmatched lengths of input values.");
+                node.Solve(nodeDisplacements, nodeReactions);
             }
 
-            for (int i = 0, loopTo = IDs.Count - 1; i <= loopTo; i++)
-                _Nodes[IDs[i]].Force = force[i];
-
-            NodeChanged?.Invoke(IDs);
+            NodesChanged?.Invoke(this, [.. _Nodes.Keys]);
         }
-        public bool ExistsAtLocation(double[] Coords)
+        
+        // ---------------------- Private Helpers ----------------------------
+
+        /// <summary>
+        /// Returns true if a node already exists at the given location
+        /// </summary>
+        /// <param name="coords"></param>
+        /// <returns></returns>
+        private bool ExistsAtLocation(double[] coords)
         {
-            foreach (Node N in _Nodes.Values)
+            foreach (Node node in _Nodes.Values)
             {
-                if (N.Dimension == 1)
-                {
-                    if (N.Coords[0] == Coords[0]) // node already exists at this location
-                    {
-                        return true;
-                    }
-                }
-                else if (N.Dimension == 2)
-                {
-                    if (N.Coords[0] == Coords[0] & N.Coords[1] == Coords[1]) // node already exists at this location
-                    {
-                        return true;
-                    }
-                }
-                else if (N.Coords[0] == Coords[0] & N.Coords[1] == Coords[1] & N.Coords[2] == Coords[2]) // 3 or 6 DOFs
-                                                                                                         // node already exists at this location
-                {
+                // This should work regardless of dimension
+                if (node.Coords.Take(node.Dimension).SequenceEqual(coords.Take(node.Dimension)))
                     return true;
-                }
             }
 
             return false;
@@ -235,14 +217,12 @@ namespace FEA_Program.Models
         private int CreateNodeId()
         {
             int NewID = 1;
-            bool IDUnique = false;
 
             while (_Nodes.Keys.Contains(NewID))
                 NewID += 1;
 
             return NewID;
         }
-
     }
 
 }

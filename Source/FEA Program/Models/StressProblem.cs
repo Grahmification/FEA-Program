@@ -13,19 +13,19 @@ namespace FEA_Program.Models
             {
                 if (_Nodes != null)
                 {
-                    _Nodes.NodeListChanged -= (_) => OnListRedrawNeeded();
-                    _Nodes.NodeChanged -= (_) => OnListRedrawNeeded();
+                    _Nodes.NodeListChanged -= (s, e) => OnListRedrawNeeded();
+                    _Nodes.NodesChanged -= (s, e) => OnListRedrawNeeded();
                     _Nodes.NodeChanged_RedrawOnly -= OnScreenRedrawOnlyNeeded;
-                    _Nodes.NodeDeleted -= HangingElements;
+                    _Nodes.NodeDeleted -= OnNodeDeletion;
                 }
 
                 _Nodes = value;
                 if (_Nodes != null)
                 {
-                    _Nodes.NodeListChanged += (_) => OnListRedrawNeeded();
-                    _Nodes.NodeChanged += (_) => OnListRedrawNeeded();
+                    _Nodes.NodeListChanged += (s, e) => OnListRedrawNeeded();
+                    _Nodes.NodesChanged += (s, e) => OnListRedrawNeeded();
                     _Nodes.NodeChanged_RedrawOnly += OnScreenRedrawOnlyNeeded;
-                    _Nodes.NodeDeleted += HangingElements;
+                    _Nodes.NodeDeleted += OnNodeDeletion;
                 }
             }
         }
@@ -234,13 +234,7 @@ namespace FEA_Program.Models
             Loadedform.GlCont.SubControl.Invalidate();
         }
 
-        private void HangingElements(int NodeID, int Dimension)
-        {
 
-            var ElementsToDelete = Connect.NodeElements(NodeID);
-            Elements.Delete(ElementsToDelete);
-
-        } // deletes elements if a node is deleted and leaves one hanging
         private void OnElementCreation(int ElemID, List<int> NodeIDs)
         {
 
@@ -248,7 +242,7 @@ namespace FEA_Program.Models
             var nodes = new List<INode>();
 
             foreach (int ID in NodeIDs)
-                nodes.Add(Nodes.NodeObj(ID));
+                nodes.Add(Nodes.GetNode(ID));
 
             Elements.GetElement(ElemID).SortNodeOrder(ref nodes);
             var sortedIDs = nodes.Select(node => node.ID).ToList();
@@ -259,6 +253,22 @@ namespace FEA_Program.Models
         {
             Connect.RemoveConnection(e.ID);
         }
+        private void OnNodeDeletion(object? sender, INode e)
+        {
+            RemoveHangingElements(e.ID);
+        }
+
+        /// <summary>
+        /// Deletes elements if a node is deleted and leaves one hanging
+        /// </summary>
+        /// <param name="nodeID"></param>
+        private void RemoveHangingElements(int nodeID)
+        {
+            var ElementsToDelete = Connect.NodeElements(nodeID);
+            Elements.Delete(ElementsToDelete);
+        }
+
+
     }
 
     public enum ProblemTypes
