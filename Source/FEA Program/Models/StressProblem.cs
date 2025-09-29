@@ -56,9 +56,9 @@ namespace FEA_Program.Models
                 }
             }
         }
-        private MaterialMgr _Materials;
+        private MaterialManager _Materials;
 
-        public virtual MaterialMgr Materials
+        public virtual MaterialManager Materials
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
@@ -71,13 +71,13 @@ namespace FEA_Program.Models
             {
                 if (_Materials != null)
                 {
-                    _Materials.MatlListChanged -= (_) => OnListRedrawNeeded();
+                    _Materials.MaterialListChanged -= (s, e) => OnListRedrawNeeded();
                 }
 
                 _Materials = value;
                 if (_Materials != null)
                 {
-                    _Materials.MatlListChanged += (_) => OnListRedrawNeeded();
+                    _Materials.MaterialListChanged += (s, e) => OnListRedrawNeeded();
                 }
             }
         }
@@ -218,7 +218,7 @@ namespace FEA_Program.Models
         {
             Nodes = new NodeMgr();
             Elements = new ElementManager();
-            Materials = new MaterialMgr();
+            Materials = new MaterialManager();
             Connect = new Connectivity();
             Loadedform = form;
             _Type = Type;

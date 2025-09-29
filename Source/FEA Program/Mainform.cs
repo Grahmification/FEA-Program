@@ -118,18 +118,19 @@ namespace FEA_Program
 
             // ------------------ Add Materials --------------------
 
-            for (int i = 0, loopTo2 = P.Materials.AllIDs.Count - 1; i <= loopTo2; i++)
+            foreach(Material mat in P.Materials.MaterialList)
             {
-                MaterialClass mat = P.Materials.MatObj(P.Materials.AllIDs[i]);
-                var N = new TreeNode(mat.Name);
-                N.Tag = mat.ID;
+                var n = new TreeNode(mat.Name)
+                {
+                    Tag = mat.ID
+                };
 
-                TreeView_Main.Nodes[3].Nodes.Add(N);
-                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode("E (GPa): " + (string)mat.E_GPa.ToString()));
-                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode("V : " + (string)mat.V.ToString()));
-                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode("Sy (MPa) : " + (string)mat.Sy_MPa.ToString()));
-                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode("Sut (MPa) : " + (string)mat.Sut_MPa.ToString()));
-                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode("Type : " + Enum.GetName(typeof(MaterialType), mat.Subtype)));
+                int i = TreeView_Main.Nodes[3].Nodes.Add(n);
+                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode($"E (GPa): {mat.E_GPa}"));
+                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode($"V : {mat.V}"));
+                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode($"Sy (MPa) : {mat.Sy_MPa}"));
+                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode($"Sut (MPa) {mat.Sut_MPa}: "));
+                TreeView_Main.Nodes[3].Nodes[i].Nodes.Add(new TreeNode($"Type : {Enum.GetName(typeof(MaterialType), mat.Subtype)}"));
             }
 
             // ------------------ Add Elements --------------------
@@ -143,7 +144,7 @@ namespace FEA_Program
                 TreeView_Main.Nodes[1].Nodes.Add(N);
                 TreeView_Main.Nodes[1].Nodes[i].Nodes.Add(new TreeNode("Type: " + tmpElem.Name));
                 // TreeView_Main.Nodes(1).Nodes(i).Nodes.Add(New TreeNode("Area: " & CStr(Units.Convert(Units.AllUnits.m_squared, tmpElem.a, Units.AllUnits.mm_squared)) & Units.UnitStrings(Units.AllUnits.mm_squared)(0)))
-                TreeView_Main.Nodes[1].Nodes[i].Nodes.Add(new TreeNode("Material: " + P.Materials.MatObj(tmpElem.Material).Name));
+                TreeView_Main.Nodes[1].Nodes[i].Nodes.Add(new TreeNode("Material: " + P.Materials.GetMaterial(tmpElem.Material).Name));
 
                 var nodeCoords = new List<double[]>();
                 foreach (int NodeID in P.Connect.ElementNodes(tmpElem.ID))
@@ -229,7 +230,7 @@ namespace FEA_Program
                 foreach (Type ElemType in P.AvailableElements)
                     ElementArgsList.Add(ElementManager.ElementArgs(ElemType));
 
-                var UC = new AddElementControl(P.AvailableElements, ElementArgsList, P.Materials.MatList, P.Nodes.BaseNodelist);
+                var UC = new AddElementControl(P.AvailableElements, ElementArgsList, P.Materials.MaterialList, P.Nodes.BaseNodelist);
                 UC.ElementAddFormSuccess += ElemAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
                 AddUserControlToSplitCont(UC, SplitContainer_Main, 1);

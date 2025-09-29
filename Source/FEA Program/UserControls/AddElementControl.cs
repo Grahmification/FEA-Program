@@ -28,7 +28,7 @@ namespace FEA_Program.UserControls
 
         public delegate void NodeSelectionUpdatedEventHandler(object sender, List<int> SelectedNodeIDs);
 
-        public AddElementControl(Type[] AvailableElemTypes, List<Dictionary<string, Units.DataUnitType>> ElementArgs, List<MaterialClass> Mats, List<Node> Nodes)
+        public AddElementControl(Type[] AvailableElemTypes, List<Dictionary<string, Units.DataUnitType>> ElementArgs, List<Material> Mats, List<Node> Nodes)
         {
             int startingY = 120;
             _FirstLabelPos = new[] { 8, startingY + _YIncrement };
@@ -58,7 +58,7 @@ namespace FEA_Program.UserControls
 
             {
                 var withBlock1 = _ComboBox_Material;
-                foreach (MaterialClass m in Mats)
+                foreach (Material m in Mats)
                 {
                     withBlock1.Items.Add(m.Name);
                     _MatIDs.Add(m.ID);
