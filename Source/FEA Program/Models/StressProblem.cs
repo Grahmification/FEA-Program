@@ -4,9 +4,9 @@ namespace FEA_Program.Models
 {
     internal class StressProblem
     {
-        private NodeMgr _Nodes;
+        private NodeManager _Nodes;
 
-        public virtual NodeMgr Nodes
+        public virtual NodeManager Nodes
         {
             get { return _Nodes; }
             set
@@ -216,7 +216,7 @@ namespace FEA_Program.Models
 
         public StressProblem(Mainform form, ProblemTypes Type)
         {
-            Nodes = new NodeMgr();
+            Nodes = new NodeManager();
             Elements = new ElementManager();
             Materials = new MaterialManager();
             Connect = new Connectivity();

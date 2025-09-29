@@ -3,7 +3,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
 {
-    internal class NodeMgr
+    internal class NodeManager
     {
         private readonly SortedDictionary<int, NodeDrawable> _Nodes = []; // reference nodes by ID, always sorting from smallest to largest ID
 
