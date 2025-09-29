@@ -4,7 +4,7 @@ using OpenTK.Mathematics;
 
 namespace FEA_Program.Models
 {
-    internal class Node
+    internal class Node : INode
     {
         /// <summary>
         /// Provides a list of available dimsensions for error checking

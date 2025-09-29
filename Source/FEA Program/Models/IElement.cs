@@ -2,21 +2,27 @@
 
 namespace FEA_Program.Models
 {
-    internal interface IElement : IBaseElement
+    internal interface IElement
     {
-        Type MyType { get; }
-        DenseMatrix Interpolated_Displacement(double[] IntrinsicCoords, DenseMatrix GblNodeQ); // can interpolate either position or displacement
-        DenseMatrix B_mtrx(List<double[]> GblNodeCoords); // needs to be given with local node 1 in first spot on list
-        double Length(List<double[]> GblNodeCoords);
-        DenseMatrix Stress_mtrx(List<double[]> GblNodeCoords, DenseMatrix GblNodeQ, double E, double[]? IntrinsicCoords = null);
+        int ID { get; }
+        int Material { get; set; }
+        string Name { get; }
+        int NumOfNodes { get; }
+        int NodeDOFs { get; }
+        int ElementDOFs { get; }
 
-        DenseMatrix K_mtrx(List<double[]> GblNodeCoords, double E); // node 1 displacement comes first in disp input, followed by second
-        DenseMatrix BodyForce_mtrx(List<double[]> GblNodeCoords); // node 1 displacement comes first in disp input, followed by second
-        DenseMatrix TractionForce_mtrx(List<double[]> GblNodeCoords);
+        DenseMatrix Interpolated_Displacement(double[] intrinsicCoords, DenseMatrix globalNodeQ); // can interpolate either position or displacement
+        DenseMatrix B_Matrix(List<double[]> nodeCoordinates); // needs to be given with local node 1 in first spot on list
+        double Length(List<double[]> nodeCoordinates);
+        DenseMatrix StressMatrix(List<double[]> nodeCoordinates, DenseMatrix globalNodeQ, double e, double[]? intrinsicCoords = null);
+
+        DenseMatrix K_Matrix(List<double[]> nodeCoordinates, double e); // node 1 displacement comes first in disp input, followed by second
+        DenseMatrix BodyForceMatrix(List<double[]> nodeCoordinates); // node 1 displacement comes first in disp input, followed by second
+        DenseMatrix TractionForceMatrix(List<double[]> nodeCoordinates);
 
 
-        void SortNodeOrder(ref List<int> NodeIDs, List<double[]> NodeCoords);
-        void SetBodyForce(DenseMatrix ForcePerVol);
-        void SetTractionForce(DenseMatrix ForcePerLength);
+        void SortNodeOrder(ref List<INode> nodes);
+        void SetBodyForce(DenseMatrix forcePerVolume);
+        void SetTractionForce(DenseMatrix forcePerLength);
     }
 }

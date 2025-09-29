@@ -15,9 +15,8 @@ namespace FEA_Program.Models
         public event NodeChangedEventHandler? NodeChanged;
         public delegate void NodeChangedEventHandler(List<int> IDs); // Node has changed such that list needs to be updated & screen redrawn
         
-        public event NodeChanged_RedrawOnlyEventHandler? NodeChanged_RedrawOnly;
-        public delegate void NodeChanged_RedrawOnlyEventHandler(); // Node has changed such that screen only needs to be redrawn
-        
+        public event EventHandler? NodeChanged_RedrawOnly; // Node has changed such that screen only needs to be redrawn
+ 
         public event NodeAddedEventHandler? NodeAdded;
         public delegate void NodeAddedEventHandler(int NodeID, int Dimension); // dont use for redrawing lists or screen
         
@@ -117,7 +116,7 @@ namespace FEA_Program.Models
         {
             foreach (int item in IDs)
                 _Nodes[item].Selected = selected;
-            NodeChanged_RedrawOnly?.Invoke();
+            NodeChanged_RedrawOnly?.Invoke(this, new());
         }
         public void AddNodes(List<double[]> Coords, List<int[]> Fixity, List<int> Dimensions)
         {

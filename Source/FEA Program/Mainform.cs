@@ -139,7 +139,7 @@ namespace FEA_Program
                 N.Tag = tmpElem.ID;
 
                 TreeView_Main.Nodes[1].Nodes.Add(N);
-                TreeView_Main.Nodes[1].Nodes[i].Nodes.Add(new TreeNode("Type: " + ElementMgr.Name(tmpElem.MyType)));
+                TreeView_Main.Nodes[1].Nodes[i].Nodes.Add(new TreeNode("Type: " + tmpElem.Name));
                 // TreeView_Main.Nodes(1).Nodes(i).Nodes.Add(New TreeNode("Area: " & CStr(Units.Convert(Units.AllUnits.m_squared, tmpElem.a, Units.AllUnits.mm_squared)) & Units.UnitStrings(Units.AllUnits.mm_squared)(0)))
                 TreeView_Main.Nodes[1].Nodes[i].Nodes.Add(new TreeNode("Material: " + P.Materials.MatObj(tmpElem.Material).Name));
 
@@ -225,7 +225,7 @@ namespace FEA_Program
                 var ElementArgsList = new List<Dictionary<string, Units.DataUnitType>>();
 
                 foreach (Type ElemType in P.AvailableElements)
-                    ElementArgsList.Add(ElementMgr.ElementArgs(ElemType));
+                    ElementArgsList.Add(ElementManager.ElementArgs(ElemType));
 
                 var UC = new AddElementControl(P.AvailableElements, ElementArgsList, P.Materials.MatList, P.Nodes.BaseNodelist);
                 UC.ElementAddFormSuccess += ElemAddFormSuccess;
@@ -325,11 +325,10 @@ namespace FEA_Program
                 }
 
                 P.Nodes.SelectNodes(P.Nodes.AllIDs.ToArray(), false);
-                P.Elements.SelectElems(P.Elements.AllIDs.ToArray(), true);
-
+                P.Elements.SelectElements(false); // De-Select all
 
                 P.Nodes.SelectNodes(NodeIDs.ToArray(), true);
-                P.Elements.SelectElems(ElemIDs.ToArray(), true);
+                P.Elements.SelectElements(true, [.. ElemIDs]);
             }
 
             // End If
@@ -353,7 +352,7 @@ namespace FEA_Program
             foreach (int NodeID in P.Nodes.AllIDs)
                 NodeDOFS.Add(NodeID, P.Nodes.NodeObj(NodeID).Dimension);
 
-            SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.get_K_matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoords, P.Materials.All_E), NodeDOFS);
+            SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoords, P.Materials.All_E), NodeDOFS);
             DenseMatrix[] output = P.Connect.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx);
 
 

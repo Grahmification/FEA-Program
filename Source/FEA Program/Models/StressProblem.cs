@@ -8,63 +8,51 @@ namespace FEA_Program.Models
 
         public virtual NodeMgr Nodes
         {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _Nodes;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
+            get { return _Nodes; }
             set
             {
                 if (_Nodes != null)
                 {
-                    _Nodes.NodeListChanged -= (_) => ListRedrawNeeded();
-                    _Nodes.NodeChanged -= (_) => ListRedrawNeeded();
-                    _Nodes.NodeChanged_RedrawOnly -= ScreenRedrawOnlyNeeded;
+                    _Nodes.NodeListChanged -= (_) => OnListRedrawNeeded();
+                    _Nodes.NodeChanged -= (_) => OnListRedrawNeeded();
+                    _Nodes.NodeChanged_RedrawOnly -= OnScreenRedrawOnlyNeeded;
                     _Nodes.NodeDeleted -= HangingElements;
                 }
 
                 _Nodes = value;
                 if (_Nodes != null)
                 {
-                    _Nodes.NodeListChanged += (_) => ListRedrawNeeded();
-                    _Nodes.NodeChanged += (_) => ListRedrawNeeded();
-                    _Nodes.NodeChanged_RedrawOnly += ScreenRedrawOnlyNeeded;
+                    _Nodes.NodeListChanged += (_) => OnListRedrawNeeded();
+                    _Nodes.NodeChanged += (_) => OnListRedrawNeeded();
+                    _Nodes.NodeChanged_RedrawOnly += OnScreenRedrawOnlyNeeded;
                     _Nodes.NodeDeleted += HangingElements;
                 }
             }
         }
-        private ElementMgr _Elements;
+        private ElementManager _Elements;
 
-        public virtual ElementMgr Elements
+        public virtual ElementManager Elements
         {
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            get
-            {
-                return _Elements;
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
+            get { return _Elements; }
             set
             {
                 if (_Elements != null)
                 {
-                    _Elements.ElementListChanged -= (_) => ListRedrawNeeded();
-                    _Elements.ElementChanged -= (_) => ListRedrawNeeded();
-                    _Elements.ElementChanged_RedrawOnly -= ScreenRedrawOnlyNeeded;
-                    _Elements.ElementAdded -= ElementCreation;
-                    _Elements.ElementDeleted -= ElementDeletion;
+                    _Elements.ElementListChanged -= (s, e) => OnListRedrawNeeded();
+                    _Elements.ElementChanged -= (s, e) => OnListRedrawNeeded();
+                    _Elements.ElementChanged_RedrawOnly -= OnScreenRedrawOnlyNeeded;
+                    _Elements.ElementAdded -= OnElementCreation;
+                    _Elements.ElementDeleted -= OnElementDeletion;
                 }
 
                 _Elements = value;
                 if (_Elements != null)
                 {
-                    _Elements.ElementListChanged += (_) => ListRedrawNeeded();
-                    _Elements.ElementChanged += (_) => ListRedrawNeeded();
-                    _Elements.ElementChanged_RedrawOnly += ScreenRedrawOnlyNeeded;
-                    _Elements.ElementAdded += ElementCreation;
-                    _Elements.ElementDeleted += ElementDeletion;
+                    _Elements.ElementListChanged += (s, e) => OnListRedrawNeeded();
+                    _Elements.ElementChanged += (s, e) => OnListRedrawNeeded();
+                    _Elements.ElementChanged_RedrawOnly += OnScreenRedrawOnlyNeeded;
+                    _Elements.ElementAdded += OnElementCreation;
+                    _Elements.ElementDeleted += OnElementDeletion;
                 }
             }
         }
@@ -83,13 +71,13 @@ namespace FEA_Program.Models
             {
                 if (_Materials != null)
                 {
-                    _Materials.MatlListChanged -= (_) => ListRedrawNeeded();
+                    _Materials.MatlListChanged -= (_) => OnListRedrawNeeded();
                 }
 
                 _Materials = value;
                 if (_Materials != null)
                 {
-                    _Materials.MatlListChanged += (_) => ListRedrawNeeded();
+                    _Materials.MatlListChanged += (_) => OnListRedrawNeeded();
                 }
             }
         }
@@ -229,19 +217,19 @@ namespace FEA_Program.Models
         public StressProblem(Mainform form, ProblemTypes Type)
         {
             Nodes = new NodeMgr();
-            Elements = new ElementMgr();
+            Elements = new ElementManager();
             Materials = new MaterialMgr();
             Connect = new Connectivity();
             Loadedform = form;
             _Type = Type;
         }
 
-        private void ListRedrawNeeded()
+        private void OnListRedrawNeeded()
         {
             Loadedform.ReDrawLists();
             Loadedform.GlCont.SubControl.Invalidate();
         }
-        private void ScreenRedrawOnlyNeeded()
+        private void OnScreenRedrawOnlyNeeded(object? sender, EventArgs e)
         {
             Loadedform.GlCont.SubControl.Invalidate();
         }
@@ -253,23 +241,23 @@ namespace FEA_Program.Models
             Elements.Delete(ElementsToDelete);
 
         } // deletes elements if a node is deleted and leaves one hanging
-        private void ElementCreation(int ElemID, List<int> NodeIDs, Type Type)
+        private void OnElementCreation(int ElemID, List<int> NodeIDs)
         {
 
-            // ---------------------- Get Coords of all of the nodes in the element and then sort Ids
-
-            var NodeCoords = new List<double[]>();
+            // Sort the node IDs accordingly for the given element type
+            var nodes = new List<INode>();
 
             foreach (int ID in NodeIDs)
-                NodeCoords.Add(Nodes.NodeObj(ID).Coords);
+                nodes.Add(Nodes.NodeObj(ID));
 
-            Elements.ElemObj(ElemID.ToString()).SortNodeOrder(ref NodeIDs, NodeCoords); // nodeIDs is passed byref
+            Elements.GetElement(ElemID).SortNodeOrder(ref nodes);
+            var sortedIDs = nodes.Select(node => node.ID).ToList();
 
-            Connect.AddConnection(ElemID, NodeIDs);
+            Connect.AddConnection(ElemID, sortedIDs);
         }
-        private void ElementDeletion(int ElemID, IElement Type)
+        private void OnElementDeletion(object? sender, IElement e)
         {
-            Connect.RemoveConnection(ElemID);
+            Connect.RemoveConnection(e.ID);
         }
     }
 

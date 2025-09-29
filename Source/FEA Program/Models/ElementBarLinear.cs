@@ -5,169 +5,114 @@ namespace FEA_Program.Models
 {
     internal class ElementBarLinear : Element, IElement
     {
-        private double _Area = 0d; // x-section area in m^2
-        private double _BodyForce = 0d; // Body force in N/m^3
-        private double _TractionForce = 0d; // Traction force in N/m
+        private double _Area = 0; // x-section area in m^2
+        private double _BodyForce = 0; // Body force in N/m^3
+        private double _TractionForce = 0; // Traction force in N/m
 
-        public override Type MyType => GetType();
+        public override string Name => "Bar_Linear";
+        public override int NumOfNodes => 2;
+        public override int NodeDOFs => 1;
 
-        private DenseMatrix N_mtrx(double[] IntrinsicCoords)
+        public ElementBarLinear(double area, int id, int material = -1) : base(id, material)
         {
-            if (IntrinsicCoords.Length != 1)
-            {
-                throw new Exception("Wrong number of coords input to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
+            if (area <= 0)
+                throw new ArgumentException($"Cannot create {Name} element with non-positive area.");
 
-            double eta = IntrinsicCoords[0];
-
-            var N = new DenseMatrix(1, NodeDOFs * NumOfNodes); // u = Nq - size based off total number of element DOFs
-            N[0, 0] = (1d - eta) / 2.0d;
-            N[0, 1] = (1d + eta) / 2.0d;
-
-            return N;
+            _Area = area;
         }
-        public DenseMatrix Interpolated_Displacement(double[] IntrinsicCoords, DenseMatrix GblNodeQ)
-        {
-            if (GblNodeQ.Values.Length != ElemDOFs)
-            {
-                throw new Exception("Wrong number of Nodes input to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
 
-            return N_mtrx(IntrinsicCoords) * GblNodeQ;
+        public DenseMatrix Interpolated_Displacement(double[] intrinsicCoords, DenseMatrix globalNodeQ)
+        {
+            ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
+            return N_matrix(intrinsicCoords) * globalNodeQ;
         } // can interpolate either position or displacement
-        public DenseMatrix B_mtrx(List<double[]> GblNodeCoords)
+        public DenseMatrix B_Matrix(List<double[]> nodeCoordinates)
         {
-            if (GblNodeCoords.Count != NumOfNodes)
-            {
-                throw new Exception("Wrong number of Nodes input to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
+            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
 
-            var B_out = new DenseMatrix(1, NodeDOFs * NumOfNodes); // based from total DOFs
+            var B_out = new DenseMatrix(1, ElementDOFs); // based from total DOFs
             B_out[0, 0] = -1.0d;
             B_out[0, 1] = 1.0d;
 
-            B_out = B_out * (1d / Length(GblNodeCoords));  // B = [-1 1]*1/(x2-x1)
-
-            return B_out;
+            return B_out * (1d / Length(nodeCoordinates)); // B = [-1 1]*1/(x2-x1)
         } // needs to be given with local node 1 in first spot on list
-        public double Length(List<double[]> GblNodeCoords)
+        public double Length(List<double[]> nodeCoordinates)
         {
-            if (GblNodeCoords.Count != NumOfNodes)
-            {
-                throw new Exception("Wrong number of Nodes input to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
-
-            double output = GblNodeCoords[1][0] - GblNodeCoords[0][0];
-
-            if (output < 0d)
-            {
-                throw new Exception("Nodes given in wrong order to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
-
-            return output;
+            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
+            return Math.Abs(nodeCoordinates[1][0] - nodeCoordinates[0][0]);
         }
-        public DenseMatrix Stress_mtrx(List<double[]> GblNodeCoords, DenseMatrix GblNodeQ, double E, double[] IntrinsicCoords = null)
+        public DenseMatrix StressMatrix(List<double[]> nodeCoordinates, DenseMatrix globalNodeQ, double E, double[]? intrinsicCoords = null)
         {
-            if (GblNodeCoords.Count != NumOfNodes | GblNodeQ.Values.Length != ElemDOFs)
-            {
-                throw new Exception("Wrong number of Nodes input to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
+            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
+            ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
 
-            DenseMatrix output = E * B_mtrx(GblNodeCoords) * GblNodeQ;
-            return output;
+            return E * B_Matrix(nodeCoordinates) * globalNodeQ;
         } // node 1 displacement comes first in disp input, followed by second
-        public DenseMatrix K_mtrx(List<double[]> GblNodeCoords, double E)
+        public DenseMatrix K_Matrix(List<double[]> nodeCoordinates, double E)
         {
-            if (GblNodeCoords.Count != NumOfNodes)
-            {
-                throw new Exception("Wrong number of Nodes input to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
+            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
 
-            var output = new DenseMatrix(ElemDOFs, ElemDOFs);
+            var output = new DenseMatrix(ElementDOFs, ElementDOFs);
             output[0, 0] = 1;
             output[1, 0] = -1;
             output[0, 1] = -1;
             output[1, 1] = 1;
 
-            return (DenseMatrix)(output * E * _Area / Length(GblNodeCoords));
+            return (DenseMatrix)(output * E * _Area / Length(nodeCoordinates));
         } // node 1 displacement comes first in disp input, followed by second
-        public DenseMatrix BodyForce_mtrx(List<double[]> GblNodeCoords)
+        public DenseMatrix BodyForceMatrix(List<double[]> nodeCoordinates)
         {
-            if (GblNodeCoords.Count != ElemDOFs)
-            {
-                throw new Exception("Wrong number of Nodes input to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
+            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
 
-            var output = new DenseMatrix(ElemDOFs, 1);
+            var output = new DenseMatrix(ElementDOFs, 1);
             output[0, 0] = 1;
             output[1, 0] = 1;
 
-            output = output * _Area * Length(GblNodeCoords) * _BodyForce * 0.5d;
-
-            return output;
+            return output * _Area * Length(nodeCoordinates) * _BodyForce * 0.5d;
         } // node 1 displacement comes first in disp input, followed by second
-        public DenseMatrix TractionForce_mtrx(List<double[]> GblNodeCoords)
+        public DenseMatrix TractionForceMatrix(List<double[]> nodeCoordinates)
         {
-            if (GblNodeCoords.Count != NumOfNodes)
-            {
-                throw new Exception("Wrong number of Nodes input to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
+            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
 
-            var output = new DenseMatrix(ElemDOFs, 1);
+            var output = new DenseMatrix(ElementDOFs, 1);
             output[0, 0] = 1;
             output[1, 0] = 1;
 
-            output = output * Length(GblNodeCoords) * _TractionForce * 0.5d;
+            output = output * Length(nodeCoordinates) * _TractionForce * 0.5d;
 
             return output;
         }
 
-        public ElementBarLinear(double Area, int ID, int Mat = -1) : base(ID, Mat)
+        public void SortNodeOrder(ref List<INode> nodes)
         {
-            _Area = Area;
+            ValidateLength(nodes, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
+
+            //Order from smallest to largest X coordinate
+            nodes = nodes.OrderBy(n => n.Coords[0]).ToList();
+        }
+        public void SetBodyForce(DenseMatrix forcePerVol)
+        {
+            ValidateLength(forcePerVol.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
+            _BodyForce = forcePerVol[0, 0];
+            InvalidateSolution(); // TODO: Confirm this line is correct. Believe this should set solved true
+        }
+        public void SetTractionForce(DenseMatrix forcePerLength)
+        {
+            ValidateLength(forcePerLength.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
+            _TractionForce = forcePerLength[0, 0];
+            InvalidateSolution(); // TODO: Confirm this line is correct. Believe this should set solved true
         }
 
-        public void SortNodeOrder(ref List<int> NodeIDs, List<double[]> NodeCoords)
+        private DenseMatrix N_matrix(double[] intrinsicCoords)
         {
-            if (NodeIDs.Count != NumOfNodes | NodeCoords.Count != NumOfNodes) // error handling
-            {
-                throw new Exception("Wrong number of Nodes input to " + MethodBase.GetCurrentMethod().Name + ".");
-            }
+            ValidateLength(intrinsicCoords, 1, MethodBase.GetCurrentMethod()?.Name);
+            double eta = intrinsicCoords[0];
 
-            var SortedIdList = new List<int>();
+            var n = new DenseMatrix(1, ElementDOFs); // u = Nq - size based off total number of element DOFs
+            n[0, 0] = (1 - eta) / 2.0d;
+            n[0, 1] = (1 + eta) / 2.0d;
 
-            if (NodeCoords[0][0] < NodeCoords[1][0]) // larger x-coord is local element 2
-            {
-                SortedIdList.Add(NodeIDs[0]);
-                SortedIdList.Add(NodeIDs[1]);
-            }
-            else
-            {
-                SortedIdList.Add(NodeIDs[1]);
-                SortedIdList.Add(NodeIDs[0]);
-            }
-
-            NodeIDs = SortedIdList;
-        }
-        public void SetBodyForce(DenseMatrix ForcePerVol)
-        {
-            if (ForcePerVol.Values.Length != NodeDOFs) // can only have forces in directions of DOFs
-            {
-                throw new Exception("Wrong number of Forces input to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
-
-            _BodyForce = ForcePerVol[0, 0];
-            InvalidateSolution();
-        }
-        public void SetTractionForce(DenseMatrix ForcePerLength)
-        {
-            if (ForcePerLength.Values.Length != NodeDOFs) // can only have forces in directions of DOFs
-            {
-                throw new Exception("Wrong number of Forces input to " + MethodBase.GetCurrentMethod().Name + ". Node: " + ID.ToString());
-            }
-
-            _BodyForce = ForcePerLength[0, 0];
-            InvalidateSolution();
+            return n;
         }
     }
 }

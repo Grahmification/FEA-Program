@@ -3,80 +3,47 @@
     /// <summary>
     /// Base element subclass - common between all types of elements
     /// </summary>
-    internal abstract class Element : IBaseElement
+    internal abstract class Element
     {
-        private int _NumOfNodes; // holds value only for internal usage
-        private int _NodeDOFs; // holds value only for internal usage
-
-        private int _ID = -1;
         private int _Material; // holds material ID
-
-
         private bool _ReadyToSolve = false; // is true if the nodes of the element are set up properly
-        protected bool _SolutionValid = false; // is true if the solution for the element is correct
+        
+        public event EventHandler<int>? SolutionInvalidated;
 
-        public event SolutionInvalidatedEventHandler SolutionInvalidated;
+        //public abstract Type MyType { get; }
 
-        public delegate void SolutionInvalidatedEventHandler(int ElemID);
-
-        public abstract Type MyType { get; }
-
-        protected int NumOfNodes
-        {
-            get
-            {
-                return _NumOfNodes;
-            }
-        }
-        protected int NodeDOFs
-        {
-            get
-            {
-                return _NodeDOFs;
-            }
-        }
-        protected int ElemDOFs
-        {
-            get
-            {
-                return _NodeDOFs * _NumOfNodes;
-            }
-        }
-
-        public int ID
-        {
-            get
-            {
-                return _ID;
-            }
-        }
-
+        public int ID { get; private set; }
         public int Material
         {
-            get
-            {
-                return _Material;
-            }
-            set
-            {
-                _Material = value;
-                InvalidateSolution();
-            }
+            get { return _Material; }
+            set { _Material = value; InvalidateSolution(); }
         } // flags the solution invalid if set
+        public bool SolutionValid { get; protected set; } = false; // is true if the solution for the element is correct
+        public abstract string Name { get; }
+        public abstract int NumOfNodes { get; }
+        public abstract int NodeDOFs { get; }
+        public int ElementDOFs => NumOfNodes * NodeDOFs;
 
-        public Element(int ID, int Mat = -1)
+        public Element(int id, int material = -1)
         {
-            _NumOfNodes = ElementMgr.NumOfNodes(MyType);
-            _NodeDOFs = ElementMgr.NodeDOFs(MyType);
-
-            _Material = Mat;
-            _ID = ID;
+            _Material = material;
+            ID = id;
         }
 
         protected void InvalidateSolution()
         {
-            _SolutionValid = false;
-            SolutionInvalidated?.Invoke(_ID);
+            SolutionValid = false;
+            SolutionInvalidated?.Invoke(this, ID);
+        }
+
+        protected void ValidateLength<T>(IReadOnlyCollection<T> coordinates, int targetLength, string? methodName)
+        {
+            methodName ??= "Unknown";
+
+            if (coordinates.Count != targetLength)
+            {
+                throw new ArgumentOutOfRangeException($"Wrong number of array values input to <{methodName}> for Element ID <{ID}>. Element has {NodeDOFs} node DOFs.");
+            }
         }
     }
 }

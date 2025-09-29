@@ -46,7 +46,7 @@ namespace FEA_Program.UserControls
             {
                 var withBlock = _ComboBox_ElemType;
                 foreach (Type i in AvailableElemTypes)
-                    withBlock.Items.Add(ElementMgr.Name(i));
+                    withBlock.Items.Add(ElementManager.Name(i));
 
                 if (withBlock.Items.Count > 0)
                 {
@@ -173,7 +173,7 @@ namespace FEA_Program.UserControls
 
             // ------------------ Add new boxes for each node ----------------
 
-            for (int I = 0, loopTo = ElementMgr.NumOfNodes(_AvailableElemTypes[CBX.SelectedIndex]) - 1; I <= loopTo; I++)
+            for (int I = 0, loopTo = ElementManager.NumOfNodes(_AvailableElemTypes[CBX.SelectedIndex]) - 1; I <= loopTo; I++)
             {
 
                 var LB = new Label();
