@@ -11,12 +11,10 @@
         // ---------------------- Public Properties ----------------------------
 
         public List<Material> MaterialList => _Materials.Values.ToList();
-        public Dictionary<int, double> All_E => _Materials.Values.ToDictionary(
-            mat => mat.ID,  // Key selector: The ID of the Material object
-            mat => mat.E    // Value selector: The E property of the Material object
-        );
 
         // ---------------------- Public Methods ----------------------------
+
+        // TODO: Update so material deletions or edits affect and elements with the material
 
         public void Add(string Name, double E_GPa, double V, double Sy_MPa, double Sut_MPa, MaterialType subtype)
         {

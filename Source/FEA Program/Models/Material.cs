@@ -51,6 +51,8 @@ namespace FEA_Program.Models
                 return (DenseMatrix)(output * E / (1.0 - V * V));
             }
         }
+
+        public static Material DummyMaterial() => new("Dummy matieral", 1, 0, 1, 1, -1);
     }
 
     public enum MaterialType

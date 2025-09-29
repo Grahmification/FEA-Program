@@ -20,7 +20,7 @@ namespace FEA_Program.Models
 
         // ---------------------- Public Methods ----------------------------
 
-        public void Add(Type elementType, List<int> nodeIDs, double[] elementArgs, int material)
+        public void Add(Type elementType, List<int> nodeIDs, double[] elementArgs, Material material)
         {
             IElementDrawable? newElement = null;
             int newElemID = CreateUniqueId();
@@ -75,7 +75,7 @@ namespace FEA_Program.Models
                 _Bar1Elements[item].Selected = selected;
             ElementChanged_RedrawOnly?.Invoke(this, new());
         }
-        public Dictionary<int, DenseMatrix> Get_K_Matricies(Dictionary<int, List<int>> connectionMatrix, Dictionary<int, double[]> nodeCoordinates, Dictionary<int, double> E)
+        public Dictionary<int, DenseMatrix> Get_K_Matricies(Dictionary<int, List<int>> connectionMatrix, Dictionary<int, double[]> nodeCoordinates)
         {
             var output = new Dictionary<int, DenseMatrix>();
 
@@ -86,9 +86,7 @@ namespace FEA_Program.Models
                 foreach (int NodeID in connectionMatrix[elementID]) // get the coordinates of each node in the element
                     elementNodeCoords.Add(nodeCoordinates[NodeID]);
 
-                int materialID = _Bar1Elements[elementID].Material;
-
-                output.Add(elementID, _Bar1Elements[elementID].K_Matrix(elementNodeCoords, E[materialID]));
+                output.Add(elementID, _Bar1Elements[elementID].K_Matrix(elementNodeCoords));
             }
 
             return output;
@@ -112,7 +110,7 @@ namespace FEA_Program.Models
         {
             return elementType switch
             {
-                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinear(1, 0, 0).NumOfNodes,
+                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinear(1, 0, Material.DummyMaterial()).NumOfNodes,
                 _ => 0,
             };
         }
@@ -120,7 +118,7 @@ namespace FEA_Program.Models
         {
             return elementType switch
             {
-                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinear(1, 0, 0).Name,
+                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinear(1, 0, Material.DummyMaterial()).Name,
                 _ => "",
             };
         }

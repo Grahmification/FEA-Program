@@ -13,7 +13,7 @@ namespace FEA_Program.Models
         public override int NumOfNodes => 2;
         public override int NodeDOFs => 1;
 
-        public ElementBarLinear(double area, int id, int material = -1) : base(id, material)
+        public ElementBarLinear(double area, int id, Material material) : base(id, material)
         {
             if (area <= 0)
                 throw new ArgumentException($"Cannot create {Name} element with non-positive area.");
@@ -41,14 +41,14 @@ namespace FEA_Program.Models
             ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
             return Math.Abs(nodeCoordinates[1][0] - nodeCoordinates[0][0]);
         }
-        public DenseMatrix StressMatrix(List<double[]> nodeCoordinates, DenseMatrix globalNodeQ, double E, double[]? intrinsicCoords = null)
+        public DenseMatrix StressMatrix(List<double[]> nodeCoordinates, DenseMatrix globalNodeQ, double[]? intrinsicCoords = null)
         {
             ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
             ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
 
-            return E * B_Matrix(nodeCoordinates) * globalNodeQ;
+            return Material.E * B_Matrix(nodeCoordinates) * globalNodeQ;
         } // node 1 displacement comes first in disp input, followed by second
-        public DenseMatrix K_Matrix(List<double[]> nodeCoordinates, double E)
+        public DenseMatrix K_Matrix(List<double[]> nodeCoordinates)
         {
             ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
 
@@ -58,7 +58,7 @@ namespace FEA_Program.Models
             output[0, 1] = -1;
             output[1, 1] = 1;
 
-            return (DenseMatrix)(output * E * _Area / Length(nodeCoordinates));
+            return (DenseMatrix)(output * Material.E * _Area / Length(nodeCoordinates));
         } // node 1 displacement comes first in disp input, followed by second
         public DenseMatrix BodyForceMatrix(List<double[]> nodeCoordinates)
         {

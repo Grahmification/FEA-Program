@@ -5,7 +5,7 @@
     /// </summary>
     internal abstract class Element
     {
-        private int _Material; // holds material ID
+        private Material _Material;
         private bool _ReadyToSolve = false; // is true if the nodes of the element are set up properly
         
         public event EventHandler<int>? SolutionInvalidated;
@@ -13,7 +13,7 @@
         //public abstract Type MyType { get; }
 
         public int ID { get; private set; }
-        public int Material
+        public Material Material
         {
             get { return _Material; }
             set { _Material = value; InvalidateSolution(); }
@@ -24,7 +24,7 @@
         public abstract int NodeDOFs { get; }
         public int ElementDOFs => NumOfNodes * NodeDOFs;
 
-        public Element(int id, int material = -1)
+        public Element(int id, Material material)
         {
             _Material = material;
             ID = id;

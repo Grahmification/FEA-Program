@@ -16,7 +16,7 @@ namespace FEA_Program.Drawable
         /// </summary>
         public Color[] Colors { get; private set; } = [];
 
-        public ElementBarLinearDrawable(double area, int ID, int material = -1) : base(area, ID, material) 
+        public ElementBarLinearDrawable(double area, int ID, Material material) : base(area, ID, material) 
         {
             Colors = new Color[NumOfNodes]; // Need to have a color for each node in the element
             SetColor(_DefaultColor); // Initially set all corners to the default color
