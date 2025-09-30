@@ -67,7 +67,7 @@ namespace FEA_Program.Models
         /// <param name="localCoords">Local coordinates inside the element to calculate the displacement</param>
         /// <param name="globalNodeQ">Global node displacement or position matrix for nodes in this element</param>
         /// <returns></returns>
-        DenseMatrix Interpolated_Displacement(double[] localCoords, DenseMatrix globalNodeQ);
+        DenseVector Interpolated_Displacement(double[] localCoords, DenseVector globalNodeQ);
 
         /// <summary>
         /// Gets the element strain matrix
@@ -83,7 +83,7 @@ namespace FEA_Program.Models
         /// <param name="globalNodeQ">Global node displacement matrix</param>
         /// <param name="localCoords">Optional local coordinates inside the element</param>
         /// <returns></returns>
-        DenseMatrix StressMatrix(List<double[]> nodeCoordinates, DenseMatrix globalNodeQ, double[]? localCoords = null);
+        DenseVector StressMatrix(List<double[]> nodeCoordinates, DenseVector globalNodeQ, double[]? localCoords = null);
 
     }
 }

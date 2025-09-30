@@ -139,13 +139,13 @@ namespace FEA_Program.Models
         }
 
         /// <summary>
-        /// Gets the element stress matrix
+        /// Gets the element stress vector
         /// </summary>
         /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
-        /// <param name="globalNodeQ">Global node displacement matrix</param>
+        /// <param name="globalNodeQ">Global node displacement vector</param>
         /// <param name="localCoords">Optional local coordinates inside the element</param>
         /// <returns></returns>
-        public DenseMatrix StressMatrix(List<double[]> nodeCoordinates, DenseMatrix globalNodeQ, double[]? localCoords = null)
+        public DenseVector StressMatrix(List<double[]> nodeCoordinates, DenseVector globalNodeQ, double[]? localCoords = null)
         {
             ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
             ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
@@ -159,7 +159,7 @@ namespace FEA_Program.Models
         /// <param name="localCoords">Local coordinates inside the element to calculate the displacement</param>
         /// <param name="globalNodeQ">Global node displacement or position matrix for nodes in this element</param>
         /// <returns></returns>
-        public DenseMatrix Interpolated_Displacement(double[] localCoords, DenseMatrix globalNodeQ)
+        public DenseVector Interpolated_Displacement(double[] localCoords, DenseVector globalNodeQ)
         {
             ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
             return N_matrix(localCoords) * globalNodeQ;

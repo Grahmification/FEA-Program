@@ -1,4 +1,4 @@
-﻿using FEA_Program.Drawable;
+using FEA_Program.Drawable;
 using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
@@ -41,50 +41,12 @@ namespace FEA_Program.Models
         /// <summary>
         /// Gets the global force vector, sorted from smallest to largest node ID
         /// </summary>
-        public DenseVector F_Mtx
-        {
-            get
-            {
-                var output = new DenseVector(ProblemSize);
-                int currentRow = 0;
-
-                foreach (Node node in Nodelist) // iterate through each node
-                {
-                    // iterate through each dimension of the node
-                    for (int i = 0; i < node.Dimension; i++)
-                    {
-                        output[currentRow] = node.Force[i];
-                        currentRow++;
-                    }
-                }
-
-                return output;
-            }
-        }
+        public DenseVector F_Mtx => Node.BuildVector(BaseNodelist, n => n.Force);
 
         /// <summary>
         /// Gets the global fixity vector, sorted from smallest to largest node ID
         /// </summary>
-        public DenseVector Q_Mtx
-        {
-            get
-            {
-                var output = new DenseVector(ProblemSize);
-                int currentRow = 0;
-
-                foreach (Node node in Nodelist) // iterate through each node
-                {
-                    // iterate through each dimension of the node
-                    for (int i = 0; i < node.Dimension; i++)
-                    {
-                        output[currentRow] = node.Fixity[i];
-                        currentRow++;
-                    }
-                }
-
-                return output;
-            }
-        }
+        public DenseVector Q_Mtx => Node.BuildVector(BaseNodelist, n => Array.ConvertAll(n.Fixity, x => (double)x));
 
         // ---------------------- Public Methods ----------------------------
 

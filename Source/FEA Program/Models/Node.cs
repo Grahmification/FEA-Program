@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using MathNet.Numerics.LinearAlgebra.Double;
 
 
@@ -151,6 +151,31 @@ namespace FEA_Program.Models
             {
                 throw new ArgumentOutOfRangeException($"Attempted to execute operation <{methodName}> for node ID <{ID}> with input params having different dimensions than specified node dimension.");
             }
+        }
+
+
+        /// <summary>
+        /// Builds a sequenctial vector from a collection of nodes
+        /// </summary>
+        /// <param name="nodes">The nodes</param>
+        /// <param name="selector">The node property to get</param>
+        /// <returns>The vector with each node sequentially appended</returns>
+        public static DenseVector BuildVector(List<Node> nodes, Func<Node, double[]> selector)
+        {
+            int outputSize = nodes.Sum(node => node.Dimension);
+            var output = new DenseVector(outputSize);
+            int currentRow = 0;
+
+            foreach (var node in nodes)
+            {
+                var values = selector(node);
+                for (int i = 0; i < node.Dimension; i++)
+                {
+                    output[currentRow++] = values[i];
+                }
+            }
+
+            return output;
         }
     }
 }
