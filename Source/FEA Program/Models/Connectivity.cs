@@ -130,7 +130,7 @@ namespace FEA_Program.Models
                                 int[] local_K_nodeRegion_i = nodeKmtxIndicies[i];
                                 int[] local_K_nodeRegion_j = nodeKmtxIndicies[j];
 
-                                output[assembled_K_nodeRegion_i[row], assembled_K_nodeRegion_j[col]] = elementID_and_K.Value[local_K_nodeRegion_i[row], local_K_nodeRegion_j[col]];
+                                output[assembled_K_nodeRegion_i[row], assembled_K_nodeRegion_j[col]] += elementID_and_K.Value[local_K_nodeRegion_i[row], local_K_nodeRegion_j[col]];
                             }
                         }
                     }
