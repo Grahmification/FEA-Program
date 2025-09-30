@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using OpenTK.Mathematics;
+using System.Reflection;
+using MathNet.Numerics.LinearAlgebra.Double;
 
 
 namespace FEA_Program.Models
@@ -60,48 +60,37 @@ namespace FEA_Program.Models
         {
             get
             {
-                Vector3 output;
+                // Dimension == 1
+                DenseVector output = new([_Force[0], 0, 0]);
 
-                if (Dimension == 1)
+                if (Dimension == 2)
                 {
-                    output = new Vector3((float)_Force[0], 0, 0);
+                    output[1] = _Force[1];
                 }
-                else if (Dimension == 2)
+                else if (Dimension == 3 || Dimension == 6)
                 {
-                    output = new Vector3((float)_Force[0], (float)_Force[1], 0);
-                }
-                else // dimensions = 3 or 6
-                {
-                    output = new Vector3((float)_Force[0], (float)_Force[1], (float)_Force[2]);
+                    output[2] = _Force[2];
                 }
 
-                return output.Length;
+                // Calculate the L2-norm (magnitude)
+                return output.L2Norm();
             }
         } // will eventually need moment functions too
         public double[] ForceDirection
         {
             get
             {
-                Vector3 output;
-
                 if (Dimension == 1)
                 {
-                    output = new Vector3((float)_Force[0], 0, 0);
-                    output.Normalize();
-                    return [(double)output.X];
+                    return [.. new DenseVector([_Force[0]]).Normalize(1)];
                 }
                 else if (Dimension == 2)
                 {
-                    output = new Vector3((float)_Force[0], (float)_Force[1], 0);
-                    output.Normalize();
-                    return [(double)output.X, (double)output.Y];
+                    return [.. new DenseVector([_Force[0], _Force[1]]).Normalize(1)];
                 }
                 else // dimensions = 3 or 6
                 {
-                    output = new Vector3((float)_Force[0], (float)_Force[1], (float)_Force[2]);
-                    output.Normalize();
-                    return [(double)output.X, (double)output.Y, (double)output.Z];
-
+                    return [.. new DenseVector([_Force[0], _Force[1], _Force[2]]).Normalize(1)];
                 }
             }
         }
