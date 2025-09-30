@@ -214,7 +214,7 @@ namespace FEA_Program
                 nodeDOFS.Add(node.ID, node.Dimension);
 
             SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoordinates), nodeDOFS);
-            DenseVector[] output = Connectivity.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx);
+            DenseVector[] output = Connectivity.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx, true);
 
             var displacements = output[0].Values;
             var reactionForces = output[1].Values;

@@ -1,3 +1,4 @@
+using FEA_Program.Forms;
 using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
@@ -147,8 +148,14 @@ namespace FEA_Program.Models
         /// <param name="F">The global force vector</param>
         /// <param name="Q">The global fixity vector</param>
         /// <returns>The global [Displacement Vector, Reaction Force Vector]</returns>
-        public static DenseVector[] Solve(SparseMatrix K, DenseVector F, DenseVector Q)
+        public static DenseVector[] Solve(SparseMatrix K, DenseVector F, DenseVector Q, bool debugging = false)
         {
+            if (debugging)  // Display matricies for the user
+            {
+                var form = new MatrixViewerForm([K, SparseMatrix.OfColumnVectors(Q), SparseMatrix.OfColumnVectors(F)], 
+                    ["K Matrix", "Q Matrix", "F Matrix"]);
+            }
+            
             // Convert to matrix so we can use .RemoveRow
             DenseMatrix Fm = (DenseMatrix)F.ToColumnMatrix();
 
@@ -178,6 +185,12 @@ namespace FEA_Program.Models
             {
                 K = (SparseMatrix)K.RemoveRow(index);
                 Fm = (DenseMatrix)Fm.RemoveRow(index);
+            }
+
+            if (debugging)  // Display matricies for the user
+            {
+                //var form = new MatrixViewerForm(Fm, "F Matrix Reduced");
+                var form = new MatrixViewerForm([K, Fm], ["K Matrix Reduced", "F Matrix Reduced"]);
             }
 
             SparseVector Q_Solved = (SparseVector)K.Solve(Fm).Column(0); // solve displacements
