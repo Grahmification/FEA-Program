@@ -200,7 +200,7 @@ namespace FEA_Program.Models
                 Fm = (SparseMatrix)Fm.RemoveRow(index);
             }
 
-            var Q_Solved = SolveReduced(K, Fm, debugging);  // solve displacements
+            var Q_Solved = SolveReduced(DenseMatrix.OfMatrix(K), DenseMatrix.OfMatrix(Fm), debugging);  // solve displacements
             Reaction_F_Mtx += (DenseVector)Reaction_K_Mtx.Multiply(Q_Solved); // add reactions due to displacements
 
             var Q_output = new DenseVector(problemSize);
@@ -234,7 +234,7 @@ namespace FEA_Program.Models
         /// <param name="K">The global stiffness matrix with fixed rows/columns removed</param>
         /// <param name="F">The global force matrix with fixed rows removed</param>
         /// <returns>The displacement vector</returns>
-        private static SparseVector SolveReduced(SparseMatrix K, SparseMatrix F, bool debugging)
+        private static DenseVector SolveReduced(DenseMatrix K, DenseMatrix F, bool debugging)
         {
             int problemSize = F.RowCount;
             
@@ -243,53 +243,25 @@ namespace FEA_Program.Models
                 var form = new MatrixViewerForm([K, F], ["K Matrix Partially Reduced", "F Matrix Partially Reduced"]);
             }
 
-            // Check for errors. If we still have F[i] = 0, we have a force pointing in an un-constrained direction
-            if (F.NonZerosCount < F.RowCount)
+            // Check for errors. If we still a row of K[i] = [0....] and F[i] = 0, we have a force pointing in an un-constrained direction
+            if (GetZeroRows(SparseMatrix.OfMatrix(K)).Where(index => F[index, 0] != 0).Any())
             {
                 throw new ArithmeticException("Unable to solve. There is a force pointing in a direction that is unconstrained, resulting in infinite displacement.");
             }
 
             // -------------------- Step 1 - Find any duplicate equations in the solution -------------------------
 
-            // Append F onto the last column of K
-            SparseMatrix equationRows = SparseMatrix.OfColumnVectors(K.EnumerateColumns().Append(F.Column(0)));
-
             // Get indexes of and duplicate rows, indexed by the first occurrence
-            SortedDictionary<int, List<int>> duplicateRowIndexes = [];
-
-            for (int i = 0; i < equationRows.RowCount; i++)
-            {
-                var targetRow = equationRows.Row(i);
-                List<int> identicalIndexes = [];
-
-                // Search for rows below the target
-                for (int j = i + 1; j < equationRows.RowCount; j++)
-                {
-                    var compareRow = equationRows.Row(j);
-                    
-                    // Compare the two row vectors for exact equality.
-                    // Vector<T>.Equals(Vector<T>) method provides an element-wise check for equality.
-                    if (targetRow.Equals(compareRow))
-                    {
-                        // Check that the index isn't already in the list of indexes
-                        if (!duplicateRowIndexes.Values.SelectMany(list => list).Contains(j))
-                            identicalIndexes.Add(j);
-                    }
-                }
-                
-                // If we found duplicates, add them
-                if (identicalIndexes.Count != 0)
-                    duplicateRowIndexes[i] = identicalIndexes;
-            }
+            SortedDictionary<int, List<int>> duplicateRowIndexes = GetDuplicateEquationIndexes(K, F);
+            var allDuplicateRows = duplicateRowIndexes.Values.SelectMany(list => list).OrderByDescending(row => row);
 
             // -------------------- Step 2 - Remove all duplicate rows/columns to fully reduce solution -------------------------
 
-            var allDuplicateRows = duplicateRowIndexes.Values.SelectMany(list => list).OrderByDescending(row => row);
-            foreach(int duplicateRow in allDuplicateRows)
+            foreach (int duplicateRow in allDuplicateRows)
             {
-                K = (SparseMatrix)K.RemoveRow(duplicateRow);
-                K = (SparseMatrix)K.RemoveColumn(duplicateRow);
-                F = (SparseMatrix)F.RemoveRow(duplicateRow);
+                K = (DenseMatrix)K.RemoveRow(duplicateRow);
+                K = (DenseMatrix)K.RemoveColumn(duplicateRow);
+                F = (DenseMatrix)F.RemoveRow(duplicateRow);
             }
 
             // -------------------- Step 3 - Solve reduced solution -------------------------
@@ -299,11 +271,11 @@ namespace FEA_Program.Models
                 var form = new MatrixViewerForm([K, F], ["K Matrix Fully Reduced", "F Matrix Fully Reduced"]);
             }
 
-            SparseVector Q = (SparseVector)K.Solve(F).Column(0); // solve displacements
+            DenseVector Q = (DenseVector)K.Solve(F).Column(0); // solve displacements
 
             // -------------------- Step 4 - Re-add duplicate displacement values -------------------------
 
-            SparseVector Q_output = new(problemSize);
+            DenseVector Q_output = new(problemSize);
 
             // Re add unique values to the solution
             var uniqueRowIndices = Enumerable.Range(0, problemSize).Except(allDuplicateRows).ToList();
@@ -314,79 +286,66 @@ namespace FEA_Program.Models
             }
 
             // Re add duplicate values to the solution
-            foreach(KeyValuePair<int, List<int>> duplicateRow in duplicateRowIndexes)
+            foreach(var kvp in duplicateRowIndexes)
             {
                 // If there are duplicate equations the displacement will be over-estimated by the number of duplicates
-                Q_output[duplicateRow.Key] /= (duplicateRow.Value.Count + 1);
+                Q_output[kvp.Key] /= (kvp.Value.Count + 1);
 
-                foreach (int duplicateIndex in duplicateRow.Value)
+                foreach (int duplicateIndex in kvp.Value)
                 {
-                    Q_output[duplicateIndex] = Q_output[duplicateRow.Key];
+                    Q_output[duplicateIndex] = Q_output[kvp.Key];
                 }
             }
-
-            /*
-            int reducedIndex = 0;
-            for(int i = 0; i< problemSize; i++)
-            {
-                Q_output[i] = Q[reducedIndex];
-
-                if (duplicateRowIndexes.TryGetValue(i, out List<int>? duplicates))
-                {
-                    // Set the duplicate values
-                    foreach(int index in duplicates)
-                        Q_output[index] = Q[reducedIndex];
-                }
-
-                reducedIndex++;
-            }
-            */
 
             return Q_output;
         }
 
-
         /// <summary>
-        /// Finds the indexes of all rows in a SparseMatrix that are identical to the target row.
+        /// Gets duplicate equation indexes in the reduced solution
         /// </summary>
-        /// <param name="matrix">The SparseMatrix to search within.</param>
-        /// <param name="targetRowIndex">The index of the row to compare against.</param>
-        /// <returns>A list of row indexes (excluding the target index itself) that are identical to the target row.</returns>
-        public List<int> FindIdenticalRowIndexes(SparseMatrix matrix, int targetRowIndex)
+        /// <param name="K">The global stiffness matrix with fixed rows/columns removed</param>
+        /// <param name="F">The global force matrix with fixed rows removed</param>
+        /// <returns>[first index of duplicate, indexes of corresponding duplicates]</returns>
+        private static SortedDictionary<int, List<int>> GetDuplicateEquationIndexes(DenseMatrix K, DenseMatrix F)
         {
-            // 1. Extract the target row vector.
-            // This is the vector we will compare all other rows against.
-            Vector<double> targetRow = matrix.Row(targetRowIndex);
+            // Append F onto the last column of K
+            DenseMatrix equationRows = DenseMatrix.OfColumnVectors(K.EnumerateColumns().Append(F.Column(0)));
 
-            // 2. Initialize a list to store the indexes of the identical rows.
-            List<int> identicalIndexes = new List<int>();
+            // Get indexes of and duplicate rows, indexed by the first occurrence
+            SortedDictionary<int, List<int>> duplicateRowIndexes = [];
 
-            // 3. Iterate through all rows of the matrix.
-            for (int i = 0; i < matrix.RowCount; i++)
+            // Stores the first occurrence of each unique row vector.
+            // Key: The unique row vector itself.
+            // Value: The row index of its first occurrence.
+            var uniqueRowsMap = new Dictionary<Vector<double>, int>();
+
+            for (int i = 0; i < equationRows.RowCount; i++)
             {
-                // Skip comparing a row with itself.
-                if (i == targetRowIndex)
+                Vector<double> currentRow = equationRows.Row(i);
+
+                // Try to get the index of the first occurrence of this row.
+                if (uniqueRowsMap.TryGetValue(currentRow, out int firstIndex))
                 {
-                    continue;
+                    // Case 1: Duplicate Found (currentRow already exists in the dictionary)
+                    // Ensure the list for the first occurrence index exists in the output dictionary.
+                    if (!duplicateRowIndexes.ContainsKey(firstIndex))
+                    {
+                        duplicateRowIndexes[firstIndex] = [];
+                    }
+
+                    // Add the current index 'i' to the list of duplicates for 'firstIndex'.
+                    duplicateRowIndexes[firstIndex].Add(i);
                 }
-
-                // 4. Extract the current row vector for comparison.
-                Vector<double> currentRow = matrix.Row(i);
-
-                // 5. Compare the two row vectors for exact equality.
-                // MathNet's Vector<T>.Equals(Vector<T>) method provides an element-wise
-                // check for equality, which is what we need for identical rows.
-                if (currentRow.Equals(targetRow))
+                else
                 {
-                    identicalIndexes.Add(i);
+                    // Case 2: Unique Row (first time seeing this row)
+                    // Store the current row vector and its index as the first occurrence.
+                    uniqueRowsMap.Add(currentRow, i);
                 }
             }
 
-            return identicalIndexes;
+            return duplicateRowIndexes;
         }
-
-
-
 
         /// <summary>
         /// Get all the row indicies where every value in the row is 0
