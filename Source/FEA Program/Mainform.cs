@@ -196,7 +196,8 @@ namespace FEA_Program
             try
             {
                 ToolStripComboBox TSCB = (ToolStripComboBox)sender;
-                P = new StressProblem(this, (ProblemTypes)TSCB.SelectedIndex);
+                var materials = P.Materials; // Save materials - they don't change
+                P = new StressProblem(this, (ProblemTypes)TSCB.SelectedIndex, materials);
                 GlCont.ThreeDimensional = P.ThreeDimensional;
 
                 ReDrawLists();

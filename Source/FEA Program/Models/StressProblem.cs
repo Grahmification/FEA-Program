@@ -1,4 +1,4 @@
-﻿namespace FEA_Program.Models
+namespace FEA_Program.Models
 {
     internal class StressProblem
     {
@@ -85,7 +85,7 @@
             }
         }
 
-        public StressProblem(Mainform form, ProblemTypes Type)
+        public StressProblem(Mainform form, ProblemTypes Type, MaterialManager? materials = null)
         {
             Nodes = new NodeManager();
             Nodes.NodeListChanged += (s, e) => OnListRedrawNeeded();
@@ -101,7 +101,7 @@
             Elements.ElementAdded += OnElementCreation;
             Elements.ElementDeleted += OnElementDeletion;
 
-            Materials = new MaterialManager();
+            Materials = materials ?? new MaterialManager();
             Materials.MaterialListChanged += (s, e) => OnListRedrawNeeded();
 
             Connect = new Connectivity();
