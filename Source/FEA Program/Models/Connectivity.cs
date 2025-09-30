@@ -1,5 +1,6 @@
 using FEA_Program.Forms;
 using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Storage;
 
 namespace FEA_Program.Models
 {
@@ -163,8 +164,19 @@ namespace FEA_Program.Models
 
             // get indicies of each fixed displacement
             // If Q[i] == 1 then fixed
-            var fixedIndicies = Enumerable.Range(0, problemSize).Where(i => Q[i] == 1).ToList();
-            fixedIndicies.Reverse(); // need to remove rows with highest index first
+            var fixedDisplacementIndicies = Enumerable.Range(0, problemSize).Where(i => Q[i] == 1).ToList();
+
+            // Remove unused directions (no fixity, no force, no K)
+            // If K has a row that's all zeros and corresponding F is also Zero, we should treat it as fixed too
+            var zeroKandFIndicies = GetZeroRows(K)
+                            .Where(index => F[index] == 0); // Only keep if F[index] is 0
+
+            // Combine, ensure uniqueness, and sort in descending order (largest to smallest)
+            // Sort because rows must be removed from the matrix starting with the highest index
+            var fixedIndicies = fixedDisplacementIndicies
+                .Union(zeroKandFIndicies)  // Combine and enforce uniqueness
+                .OrderByDescending(i => i) // Sort largest to smallest
+                .ToList();
 
             // first remove columns - they will be multiplied by 0 anyway - rows are still needed for reaction forces
             foreach (int index in fixedIndicies) 
@@ -191,6 +203,12 @@ namespace FEA_Program.Models
             {
                 //var form = new MatrixViewerForm(Fm, "F Matrix Reduced");
                 var form = new MatrixViewerForm([K, Fm], ["K Matrix Reduced", "F Matrix Reduced"]);
+            }
+
+            // check for errors. If a row of K is all zero and F is not, we have a force pointing in an un-constrained direction
+            if (GetZeroRows(K).Where(index => Fm[index, 0] != 0).Any())
+            {
+                throw new ArithmeticException("Unable to solve. There is a force pointing in a direction that is unconstrained, resulting in infinite displacement.");
             }
 
             SparseVector Q_Solved = (SparseVector)K.Solve(Fm).Column(0); // solve displacements
@@ -222,5 +240,43 @@ namespace FEA_Program.Models
         }
 
 
+        /// <summary>
+        /// Get all the row indicies where every value in the row is 0
+        /// </summary>
+        /// <param name="matrix">The matrix to evaluate</param>
+        /// <returns></returns>
+        public static List<int> GetZeroRows(SparseMatrix matrix)
+        {
+            // 1. Safely cast the matrix's internal storage to the SparseCompressedRow format.
+            var storage = matrix.Storage as SparseCompressedRowMatrixStorage<double>;
+
+            // Safety check, though for a SparseMatrix it should succeed
+            if (storage == null)
+            {
+                // Fallback to iterating rows if the storage type is unexpected (less efficient)
+                return Enumerable.Range(0, matrix.RowCount)
+                                 .Where(r => matrix.Row(r).All(v => v == 0.0))
+                                 .ToList();
+            }
+
+            // Access the CSR RowPointers array, which stores the start index of each row's 
+            // non-zero elements in the Values array.
+            var rowPointers = storage.RowPointers;
+
+            // The number of non-zero elements in row 'i' is: rowPointers[i+1] - rowPointers[i].
+            // If this difference is 0, the row contains only zeros (explicitly or implicitly).
+            var zeroRowIndices = new List<int>();
+            for (int i = 0; i < matrix.RowCount; i++)
+            {
+                // Check if the start index for the current row is the same 
+                // as the start index for the next row.
+                if (rowPointers[i + 1] - rowPointers[i] == 0)
+                {
+                    zeroRowIndices.Add(i);
+                }
+            }
+
+            return zeroRowIndices;
+        }
     } // need to call functions in here from element/node events upon creation/deletion
 }
