@@ -21,32 +21,40 @@ namespace FEA_Program.Models
             _Area = area;
         }
 
+        // ---------------- Pre solution methods ----------------
+
         /// <summary>
-        /// Gets a displacement or position at the given location inside the element
+        /// Sorts the nodes for the correct ordering in the element
         /// </summary>
-        /// <param name="localCoords">Local coordinates inside the element to calculate the displacement</param>
-        /// <param name="globalNodeQ">Global node displacement or position matrix for nodes in this element</param>
-        /// <returns></returns>
-        public DenseMatrix Interpolated_Displacement(double[] localCoords, DenseMatrix globalNodeQ)
+        /// <param name="nodes">The list to sort in place</param>
+        public void SortNodeOrder(ref List<INode> nodes)
         {
-            ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
-            return N_matrix(localCoords) * globalNodeQ;
+            ValidateLength(nodes, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
+
+            //Order from smallest to largest X coordinate
+            nodes = nodes.OrderBy(n => n.Coords[0]).ToList();
         }
 
         /// <summary>
-        /// Gets the element strain matrix
+        /// Sets the element body force
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
-        /// <returns></returns>
-        public DenseMatrix B_Matrix(List<double[]> nodeCoordinates)
+        /// <param name="forcePerVol">The body force matrix</param>
+        public void SetBodyForce(DenseMatrix forcePerVol)
         {
-            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
+            ValidateLength(forcePerVol.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
+            _BodyForce = forcePerVol[0, 0];
+            InvalidateSolution();
+        }
 
-            var B_out = new DenseMatrix(1, ElementDOFs); // based from total DOFs
-            B_out[0, 0] = -1.0;
-            B_out[0, 1] = 1.0;
-
-            return B_out * (1.0 / Length(nodeCoordinates)); // B = [-1 1]*1/(x2-x1)
+        /// <summary>
+        /// Sets the element traction force
+        /// </summary>
+        /// <param name="forcePerLength">The traction force matrix</param>
+        public void SetTractionForce(DenseMatrix forcePerLength)
+        {
+            ValidateLength(forcePerLength.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
+            _TractionForce = forcePerLength[0, 0];
+            InvalidateSolution();
         }
 
         /// <summary>
@@ -60,21 +68,6 @@ namespace FEA_Program.Models
             return Math.Abs(nodeCoordinates[1][0] - nodeCoordinates[0][0]);
         }
 
-        /// <summary>
-        /// Gets the element stress matrix
-        /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
-        /// <param name="globalNodeQ">Global node displacement matrix</param>
-        /// <param name="localCoords">Optional local coordinates inside the element</param>
-        /// <returns></returns>
-        public DenseMatrix StressMatrix(List<double[]> nodeCoordinates, DenseMatrix globalNodeQ, double[]? localCoords = null)
-        {
-            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
-            ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
-
-            return Material.E * B_Matrix(nodeCoordinates) * globalNodeQ;
-        }
-        
         /// <summary>
         /// Gets the element stiffness matrix
         /// </summary>
@@ -127,29 +120,51 @@ namespace FEA_Program.Models
             return output;
         }
 
-        /// <summary>
-        /// Sorts the nodes for the correct ordering in the element
-        /// </summary>
-        /// <param name="nodes">The list to sort in place</param>
-        public void SortNodeOrder(ref List<INode> nodes)
-        {
-            ValidateLength(nodes, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
+        // ---------------- Post solution methods ----------------
 
-            //Order from smallest to largest X coordinate
-            nodes = nodes.OrderBy(n => n.Coords[0]).ToList();
-        }
-        public void SetBodyForce(DenseMatrix forcePerVol)
+        /// <summary>
+        /// Gets the element strain matrix
+        /// </summary>
+        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
+        /// <returns></returns>
+        public DenseMatrix B_Matrix(List<double[]> nodeCoordinates)
         {
-            ValidateLength(forcePerVol.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
-            _BodyForce = forcePerVol[0, 0];
-            InvalidateSolution(); // TODO: Confirm this line is correct. Believe this should set solved true
+            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
+
+            var B_out = new DenseMatrix(1, ElementDOFs); // based from total DOFs
+            B_out[0, 0] = -1.0;
+            B_out[0, 1] = 1.0;
+
+            return B_out * (1.0 / Length(nodeCoordinates)); // B = [-1 1]*1/(x2-x1)
         }
-        public void SetTractionForce(DenseMatrix forcePerLength)
+
+        /// <summary>
+        /// Gets the element stress matrix
+        /// </summary>
+        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
+        /// <param name="globalNodeQ">Global node displacement matrix</param>
+        /// <param name="localCoords">Optional local coordinates inside the element</param>
+        /// <returns></returns>
+        public DenseMatrix StressMatrix(List<double[]> nodeCoordinates, DenseMatrix globalNodeQ, double[]? localCoords = null)
         {
-            ValidateLength(forcePerLength.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
-            _TractionForce = forcePerLength[0, 0];
-            InvalidateSolution(); // TODO: Confirm this line is correct. Believe this should set solved true
+            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
+            ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
+
+            return Material.E * B_Matrix(nodeCoordinates) * globalNodeQ;
         }
+
+        /// <summary>
+        /// Gets a displacement or position at the given location inside the element
+        /// </summary>
+        /// <param name="localCoords">Local coordinates inside the element to calculate the displacement</param>
+        /// <param name="globalNodeQ">Global node displacement or position matrix for nodes in this element</param>
+        /// <returns></returns>
+        public DenseMatrix Interpolated_Displacement(double[] localCoords, DenseMatrix globalNodeQ)
+        {
+            ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
+            return N_matrix(localCoords) * globalNodeQ;
+        }
+
 
         /// <summary>
         /// Gets the element shape function (interpolation) matrix

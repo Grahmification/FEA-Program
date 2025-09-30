@@ -11,20 +11,25 @@ namespace FEA_Program.Models
         int NodeDOFs { get; }
         int ElementDOFs { get; }
 
-        /// <summary>
-        /// Gets a displacement or position at the given location inside the element
-        /// </summary>
-        /// <param name="localCoords">Local coordinates inside the element to calculate the displacement</param>
-        /// <param name="globalNodeQ">Global node displacement or position matrix for nodes in this element</param>
-        /// <returns></returns>
-        DenseMatrix Interpolated_Displacement(double[] localCoords, DenseMatrix globalNodeQ);
+        // ---------------- Pre solution methods ----------------
 
         /// <summary>
-        /// Gets the element strain matrix
+        /// Sorts the nodes for the correct ordering in the element
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
-        /// <returns></returns>
-        DenseMatrix B_Matrix(List<double[]> nodeCoordinates); // needs to be given with local node 1 in first spot on list
+        /// <param name="nodes">The list to sort in place</param>
+        void SortNodeOrder(ref List<INode> nodes);
+
+        /// <summary>
+        /// Sets the element body force
+        /// </summary>
+        /// <param name="forcePerVol">The body force matrix</param>
+        void SetBodyForce(DenseMatrix forcePerVolume);
+
+        /// <summary>
+        /// Sets the element traction force
+        /// </summary>
+        /// <param name="forcePerLength">The traction force matrix</param>
+        void SetTractionForce(DenseMatrix forcePerLength);
 
         /// <summary>
         /// Gets the element length
@@ -32,15 +37,6 @@ namespace FEA_Program.Models
         /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
         double Length(List<double[]> nodeCoordinates);
-
-        /// <summary>
-        /// Gets the element stress matrix
-        /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
-        /// <param name="globalNodeQ">Global node displacement matrix</param>
-        /// <param name="localCoords">Optional local coordinates inside the element</param>
-        /// <returns></returns>
-        DenseMatrix StressMatrix(List<double[]> nodeCoordinates, DenseMatrix globalNodeQ, double[]? localCoords = null);
 
         /// <summary>
         /// Gets the element stiffness matrix
@@ -63,12 +59,31 @@ namespace FEA_Program.Models
         /// <returns></returns>
         DenseMatrix TractionForceMatrix(List<double[]> nodeCoordinates);
 
+        // ---------------- Post solution methods ----------------
+
         /// <summary>
-        /// Sorts the nodes for the correct ordering in the element
+        /// Gets a displacement or position at the given location inside the element
         /// </summary>
-        /// <param name="nodes">The list to sort in place</param>
-        void SortNodeOrder(ref List<INode> nodes);
-        void SetBodyForce(DenseMatrix forcePerVolume);
-        void SetTractionForce(DenseMatrix forcePerLength);
+        /// <param name="localCoords">Local coordinates inside the element to calculate the displacement</param>
+        /// <param name="globalNodeQ">Global node displacement or position matrix for nodes in this element</param>
+        /// <returns></returns>
+        DenseMatrix Interpolated_Displacement(double[] localCoords, DenseMatrix globalNodeQ);
+
+        /// <summary>
+        /// Gets the element strain matrix
+        /// </summary>
+        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
+        /// <returns></returns>
+        DenseMatrix B_Matrix(List<double[]> nodeCoordinates);
+
+        /// <summary>
+        /// Gets the element stress matrix
+        /// </summary>
+        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
+        /// <param name="globalNodeQ">Global node displacement matrix</param>
+        /// <param name="localCoords">Optional local coordinates inside the element</param>
+        /// <returns></returns>
+        DenseMatrix StressMatrix(List<double[]> nodeCoordinates, DenseMatrix globalNodeQ, double[]? localCoords = null);
+
     }
 }
