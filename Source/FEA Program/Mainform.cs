@@ -295,7 +295,8 @@ namespace FEA_Program
             sender.NodeSelectionUpdated -= FeatureAddFormNodeSelectionChanged;
 
             var material = P.Materials.GetMaterial(Mat);
-            P.Elements.Add(Type, NodeIDs, ElementArgs, material);
+            int nodeDOFs = P.AvailableNodeDOFs;
+            P.Elements.Add(nodeDOFs, Type, NodeIDs, ElementArgs, material);
 
         }
 

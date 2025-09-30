@@ -21,7 +21,7 @@
         public bool SolutionValid { get; protected set; } = false; // is true if the solution for the element is correct
         public abstract string Name { get; }
         public abstract int NumOfNodes { get; }
-        public abstract int NodeDOFs { get; }
+        public abstract int NodeDOFs { get; protected set; }
         public int ElementDOFs => NumOfNodes * NodeDOFs;
 
         public Element(int id, Material material)

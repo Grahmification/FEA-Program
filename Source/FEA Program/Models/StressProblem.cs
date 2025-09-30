@@ -1,4 +1,4 @@
-namespace FEA_Program.Models
+﻿namespace FEA_Program.Models
 {
     internal class StressProblem
     {
@@ -15,6 +15,7 @@ namespace FEA_Program.Models
         public Type[]? AvailableElements => ProblemType switch
         {
             ProblemTypes.Bar_1D => new[] { typeof(ElementBarLinear) },
+            ProblemTypes.Truss_3D => new[] { typeof(ElementBarLinear) },
 
             // Default case: return null
             _ => null

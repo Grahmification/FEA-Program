@@ -20,7 +20,7 @@ namespace FEA_Program.Models
 
         // ---------------------- Public Methods ----------------------------
 
-        public void Add(Type elementType, List<int> nodeIDs, double[] elementArgs, Material material)
+        public void Add(int nodeDOFs, Type elementType, List<int> nodeIDs, double[] elementArgs, Material material)
         {
             IElementDrawable? newElement = null;
             int newElemID = CreateUniqueId();
@@ -29,7 +29,7 @@ namespace FEA_Program.Models
 
             if (ReferenceEquals(elementType, typeof(ElementBarLinear))) // linear bar element
             {
-                newElement = new ElementBarLinearDrawable(elementArgs[0], newElemID, material);
+                newElement = new ElementBarLinearDrawable(elementArgs[0], newElemID, material, nodeDOFs);
             }
             else
             {

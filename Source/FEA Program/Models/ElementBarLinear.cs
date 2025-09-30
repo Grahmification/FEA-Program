@@ -11,13 +11,17 @@ namespace FEA_Program.Models
 
         public override string Name => "Bar_Linear";
         public override int NumOfNodes => 2;
-        public override int NodeDOFs => 1;
+        public override int NodeDOFs { get; protected set; } = 1;
 
-        public ElementBarLinear(double area, int id, Material material) : base(id, material)
+        public ElementBarLinear(double area, int id, Material material, int nodeDOFs = 1) : base(id, material)
         {
             if (area <= 0)
                 throw new ArgumentException($"Cannot create {Name} element with non-positive area.");
 
+            if (nodeDOFs != 1 & nodeDOFs != 2 & nodeDOFs != 3)
+                throw new ArgumentException($"Cannot create {Name} element with {nodeDOFs} DOFs. Unsupported");
+
+            NodeDOFs = nodeDOFs;
             _Area = area;
         }
 
@@ -65,7 +69,7 @@ namespace FEA_Program.Models
         public double Length(List<double[]> nodeCoordinates)
         {
             ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
-            return Math.Abs(nodeCoordinates[1][0] - nodeCoordinates[0][0]);
+            return Geometry.Length(nodeCoordinates[1], nodeCoordinates[0]);
         }
 
         /// <summary>
@@ -77,13 +81,18 @@ namespace FEA_Program.Models
         {
             ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
 
-            var output = new DenseMatrix(ElementDOFs, ElementDOFs);
-            output[0, 0] = 1;
-            output[1, 0] = -1;
-            output[0, 1] = -1;
-            output[1, 1] = 1;
+            var K_local = new DenseMatrix(2, 2);
+            K_local[0, 0] = 1;
+            K_local[1, 0] = -1;
+            K_local[0, 1] = -1;
+            K_local[1, 1] = 1;
 
-            return (DenseMatrix)(output * Material.E * _Area / Length(nodeCoordinates));
+            //var B = B_Matrix(nodeCoordinates);
+            //return (DenseMatrix)(Length(nodeCoordinates) * _Area * Material.E * B.TransposeThisAndMultiply(B));
+
+            var M = M_matrix(nodeCoordinates);
+            var K_global = M.TransposeThisAndMultiply(K_local) * M; // Convert to global coordinates
+            return (DenseMatrix)(K_global * Material.E * _Area / Length(nodeCoordinates));
         }
 
         /// <summary>
@@ -131,11 +140,13 @@ namespace FEA_Program.Models
         {
             ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
 
-            var B_out = new DenseMatrix(1, ElementDOFs); // based from total DOFs
-            B_out[0, 0] = -1.0;
-            B_out[0, 1] = 1.0;
-
-            return B_out * (1.0 / Length(nodeCoordinates)); // B = [-1 1]*1/(x2-x1)
+            // Always B = [-1 1]*1/(x2-x1) for a 1D element
+            var B_local = new DenseMatrix(1, 2); 
+            B_local[0, 0] = -1.0;
+            B_local[0, 1] = 1.0;
+            
+            // Convert to global coordinates and scale by the length to get the global B matrix
+            return B_local * M_matrix(nodeCoordinates) * (1.0 / Length(nodeCoordinates));
         }
 
         /// <summary>
@@ -173,7 +184,7 @@ namespace FEA_Program.Models
         /// <returns></returns>
         private DenseMatrix N_matrix(double[] localCoords)
         {
-            ValidateLength(localCoords, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
+            ValidateLength(localCoords, 1, MethodBase.GetCurrentMethod()?.Name);
             double eta = localCoords[0];
 
             var n = new DenseMatrix(1, ElementDOFs); // u = Nq - size based off total number of element DOFs
@@ -181,6 +192,41 @@ namespace FEA_Program.Models
             n[0, 1] = (1 + eta) / 2.0d;
 
             return n;
+        }
+
+        /// <summary>
+        /// Get the transformation matrix from global node coordinates to local node coordinates for higher DOF elements
+        /// </summary>
+        /// <param name="nodeCoordinates"></param>
+        /// <returns></returns>
+        private DenseMatrix M_matrix(List<double[]> nodeCoordinates)
+        {
+            if(NodeDOFs == 1)
+            {
+                return DenseMatrix.CreateIdentity(2); // Leaves B Matrix unchanged
+            }
+            else if (NodeDOFs == 2) 
+            {
+                (var l, var m, _) = Geometry.ComputeDirectionCosines(nodeCoordinates[1], nodeCoordinates[0]);
+                var matrix = new DenseMatrix(2, 4);
+                matrix[0, 0] = l;
+                matrix[0, 1] = m;
+                matrix[1, 2] = l;
+                matrix[1, 3] = m;
+                return matrix;
+            }
+            else // Node DOFs == 3
+            {
+                (var l, var m, var n) = Geometry.ComputeDirectionCosines(nodeCoordinates[1], nodeCoordinates[0]);
+                var matrix = new DenseMatrix(2, 6);
+                matrix[0, 0] = l;
+                matrix[0, 1] = m;
+                matrix[0, 2] = n;
+                matrix[1, 3] = l;
+                matrix[1, 4] = m;
+                matrix[1, 5] = n;
+                return matrix;
+            }
         }
     }
 }
