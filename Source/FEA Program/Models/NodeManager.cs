@@ -50,7 +50,7 @@ namespace FEA_Program.Models
 
         // ---------------------- Public Methods ----------------------------
 
-        public Node GetNode(int ID) => _Nodes[ID];
+        public NodeDrawable GetNode(int ID) => _Nodes[ID];
         public void SelectNodes(bool selected, int[]? ids = null)
         {
             // If IDs isn't specified, select all elements

@@ -89,7 +89,7 @@ namespace FEA_Program
             {
                 var nodeCoords = new List<double[]>();
                 foreach (int NodeID in P.Connect.ElementNodes(E.ID))
-                    nodeCoords.Add(P.Nodes.GetNode(NodeID).Coords_mm);
+                    nodeCoords.Add(P.Nodes.GetNode(NodeID).DrawCoordinates);
 
                 E.Draw(nodeCoords);
             }
