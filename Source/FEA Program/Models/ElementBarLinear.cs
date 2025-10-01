@@ -1,4 +1,4 @@
-using MathNet.Numerics.LinearAlgebra.Double;
+﻿using MathNet.Numerics.LinearAlgebra.Double;
 using System.Reflection;
 
 namespace FEA_Program.Models
@@ -6,8 +6,8 @@ namespace FEA_Program.Models
     internal class ElementBarLinear : Element, IElement
     {
         private double _Area = 0; // x-section area in m^2
-        private double _BodyForce = 0; // Body force in N/m^3
-        private double _TractionForce = 0; // Traction force in N/m
+        private DenseVector _BodyForce; // Body force in N/m^3 [X, Y, Z]^T
+        private DenseVector _TractionForce; // Traction force in N/m [X, Y, Z]^T
 
         public string Name => "Bar_Linear";
         public override int NumOfNodes => 2;
@@ -23,6 +23,8 @@ namespace FEA_Program.Models
 
             NodeDOFs = nodeDOFs;
             _Area = area;
+            _BodyForce = new DenseVector(NodeDOFs);
+            _TractionForce = new DenseVector(NodeDOFs);
         }
 
         // ---------------- Public methods ----------------
@@ -42,22 +44,22 @@ namespace FEA_Program.Models
         /// <summary>
         /// Sets the element body force
         /// </summary>
-        /// <param name="forcePerVol">The body force matrix</param>
-        public void SetBodyForce(DenseMatrix forcePerVol)
+        /// <param name="forcePerVol">The body force matrix [Node DOF x 1]</param>
+        public void SetBodyForce(DenseVector forcePerVol)
         {
             ValidateLength(forcePerVol.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
-            _BodyForce = forcePerVol[0, 0];
+            _BodyForce = forcePerVol;
             InvalidateSolution();
         }
 
         /// <summary>
         /// Sets the element traction force
         /// </summary>
-        /// <param name="forcePerLength">The traction force matrix</param>
-        public void SetTractionForce(DenseMatrix forcePerLength)
+        /// <param name="forcePerLength">The traction force matrix [Node DOF x 1]</param>
+        public void SetTractionForce(DenseVector forcePerLength)
         {
             ValidateLength(forcePerLength.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
-            _TractionForce = forcePerLength[0, 0];
+            _TractionForce = forcePerLength;
             InvalidateSolution();
         }
 
@@ -77,15 +79,36 @@ namespace FEA_Program.Models
         /// </summary>
         /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        public DenseMatrix BodyForceMatrix(List<double[]> nodeCoordinates)
+        public DenseVector BodyForceMatrix(List<double[]> nodeCoordinates)
         {
             ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
 
-            var output = new DenseMatrix(ElementDOFs, 1);
-            output[0, 0] = 1;
-            output[1, 0] = 1;
+            var local_body = new DenseMatrix(ElementDOFs, NodeDOFs);
+            if (NodeDOFs == 1)
+            {
+                // [1x1] = [2x1] * [1x1]
+                local_body[0, 0] = 1;
+                local_body[1, 0] = 1;
+            }
+            else if (NodeDOFs == 2)
+            {
+                // [2x1] = [4x2] * [2x1]
+                local_body[0, 0] = 1;
+                local_body[1, 1] = 1;
+            }
+            else // Node DOFs == 3
+            {
+                // [3x1] = [6x3] * [3x1]
+                local_body[0, 0] = 1;
+                local_body[1, 1] = 1;
+                local_body[2, 2] = 1;
+                local_body[0, 3] = 1;
+                local_body[1, 4] = 1;
+                local_body[2, 5] = 1;
+            }
 
-            return output * _Area * Length(nodeCoordinates) * _BodyForce * 0.5d;
+            // [Fb] = 0.5 * A * L * [body_local] * [body force]
+            return (DenseVector)(0.5 * _Area * Length(nodeCoordinates) * local_body.Multiply(_BodyForce));
         }
 
         /// <summary>
@@ -93,17 +116,36 @@ namespace FEA_Program.Models
         /// </summary>
         /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        public DenseMatrix TractionForceMatrix(List<double[]> nodeCoordinates)
+        public DenseVector TractionForceMatrix(List<double[]> nodeCoordinates)
         {
             ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
 
-            var output = new DenseMatrix(ElementDOFs, 1);
-            output[0, 0] = 1;
-            output[1, 0] = 1;
+            var local_traction = new DenseMatrix(ElementDOFs, NodeDOFs);
+            if (NodeDOFs == 1)
+            {
+                // [1x1] = [2x1] * [1x1]
+                local_traction[0, 0] = 1;
+                local_traction[1, 0] = 1;
+            }
+            else if (NodeDOFs == 2)
+            {
+                // [2x1] = [4x2] * [2x1]
+                local_traction[0, 0] = 1;
+                local_traction[1, 1] = 1;
+            }
+            else // Node DOFs == 3
+            {
+                // [3x1] = [6x3] * [3x1]
+                local_traction[0, 0] = 1;
+                local_traction[1, 1] = 1;
+                local_traction[2, 2] = 1;
+                local_traction[0, 3] = 1;
+                local_traction[1, 4] = 1;
+                local_traction[2, 5] = 1;
+            }
 
-            output = output * Length(nodeCoordinates) * _TractionForce * 0.5d;
-
-            return output;
+            // [Ft] = 0.5 * L * [body_traction] * [traction force]
+            return (DenseVector)(0.5 * Length(nodeCoordinates) * local_traction.Multiply(_TractionForce));
         }
 
         // ---------------- Base override methods ----------------

@@ -23,13 +23,13 @@ namespace FEA_Program.Models
         /// Sets the element body force
         /// </summary>
         /// <param name="forcePerVol">The body force matrix</param>
-        void SetBodyForce(DenseMatrix forcePerVolume);
+        void SetBodyForce(DenseVector forcePerVolume);
 
         /// <summary>
         /// Sets the element traction force
         /// </summary>
         /// <param name="forcePerLength">The traction force matrix</param>
-        void SetTractionForce(DenseMatrix forcePerLength);
+        void SetTractionForce(DenseVector forcePerLength);
 
         /// <summary>
         /// Gets the element length
@@ -50,14 +50,14 @@ namespace FEA_Program.Models
         /// </summary>
         /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        DenseMatrix BodyForceMatrix(List<double[]> nodeCoordinates);
+        DenseVector BodyForceMatrix(List<double[]> nodeCoordinates);
 
         /// <summary>
         /// Gets the element traction force matrix
         /// </summary>
         /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        DenseMatrix TractionForceMatrix(List<double[]> nodeCoordinates);
+        DenseVector TractionForceMatrix(List<double[]> nodeCoordinates);
 
         // ---------------- Post solution methods ----------------
 
