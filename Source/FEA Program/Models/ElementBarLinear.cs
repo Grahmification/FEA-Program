@@ -9,7 +9,7 @@ namespace FEA_Program.Models
         private double _BodyForce = 0; // Body force in N/m^3
         private double _TractionForce = 0; // Traction force in N/m
 
-        public override string Name => "Bar_Linear";
+        public string Name => "Bar_Linear";
         public override int NumOfNodes => 2;
         public override int NodeDOFs { get; protected set; } = 1;
 
@@ -25,7 +25,7 @@ namespace FEA_Program.Models
             _Area = area;
         }
 
-        // ---------------- Pre solution methods ----------------
+        // ---------------- Public methods ----------------
 
         /// <summary>
         /// Sorts the nodes for the correct ordering in the element
@@ -73,29 +73,6 @@ namespace FEA_Program.Models
         }
 
         /// <summary>
-        /// Gets the element stiffness matrix
-        /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
-        /// <returns></returns>
-        public DenseMatrix K_Matrix(List<double[]> nodeCoordinates)
-        {
-            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
-
-            var K_local = new DenseMatrix(2, 2);
-            K_local[0, 0] = 1;
-            K_local[1, 0] = -1;
-            K_local[0, 1] = -1;
-            K_local[1, 1] = 1;
-
-            //var B = B_Matrix(nodeCoordinates);
-            //return (DenseMatrix)(Length(nodeCoordinates) * _Area * Material.E * B.TransposeThisAndMultiply(B));
-
-            var M = M_matrix(nodeCoordinates);
-            var K_global = M.TransposeThisAndMultiply(K_local) * M; // Convert to global coordinates
-            return (DenseMatrix)(K_global * Material.E * _Area / Length(nodeCoordinates));
-        }
-
-        /// <summary>
         /// Gets the element body force matrix
         /// </summary>
         /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
@@ -129,14 +106,22 @@ namespace FEA_Program.Models
             return output;
         }
 
-        // ---------------- Post solution methods ----------------
+        // ---------------- Base override methods ----------------
 
         /// <summary>
-        /// Gets the element strain matrix
+        /// Gets the scaling factor for the element's K matrix
+        /// </summary>
+        protected override double StiffnessScalingFactor(List<double[]> nodeCoordinates)
+        {
+            return Length(nodeCoordinates) * _Area;
+        }
+
+        /// <summary>
+        /// Gets the element strain / displacement matrix
         /// </summary>
         /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        public DenseMatrix B_Matrix(List<double[]> nodeCoordinates)
+        protected override DenseMatrix B_Matrix(List<double[]> nodeCoordinates)
         {
             ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
 
@@ -146,43 +131,15 @@ namespace FEA_Program.Models
             B_local[0, 1] = 1.0;
             
             // Convert to global coordinates and scale by the length to get the global B matrix
-            return B_local * M_matrix(nodeCoordinates) * (1.0 / Length(nodeCoordinates));
+            return B_local * M_Matrix(nodeCoordinates) * (1.0 / Length(nodeCoordinates));
         }
-
-        /// <summary>
-        /// Gets the element stress vector
-        /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
-        /// <param name="globalNodeQ">Global node displacement vector</param>
-        /// <param name="localCoords">Optional local coordinates inside the element</param>
-        /// <returns></returns>
-        public DenseVector StressMatrix(List<double[]> nodeCoordinates, DenseVector globalNodeQ, double[]? localCoords = null)
-        {
-            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
-            ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
-
-            return Material.E * B_Matrix(nodeCoordinates) * globalNodeQ;
-        }
-
-        /// <summary>
-        /// Gets a displacement or position at the given location inside the element
-        /// </summary>
-        /// <param name="localCoords">Local coordinates inside the element to calculate the displacement</param>
-        /// <param name="globalNodeQ">Global node displacement or position matrix for nodes in this element</param>
-        /// <returns></returns>
-        public DenseVector Interpolated_Displacement(double[] localCoords, DenseVector globalNodeQ)
-        {
-            ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
-            return N_matrix(localCoords) * globalNodeQ;
-        }
-
 
         /// <summary>
         /// Gets the element shape function (interpolation) matrix
         /// </summary>
         /// <param name="localCoords">Local coordinates inside the element</param>
         /// <returns></returns>
-        private DenseMatrix N_matrix(double[] localCoords)
+        protected override DenseMatrix N_Matrix(double[] localCoords)
         {
             ValidateLength(localCoords, 1, MethodBase.GetCurrentMethod()?.Name);
             double eta = localCoords[0];
@@ -195,11 +152,23 @@ namespace FEA_Program.Models
         }
 
         /// <summary>
+        /// Get the material's constitutive matrix for the given element
+        /// </summary>
+        /// <returns></returns>
+        protected override DenseMatrix D_Matrix()
+        {
+            // For a truss element, D = [E] regardless of DOFs
+            return new DenseMatrix(1, 1, [Material.E]);
+        }
+
+        // ---------------- Private helpers ----------------
+
+        /// <summary>
         /// Get the transformation matrix from global node coordinates to local node coordinates for higher DOF elements
         /// </summary>
         /// <param name="nodeCoordinates"></param>
         /// <returns></returns>
-        private DenseMatrix M_matrix(List<double[]> nodeCoordinates)
+        private DenseMatrix M_Matrix(List<double[]> nodeCoordinates)
         {
             if(NodeDOFs == 1)
             {
@@ -228,5 +197,6 @@ namespace FEA_Program.Models
                 return matrix;
             }
         }
+
     }
 }

@@ -70,13 +70,6 @@ namespace FEA_Program.Models
         DenseVector Interpolated_Displacement(double[] localCoords, DenseVector globalNodeQ);
 
         /// <summary>
-        /// Gets the element strain matrix
-        /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
-        /// <returns></returns>
-        DenseMatrix B_Matrix(List<double[]> nodeCoordinates);
-
-        /// <summary>
         /// Gets the element stress matrix
         /// </summary>
         /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
