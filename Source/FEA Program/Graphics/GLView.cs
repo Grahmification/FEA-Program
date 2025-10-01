@@ -25,8 +25,16 @@ namespace FEA_Program.Graphics
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.Clear(ClearBufferMask.DepthBufferBit);
 
+            // Values > 1.0 will zoom OUT (show more of the world).
+            // Values < 1.0 will zoom IN
+            float zoomFactor = 0.1f;
+
+            // Calculate the dimensions of the world space that should fit into the viewport.
+            float visibleWidth = screenwidth * zoomFactor;
+            float visibleHeight = screenHeight * zoomFactor;
+
             // Basic Setup for viewing
-            Matrix4 perspective = Matrix4.CreateOrthographic(screenwidth, screenHeight, 0.001f, 1000); // Setup 2D Perspective
+            Matrix4 perspective = Matrix4.CreateOrthographic(visibleWidth, visibleHeight, 1.0f, 200.01f); // Setup 2D Perspective
             if (threeDimensional)
             {
                 perspective = Matrix4.CreatePerspectiveFieldOfView(1.1f, 4f / 3f, 1, 10000); // Change to 3D perspective if desired
