@@ -1,5 +1,6 @@
 ﻿using FEA_Program.Controls;
 using FEA_Program.Models;
+using FEA_Program.UI;
 
 namespace FEA_Program.UserControls
 {
@@ -127,7 +128,7 @@ namespace FEA_Program.UserControls
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error occurred when attempting to highlight selected node.");
+                FormattedMessageBox.DisplayError(ex);
             }
         }
 

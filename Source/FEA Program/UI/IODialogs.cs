@@ -1,4 +1,4 @@
-﻿namespace FEA_Program.SaveData
+﻿namespace FEA_Program.UI
 {
     internal class IODialogs
     {
@@ -34,7 +34,7 @@
 
 
             //join the strings with the correct separator to create the output
-            return String.Join("|", fileStrings.ToArray());
+            return string.Join("|", fileStrings.ToArray());
         }
 
         /// <summary>

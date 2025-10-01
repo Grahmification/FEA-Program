@@ -1,5 +1,6 @@
 ﻿using FEA_Program.Controls;
 using FEA_Program.Models;
+using FEA_Program.UI;
 
 namespace FEA_Program.UserControls
 {
@@ -104,13 +105,20 @@ namespace FEA_Program.UserControls
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error adding element: " + ex.Message);
+                FormattedMessageBox.DisplayError("Error adding element: " + ex.Message);
             }
         }
 
         private void ComboBoxSelectionChanged(object? sender, EventArgs e)
         {
-            ValidateEntry();
+            try
+            {
+                ValidateEntry();
+            }
+            catch(Exception ex)
+            {
+                FormattedMessageBox.DisplayError(ex);
+            }
         }
 
         private void ValidateEntry()
@@ -151,95 +159,101 @@ namespace FEA_Program.UserControls
 
         private void ComboBox_ElemType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ComboBox CBX = (ComboBox)sender;
-
-            // ------------------ First remove any previous boxes --------------------------
-
-            foreach (Label LB in _Labels)
-                LB.Dispose();
-            _Labels.Clear();
-
-            foreach (ComboBox CB in _ComboBoxes)
+            try
             {
-                CB.SelectionChangeCommitted -= ComboBoxSelectionChanged;
-                CB.SelectionChangeCommitted -= NodeComboBoxSelectionChanged; // for node selection event
-                CB.Dispose();
-            }
-            _ComboBoxes.Clear();
+                ComboBox CBX = (ComboBox)sender;
 
-            foreach (TextBox txt in _TxtBoxes)
-                txt.Dispose();
-            _TxtBoxes.Clear();
+                // ------------------ First remove any previous boxes --------------------------
 
-            // ------------------ Add new boxes for each node ----------------
-
-            for (int I = 0, loopTo = ElementManager.NumOfNodes(_AvailableElemTypes[CBX.SelectedIndex]) - 1; I <= loopTo; I++)
-            {
-
-                var LB = new Label();
-                LB.Text = "Node " + (I + 1).ToString();
-                LB.Width = 80;
-                LB.Height = 16;
-                LB.Anchor = AnchorStyles.Left | AnchorStyles.Top;
-                LB.Location = new Point(_FirstLabelPos[0], _FirstLabelPos[1]);
-                _Labels.Add(LB);
-                this.Controls.Add(LB);
-
-                var CBox = new ComboBox();
-                CBox.Width = 196;
-                CBox.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-                CBox.Location = new Point(_FirstComboBoxPos[0], _FirstComboBoxPos[1]);
-                CBox.Tag = I;
-                CBox.AutoCompleteCustomSource = nodeCollection;
-                CBox.SelectionChangeCommitted += ComboBoxSelectionChanged;
-
-                _ComboBoxes.Add(CBox);
-                this.Controls.Add(CBox);
-
-                _FirstLabelPos[1] += _YIncrement;
-                _FirstComboBoxPos[1] += _YIncrement;
-                _FirstTextBoxPos[1] += _YIncrement;
-            }
-
-            // --------------------- Populate Node Comboboxes -------------------------
-
-            foreach (Node Node in _Nodes)
-            {
-                string text = (string)Node.ID.ToString() + " - (" + string.Join(",", Node.Coords_mm) + ")";
-
-                nodeCollection.Add(text);
+                foreach (Label LB in _Labels)
+                    LB.Dispose();
+                _Labels.Clear();
 
                 foreach (ComboBox CB in _ComboBoxes)
-                    CB.Items.Add(text);
+                {
+                    CB.SelectionChangeCommitted -= ComboBoxSelectionChanged;
+                    CB.SelectionChangeCommitted -= NodeComboBoxSelectionChanged; // for node selection event
+                    CB.Dispose();
+                }
+                _ComboBoxes.Clear();
+
+                foreach (TextBox txt in _TxtBoxes)
+                    txt.Dispose();
+                _TxtBoxes.Clear();
+
+                // ------------------ Add new boxes for each node ----------------
+
+                for (int I = 0, loopTo = ElementManager.NumOfNodes(_AvailableElemTypes[CBX.SelectedIndex]) - 1; I <= loopTo; I++)
+                {
+
+                    var LB = new Label();
+                    LB.Text = "Node " + (I + 1).ToString();
+                    LB.Width = 80;
+                    LB.Height = 16;
+                    LB.Anchor = AnchorStyles.Left | AnchorStyles.Top;
+                    LB.Location = new Point(_FirstLabelPos[0], _FirstLabelPos[1]);
+                    _Labels.Add(LB);
+                    this.Controls.Add(LB);
+
+                    var CBox = new ComboBox();
+                    CBox.Width = 196;
+                    CBox.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
+                    CBox.Location = new Point(_FirstComboBoxPos[0], _FirstComboBoxPos[1]);
+                    CBox.Tag = I;
+                    CBox.AutoCompleteCustomSource = nodeCollection;
+                    CBox.SelectionChangeCommitted += ComboBoxSelectionChanged;
+
+                    _ComboBoxes.Add(CBox);
+                    this.Controls.Add(CBox);
+
+                    _FirstLabelPos[1] += _YIncrement;
+                    _FirstComboBoxPos[1] += _YIncrement;
+                    _FirstTextBoxPos[1] += _YIncrement;
+                }
+
+                // --------------------- Populate Node Comboboxes -------------------------
+
+                foreach (Node Node in _Nodes)
+                {
+                    string text = (string)Node.ID.ToString() + " - (" + string.Join(",", Node.Coords_mm) + ")";
+
+                    nodeCollection.Add(text);
+
+                    foreach (ComboBox CB in _ComboBoxes)
+                        CB.Items.Add(text);
+                }
+
+                // ------------------------------------Add handler for node combobox highlight selection event -------------
+                // do after population so not firing over and over
+
+                foreach (ComboBox Cbox in _ComboBoxes)
+                    Cbox.SelectedIndexChanged += NodeComboBoxSelectionChanged; // for node selection event
+
+                // -------------------- Add TextBoxes for Element Arguments -------------
+
+                foreach (KeyValuePair<string, Units.DataUnitType> Arg in this._ElementArgs[CBX.SelectedIndex])
+                {
+                    var LB = new Label();
+                    LB.Text = Arg.Key;
+                    LB.Width = 80;
+                    LB.Height = 16;
+                    LB.Anchor = AnchorStyles.Left | AnchorStyles.Top;
+                    LB.Location = new Point(_FirstLabelPos[0], _FirstLabelPos[1]);
+                    _Labels.Add(LB);
+                    this.Controls.Add(LB);
+
+                    var txt = new NumericalInputTextBox(196, new Point(_FirstTextBoxPos[0], _FirstTextBoxPos[1]), Arg.Value, Units.AllUnits.mm_squared);
+                    _TxtBoxes.Add(txt);
+                    this.Controls.Add(txt);
+
+                    _FirstTextBoxPos[1] += _YIncrement;
+                    _FirstLabelPos[1] += _YIncrement;
+                }
             }
-
-            // ------------------------------------Add handler for node combobox highlight selection event -------------
-            // do after population so not firing over and over
-
-            foreach (ComboBox Cbox in _ComboBoxes)
-                Cbox.SelectedIndexChanged += NodeComboBoxSelectionChanged; // for node selection event
-
-            // -------------------- Add TextBoxes for Element Arguments -------------
-
-            foreach (KeyValuePair<string, Units.DataUnitType> Arg in this._ElementArgs[CBX.SelectedIndex])
+            catch (Exception ex)
             {
-                var LB = new Label();
-                LB.Text = Arg.Key;
-                LB.Width = 80;
-                LB.Height = 16;
-                LB.Anchor = AnchorStyles.Left | AnchorStyles.Top;
-                LB.Location = new Point(_FirstLabelPos[0], _FirstLabelPos[1]);
-                _Labels.Add(LB);
-                this.Controls.Add(LB);
-
-                var txt = new NumericalInputTextBox(196, new Point(_FirstTextBoxPos[0], _FirstTextBoxPos[1]), Arg.Value, Units.AllUnits.mm_squared);
-                _TxtBoxes.Add(txt);
-                this.Controls.Add(txt);
-
-                _FirstTextBoxPos[1] += _YIncrement;
-                _FirstLabelPos[1] += _YIncrement;
+                FormattedMessageBox.DisplayError(ex);
             }
-
         }
 
         private bool AllIndexesDifferent(List<int> Indexes)
@@ -288,7 +302,7 @@ namespace FEA_Program.UserControls
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error occurred when attempting to highlight selected node.");
+                FormattedMessageBox.DisplayError(ex);
             }
         } // raises selection event to highlight nodes
     }

@@ -1,5 +1,6 @@
 ﻿using FEA_Program.Controls;
 using FEA_Program.Models;
+using FEA_Program.UI;
 
 namespace FEA_Program.UserControls
 {
@@ -128,7 +129,14 @@ namespace FEA_Program.UserControls
 
         private void TextBox_Name_TextChanged(object sender, EventArgs e)
         {
-            ValidateEntry();
+            try
+            {
+                ValidateEntry();
+            }
+            catch (Exception ex)
+            {
+                FormattedMessageBox.DisplayError(ex);
+            }
         }
     }
 }

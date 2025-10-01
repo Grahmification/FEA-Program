@@ -3,6 +3,7 @@ using FEA_Program.Drawable;
 using FEA_Program.Graphics;
 using FEA_Program.Models;
 using FEA_Program.SaveData;
+using FEA_Program.UI;
 using FEA_Program.UserControls;
 using MathNet.Numerics.LinearAlgebra.Double;
 using OpenTK.Mathematics;
@@ -46,7 +47,7 @@ namespace FEA_Program
 
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred: {ex}");
+                FormattedMessageBox.DisplayError(ex);
             }
         }
 
@@ -205,29 +206,36 @@ namespace FEA_Program
             }
             catch (Exception ex)
             {
-
+                FormattedMessageBox.DisplayError(ex);
             }
         }
 
         private void ToolStripButtonSolve_Click(object sender, EventArgs e)
         {
-            var nodeDOFS = new Dictionary<int, int>();
-            foreach (INode node in P.Nodes.Nodelist)
-                nodeDOFS.Add(node.ID, node.Dimension);
+            try
+            {
+                var nodeDOFS = new Dictionary<int, int>();
+                foreach (INode node in P.Nodes.Nodelist)
+                    nodeDOFS.Add(node.ID, node.Dimension);
 
-            SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoordinates), nodeDOFS);
-            DenseVector[] output = Connectivity.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx, true);
+                SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoordinates), nodeDOFS);
+                DenseVector[] output = Connectivity.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx, true);
 
-            var displacements = output[0].Values;
-            var reactionForces = output[1].Values;
+                var displacements = output[0].Values;
+                var reactionForces = output[1].Values;
 
-            MessageBox.Show(string.Join(",", displacements), "Displacements");
-            MessageBox.Show(string.Join(",", reactionForces), "Reaction Forces");
+                MessageBox.Show(string.Join(",", displacements), "Displacements");
+                MessageBox.Show(string.Join(",", reactionForces), "Reaction Forces");
 
-            // TODO: Ensure sorting between nodes and results is correct!!!
-            P.Nodes.SetSolution(output[0], output[1]);
- 
-            resultsTreeControl_main.DrawSolution(P);
+                // TODO: Ensure sorting between nodes and results is correct!!!
+                P.Nodes.SetSolution(output[0], output[1]);
+
+                resultsTreeControl_main.DrawSolution(P);
+            }
+            catch (Exception ex)
+            {
+                FormattedMessageBox.DisplayError(ex);
+            }
         }
 
         private void ToolStripButton_Addnode_Click(object sender, EventArgs e)
@@ -241,7 +249,7 @@ namespace FEA_Program
             }
             catch (Exception ex)
             {
-
+                FormattedMessageBox.DisplayError(ex);
             }
         }
         private void NodeAddFormSuccess(AddNodeControl sender, List<double[]> Coords, List<int[]> Fixity, List<int> Dimensions)
@@ -261,7 +269,7 @@ namespace FEA_Program
             }
             catch (Exception ex)
             {
-
+                FormattedMessageBox.DisplayError(ex);
             }
         }
         private void MatlAddFormSuccess(AddMaterialControl sender, string Name, double E_GPa, double V, double Sy_MPa, double Sut_MPa, int subtype)
@@ -286,7 +294,7 @@ namespace FEA_Program
             }
             catch (Exception ex)
             {
-
+                FormattedMessageBox.DisplayError(ex);
             }
         }
         private void ElemAddFormSuccess(AddElementControl sender, Type Type, List<int> NodeIDs, double[] ElementArgs, int Mat)
@@ -305,7 +313,6 @@ namespace FEA_Program
         {
             try
             {
-
                 var UC = new AddNodeForceControl(P.AvailableNodeDOFs, P.Nodes.BaseNodelist);
                 UC.NodeForceAddFormSuccess += NodeForceAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
@@ -313,7 +320,7 @@ namespace FEA_Program
             }
             catch (Exception ex)
             {
-
+                FormattedMessageBox.DisplayError(ex);
             }
         }
         private void NodeForceAddFormSuccess(AddNodeForceControl sender, List<double[]> Forces, List<int> NodeIDs)
@@ -362,7 +369,7 @@ namespace FEA_Program
             }
             catch (Exception ex)
             {
-
+                FormattedMessageBox.DisplayError(ex);
             }
         }
 
@@ -387,7 +394,7 @@ namespace FEA_Program
             }
             catch (Exception ex)
             {
-
+                FormattedMessageBox.DisplayError(ex);
             }
         }
 
@@ -395,41 +402,48 @@ namespace FEA_Program
 
         private void TreeView_Main_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            TreeView Tree = (TreeView)sender;
-
-            if (InputManager.ButtonPressOccurred(MouseButtons.Left))
+            try
             {
-                // If e.Node.Level = 1 Then
-                // Dim FirstLevel As String = e.Node.FullPath.Split("\").First()
-                var NodeIDs = new List<int>();
-                var ElemIDs = new List<int>();
+                TreeView Tree = (TreeView)sender;
 
-                foreach (TreeNode N in Tree.Nodes[0].Nodes)
+                if (InputManager.ButtonPressOccurred(MouseButtons.Left))
                 {
-                    if (N.IsSelected)
+                    // If e.Node.Level = 1 Then
+                    // Dim FirstLevel As String = e.Node.FullPath.Split("\").First()
+                    var NodeIDs = new List<int>();
+                    var ElemIDs = new List<int>();
+
+                    foreach (TreeNode N in Tree.Nodes[0].Nodes)
                     {
-                        NodeIDs.Add((int)N.Tag);
+                        if (N.IsSelected)
+                        {
+                            NodeIDs.Add((int)N.Tag);
+                        }
                     }
+
+                    foreach (TreeNode N in Tree.Nodes[1].Nodes)
+                    {
+                        if (N.IsSelected)
+                        {
+                            ElemIDs.Add((int)N.Tag);
+                        }
+                    }
+
+                    P.Nodes.SelectNodes(false); // De-Select all
+                    P.Elements.SelectElements(false); // De-Select all
+
+                    P.Nodes.SelectNodes(true, [.. NodeIDs]);
+                    P.Elements.SelectElements(true, [.. ElemIDs]);
                 }
 
-                foreach (TreeNode N in Tree.Nodes[1].Nodes)
+                // End If
+                else if (InputManager.IsButtonDown(MouseButtons.Right))
                 {
-                    if (N.IsSelected)
-                    {
-                        ElemIDs.Add((int)N.Tag);
-                    }
                 }
-
-                P.Nodes.SelectNodes(false); // De-Select all
-                P.Elements.SelectElements(false); // De-Select all
-
-                P.Nodes.SelectNodes(true, [.. NodeIDs]);
-                P.Elements.SelectElements(true, [.. ElemIDs]);
             }
-
-            // End If
-            else if (InputManager.IsButtonDown(MouseButtons.Right))
+            catch (Exception ex)
             {
+                FormattedMessageBox.DisplayError(ex);
             }
         }
     }
