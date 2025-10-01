@@ -2,6 +2,7 @@ using FEA_Program.Controls;
 using FEA_Program.Drawable;
 using FEA_Program.Graphics;
 using FEA_Program.Models;
+using FEA_Program.SaveData;
 using FEA_Program.UserControls;
 using MathNet.Numerics.LinearAlgebra.Double;
 using OpenTK.Mathematics;
@@ -343,6 +344,51 @@ namespace FEA_Program
             SplitContainer_Main.Panel1MinSize = uc.Width;
             uc.BringToFront();
             uc.Dock = DockStyle.Fill;
+        }
+
+        // ------------------------------ Load/Save ---------------------------------
+        private async void toolStripMenuItem_Save_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var filePath = IODialogs.DisplaySaveFileDialog([IOFileTypes.JSON], "FEA Problem 1");
+
+                if (filePath != null && filePath != "")
+                {
+                    var saveData = P.GetSaveData();
+
+                    await JsonSerializer.SerializeToJsonFile(saveData, filePath);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        private async void toolStripMenuItem_Load_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var filePath = IODialogs.DisplayOpenFileDialog([IOFileTypes.JSON]);
+
+                if (filePath != null && filePath != "")
+                {
+                    var saveData = await JsonSerializer.DeserializeFromJsonFile<ProblemData>(filePath);
+
+                    if (saveData != null)
+                    {
+                        // This this before loading data so changing it doesn't reset the problem
+                        ToolStripComboBox_ProblemMode.SelectedIndex = (int)saveData.ProblemType;
+
+                        P.LoadData(saveData);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         // ------------------------------ Misc Events ---------------------------------

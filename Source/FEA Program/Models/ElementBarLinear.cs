@@ -6,12 +6,27 @@ namespace FEA_Program.Models
     internal class ElementBarLinear : Element, IElement
     {
         private double _Area = 0; // x-section area in m^2
-        private DenseVector _BodyForce; // Body force in N/m^3 [X, Y, Z]^T
-        private DenseVector _TractionForce; // Traction force in N/m [X, Y, Z]^T
 
         public string Name => "Bar_Linear";
+        public ElementTypes ElementType => ElementTypes.BarLinear;
         public override int NumOfNodes => 2;
         public override int NodeDOFs { get; protected set; } = 1;
+
+        /// <summary>
+        /// Element body force in N/m^3 [X, Y, Z]^T
+        /// </summary>
+        public DenseVector BodyForce { get; private set; }
+
+        /// <summary>
+        /// Element traction force in N/m [X, Y, Z]^T
+        /// </summary>
+        public DenseVector TractionForce { get; private set; }
+
+        /// <summary>
+        /// Get arguments that may vary between different element types
+        /// </summary>
+        public double[] ElementArgs { get => [_Area]; set => _Area = value[0]; }
+
 
         public ElementBarLinear(double area, int id, Material material, int nodeDOFs = 1) : base(id, material)
         {
@@ -23,8 +38,8 @@ namespace FEA_Program.Models
 
             NodeDOFs = nodeDOFs;
             _Area = area;
-            _BodyForce = new DenseVector(NodeDOFs);
-            _TractionForce = new DenseVector(NodeDOFs);
+            BodyForce = new DenseVector(NodeDOFs);
+            TractionForce = new DenseVector(NodeDOFs);
         }
 
         // ---------------- Public methods ----------------
@@ -48,7 +63,7 @@ namespace FEA_Program.Models
         public void SetBodyForce(DenseVector forcePerVol)
         {
             ValidateLength(forcePerVol.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
-            _BodyForce = forcePerVol;
+            BodyForce = forcePerVol;
             InvalidateSolution();
         }
 
@@ -59,7 +74,7 @@ namespace FEA_Program.Models
         public void SetTractionForce(DenseVector forcePerLength)
         {
             ValidateLength(forcePerLength.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
-            _TractionForce = forcePerLength;
+            TractionForce = forcePerLength;
             InvalidateSolution();
         }
 
@@ -108,7 +123,7 @@ namespace FEA_Program.Models
             }
 
             // [Fb] = 0.5 * A * L * [body_local] * [body force]
-            return (DenseVector)(0.5 * _Area * Length(nodeCoordinates) * local_body.Multiply(_BodyForce));
+            return (DenseVector)(0.5 * _Area * Length(nodeCoordinates) * local_body.Multiply(BodyForce));
         }
 
         /// <summary>
@@ -145,7 +160,7 @@ namespace FEA_Program.Models
             }
 
             // [Ft] = 0.5 * L * [body_traction] * [traction force]
-            return (DenseVector)(0.5 * Length(nodeCoordinates) * local_traction.Multiply(_TractionForce));
+            return (DenseVector)(0.5 * Length(nodeCoordinates) * local_traction.Multiply(TractionForce));
         }
 
         // ---------------- Base override methods ----------------

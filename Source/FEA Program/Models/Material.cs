@@ -4,37 +4,46 @@ namespace FEA_Program.Models
 {
     internal class Material(string name, double E_GPa, double v, double sy_MPa, double sut_MPa, int id, MaterialType subtype = MaterialType.Other)
     {
-        private double _Sy = sy_MPa * 1000d * 1000d; // yield strength in Pa
-        private double _Sut = sut_MPa * 1000d * 1000d; // ultimate strength in Pa
-
         public int ID { get; private set; } = id;
         public string Name { get; private set; } = name;
+        public MaterialType Subtype { get; set; } = subtype;
 
         /// <summary>
         /// Youngs modulus in Pa
         /// </summary>
-        public double E { get; private set; } = E_GPa * 1000d * 1000d * 1000d; // convert to Pa
+        public double E { get; set; } = E_GPa * 1000 * 1000 * 1000; // convert to Pa
 
         /// <summary>
         /// Poissons ratio
         /// </summary>
-        public double V { get; private set; } = v;
-        public MaterialType Subtype { get; private set; } = subtype;
+        public double V { get; set; } = v;
 
         /// <summary>
-        /// Yield strength in MPa
+        /// Yield strength in Pa
         /// </summary>
-        public double Sy_MPa => _Sy / Math.Pow(1000.0, 2);
+        public double Sy { get; set; } = sy_MPa * 1000 * 1000;
 
         /// <summary>
         /// Ultimate strength in Pa
         /// </summary>
-        public double Sut_MPa => _Sut / Math.Pow(1000.0, 2);
+        public double Sut { get; set; } = sut_MPa * 1000 * 1000;
+
 
         /// <summary>
         /// Youngs modulus in GPa
         /// </summary>
         public double E_GPa => E / Math.Pow(1000.0, 3);
+
+        /// <summary>
+        /// Yield strength in MPa
+        /// </summary>
+        public double Sy_MPa => Sy / Math.Pow(1000.0, 2);
+
+        /// <summary>
+        /// Ultimate strength in Pa
+        /// </summary>
+        public double Sut_MPa => Sut / Math.Pow(1000.0, 2);
+
         public DenseMatrix D_Matrix_2D
         {
             get

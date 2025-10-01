@@ -35,6 +35,8 @@
             TreeNode treeNode4 = new TreeNode("Materials");
             ToolStrip_Upper = new ToolStrip();
             ToolStripDropDownButton_File = new ToolStripDropDownButton();
+            toolStripMenuItem_Save = new ToolStripMenuItem();
+            toolStripMenuItem_Load = new ToolStripMenuItem();
             ToolStripButton_Addnode = new ToolStripButton();
             ToolStripComboBox_ProblemMode = new ToolStripComboBox();
             ToolStripButton_AddMaterial = new ToolStripButton();
@@ -50,11 +52,11 @@
             TabPage1 = new TabPage();
             TreeView_Main = new TreeView();
             TabPage2 = new TabPage();
+            resultsTreeControl_main = new UserControls.ResultsTreeControl();
             glControl_main = new OpenTK.GLControl.GLControl();
             ContextMenuStrip_TreeView = new ContextMenuStrip(components);
             ToolStripMenuItem1 = new ToolStripMenuItem();
             ToolStripMenuItem2 = new ToolStripMenuItem();
-            resultsTreeControl_main = new UserControls.ResultsTreeControl();
             ToolStrip_Upper.SuspendLayout();
             StatusStrip_Lower.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SplitContainer_Main).BeginInit();
@@ -78,10 +80,25 @@
             // 
             // ToolStripDropDownButton_File
             // 
+            ToolStripDropDownButton_File.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItem_Load, toolStripMenuItem_Save });
             ToolStripDropDownButton_File.ImageTransparentColor = Color.Magenta;
             ToolStripDropDownButton_File.Name = "ToolStripDropDownButton_File";
             ToolStripDropDownButton_File.Size = new Size(38, 22);
             ToolStripDropDownButton_File.Text = "File";
+            // 
+            // toolStripMenuItem_Save
+            // 
+            toolStripMenuItem_Save.Name = "toolStripMenuItem_Save";
+            toolStripMenuItem_Save.Size = new Size(180, 22);
+            toolStripMenuItem_Save.Text = "Save Problem";
+            toolStripMenuItem_Save.Click += toolStripMenuItem_Save_Click;
+            // 
+            // toolStripMenuItem_Load
+            // 
+            toolStripMenuItem_Load.Name = "toolStripMenuItem_Load";
+            toolStripMenuItem_Load.Size = new Size(180, 22);
+            toolStripMenuItem_Load.Text = "Open Problem";
+            toolStripMenuItem_Load.Click += toolStripMenuItem_Load_Click;
             // 
             // ToolStripButton_Addnode
             // 
@@ -237,6 +254,14 @@
             TabPage2.Text = "TabPage2";
             TabPage2.UseVisualStyleBackColor = true;
             // 
+            // resultsTreeControl_main
+            // 
+            resultsTreeControl_main.Dock = DockStyle.Fill;
+            resultsTreeControl_main.Location = new Point(4, 3);
+            resultsTreeControl_main.Name = "resultsTreeControl_main";
+            resultsTreeControl_main.Size = new Size(166, 373);
+            resultsTreeControl_main.TabIndex = 0;
+            // 
             // glControl_main
             // 
             glControl_main.API = OpenTK.Windowing.Common.ContextAPI.OpenGL;
@@ -268,14 +293,6 @@
             ToolStripMenuItem2.Name = "ToolStripMenuItem2";
             ToolStripMenuItem2.Size = new Size(107, 22);
             ToolStripMenuItem2.Text = "Delete";
-            // 
-            // resultsTreeControl_main
-            // 
-            resultsTreeControl_main.Dock = DockStyle.Fill;
-            resultsTreeControl_main.Location = new Point(4, 3);
-            resultsTreeControl_main.Name = "resultsTreeControl_main";
-            resultsTreeControl_main.Size = new Size(166, 373);
-            resultsTreeControl_main.TabIndex = 0;
             // 
             // Mainform
             // 
@@ -328,5 +345,7 @@
         internal ToolStripButton ToolStripButton_Solve;
         private OpenTK.GLControl.GLControl glControl_main;
         private UserControls.ResultsTreeControl resultsTreeControl_main;
+        private ToolStripMenuItem toolStripMenuItem_Save;
+        private ToolStripMenuItem toolStripMenuItem_Load;
     }
 }

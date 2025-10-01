@@ -7,7 +7,7 @@ namespace FEA_Program.Models
 {
     internal class Connectivity
     {
-        private readonly Dictionary<int, List<int>> _ConnectMatrix = []; // dict key is global element ID, list index is local node ID, list value at index is global node ID
+        private Dictionary<int, List<int>> _ConnectMatrix = []; // dict key is global element ID, list index is local node ID, list value at index is global node ID
 
         public Dictionary<int, List<int>> ConnectMatrix => _ConnectMatrix;
 
@@ -46,6 +46,15 @@ namespace FEA_Program.Models
         public void RemoveConnection(int elementID)
         {
             _ConnectMatrix.Remove(elementID);
+        }
+
+        /// <summary>
+        /// Import a dataset, usually when loading from a file
+        /// </summary>
+        /// <param name="connectivityMatrix"></param>
+        public void ImportMatrix(Dictionary<int, List<int>> connectivityMatrix)
+        {
+            _ConnectMatrix = connectivityMatrix;
         }
 
 

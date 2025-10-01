@@ -38,6 +38,21 @@
             Add("1045 Steel", 200, 0.29, 565, 310, MaterialType.Steel_Alloy);
         }
 
+        /// <summary>
+        /// Import a dataset, usually when loading from a file
+        /// </summary>
+        /// <param name="materials"></param>
+        public void ImportMaterials(List<Material> materials)
+        {
+            _Materials.Clear();
+            foreach (var material in materials)
+            {
+                _Materials[material.ID] = material;
+            }
+
+            MaterialListChanged?.Invoke(this, _Materials);
+        }
+
         // ---------------------- Private Helpers ----------------------------
 
         private int CreateMatlId()

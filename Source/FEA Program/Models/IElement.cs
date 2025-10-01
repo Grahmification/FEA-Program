@@ -10,6 +10,24 @@ namespace FEA_Program.Models
         int NumOfNodes { get; }
         int NodeDOFs { get; }
         int ElementDOFs { get; }
+        ElementTypes ElementType { get; }
+
+        /// <summary>
+        /// Element body force in N/m^3 [X, Y, Z]^T
+        /// </summary>
+        public DenseVector BodyForce { get; }
+
+        /// <summary>
+        /// Element traction force in N/m [X, Y, Z]^T
+        /// </summary>
+        public DenseVector TractionForce { get; }
+
+
+
+        /// <summary>
+        /// Get arguments that may vary between different element types
+        /// </summary>
+        public double[] ElementArgs { get; set; }
 
         // ---------------- Pre solution methods ----------------
 
@@ -78,5 +96,13 @@ namespace FEA_Program.Models
         /// <returns></returns>
         DenseVector StressMatrix(List<double[]> nodeCoordinates, DenseVector globalNodeQ, double[]? localCoords = null);
 
+    }
+
+    /// <summary>
+    /// Different types of elements
+    /// </summary>
+    public enum ElementTypes
+    {
+        BarLinear
     }
 }

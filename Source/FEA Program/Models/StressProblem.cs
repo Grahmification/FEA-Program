@@ -1,4 +1,8 @@
-﻿namespace FEA_Program.Models
+﻿using FEA_Program.Drawable;
+using FEA_Program.SaveData;
+using MathNet.Numerics.LinearAlgebra.Double;
+
+namespace FEA_Program.Models
 {
     internal class StressProblem
     {
@@ -86,6 +90,7 @@
             }
         }
 
+        // ---------------------- Public Methods ----------------------------
         public StressProblem(Mainform form, ProblemTypes Type, MaterialManager? materials = null)
         {
             Nodes = new NodeManager();
@@ -109,6 +114,117 @@
 
             Loadedform = form;
             ProblemType = Type;
+        }
+        public ProblemData GetSaveData()
+        {
+            var output = new ProblemData();
+
+            // ------------------- Nodes --------------------
+            foreach(var node in Nodes.Nodelist) 
+            {
+                output.Nodes.Add(new NodeProblemData
+                {
+                    Dimension = node.Dimension,
+                    ID = node.ID,
+                    Coords = node.Coords,
+                    Fixity = node.Fixity,
+                    Force = node.Force
+                });
+            }
+
+            // ------------------- Elements --------------------
+            foreach (var element in Elements.Elemlist)
+            {
+                output.Elements.Add(new ElementProblemData
+                {
+                    ID = element.ID,
+                    MaterialID = element.Material.ID,
+                    NodeDOFs = element.NodeDOFs,
+                    ElementType = element.ElementType,
+                    ElementArgs = element.ElementArgs,
+                    BodyForce = [.. element.BodyForce],
+                    TractionForce = [.. element.TractionForce],
+                });
+            }
+
+            // ------------------- Materials --------------------
+            foreach (var item in Materials.MaterialList)
+            {
+                output.Materials.Add(new MaterialSaveData
+                {
+                    ID = item.ID,
+                    Name = item.Name,
+                    Subtype = item.Subtype,
+                    E= item.E,
+                    V= item.V,
+                    Sy = item.Sy,
+                    Sut = item.Sut,
+                });
+            }
+
+            // ------------------- Other --------------------
+            output.ConnectivityMatrix = Connect.ConnectMatrix;
+            output.ProblemType = ProblemType;
+
+            return output;
+        }
+        public void LoadData(ProblemData data)
+        {
+            ProblemType = data.ProblemType;
+            // This should be done early as other things raise events which might affect it
+            Connect.ImportMatrix(data.ConnectivityMatrix);
+
+            // ----------- Import Materials ---------------
+            List<Material> materials = [];
+            foreach (var item in data.Materials)
+            {
+                materials.Add(new Material(item.Name, 0, item.V, 0, 0, item.ID, item.Subtype)
+                {
+                    E = item.E,
+                    Sy = item.Sy,
+                    Sut = item.Sut
+                });
+            }
+
+            Materials.ImportMaterials(materials);
+
+            // ----------- Import Nodes ---------------
+            List<NodeDrawable> nodes = [];
+ 
+            foreach (var item in data.Nodes)
+            {
+                nodes.Add(new NodeDrawable(item.Coords, item.Fixity, item.ID, item.Dimension)
+                {
+                    Force = item.Force
+                });
+            }
+
+            Nodes.ImportNodes(nodes);
+
+            // ----------- Import Elements ---------------
+            List<IElementDrawable> elements = [];
+            foreach (var item in data.Elements)
+            {
+                var elementMaterial = Materials.GetMaterial(item.MaterialID);
+                IElementDrawable? element = null;
+
+                switch (item.ElementType)
+                {
+                    case ElementTypes.BarLinear:
+                        element = new ElementBarLinearDrawable(1, item.ID, elementMaterial, item.NodeDOFs)
+                        {
+                            ElementArgs = item.ElementArgs
+                        };
+                        element.SetBodyForce(new DenseVector(item.BodyForce));
+                        element.SetTractionForce(new DenseVector(item.TractionForce));
+                        break;
+                }
+
+                if (element is not null)
+                    elements.Add(element);
+            }
+
+            Elements.ImportElements(elements);
         }
 
         // ---------------------- Event Handlers ----------------------------

@@ -131,6 +131,23 @@ namespace FEA_Program.Models
         }
 
         /// <summary>
+        /// Import a dataset, usually when loading from a file
+        /// </summary>
+        /// <param name="nodes"></param>
+        public void ImportNodes(List<NodeDrawable> nodes)
+        {
+            _Nodes.Clear();
+
+            foreach(NodeDrawable node in nodes)
+            {
+                _Nodes[node.ID] = node;
+            }
+
+            NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
+        }
+
+
+        /// <summary>
         /// Sets the solution for all nodes
         /// </summary>
         /// <param name="Q">The global displacement vector</param>

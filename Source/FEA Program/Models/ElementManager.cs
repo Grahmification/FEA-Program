@@ -99,6 +99,22 @@ namespace FEA_Program.Models
             return output;
         }
 
+        /// <summary>
+        /// Import a dataset, usually when loading from a file
+        /// </summary>
+        /// <param name="elements"></param>
+        public void ImportElements(List<IElementDrawable> elements)
+        {
+            _Bar1Elements.Clear();
+            foreach (var element in elements)
+            {
+                _Bar1Elements[element.ID] = element;
+            }
+
+            ElementListChanged?.Invoke(this, _Bar1Elements);
+        }
+
+
         // ---------------------- Private Helpers ----------------------------
 
         private int CreateUniqueId()
