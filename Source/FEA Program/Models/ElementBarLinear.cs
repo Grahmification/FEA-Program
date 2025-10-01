@@ -1,4 +1,4 @@
-﻿using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double;
 using System.Reflection;
 
 namespace FEA_Program.Models
@@ -143,10 +143,36 @@ namespace FEA_Program.Models
         {
             ValidateLength(localCoords, 1, MethodBase.GetCurrentMethod()?.Name);
             double eta = localCoords[0];
+            double n1 = (1 - eta) / 2.0;
+            double n2 = (1 + eta) / 2.0;
 
-            var n = new DenseMatrix(1, ElementDOFs); // u = Nq - size based off total number of element DOFs
-            n[0, 0] = (1 - eta) / 2.0d;
-            n[0, 1] = (1 + eta) / 2.0d;
+            // u = Nq - size based node DOFs
+            var n = new DenseMatrix(NodeDOFs, ElementDOFs); 
+
+            if (NodeDOFs == 1)
+            {
+                // u[1x1] = N[1x2] * q[2x1]
+                n[0, 0] = n1;
+                n[0, 1] = n2;
+            }
+            else if (NodeDOFs == 2)
+            {
+                // u[2x1] = N[2x4] * q[4x1]
+                n[0, 0] = n1;
+                n[1, 1] = n1;
+                n[0, 2] = n2;
+                n[1, 3] = n2;
+            }
+            else // Node DOFs == 3
+            {
+                // u[3x1] = N[3x6] * q[6x1]
+                n[0, 0] = n1;
+                n[1, 1] = n1;
+                n[2, 2] = n1;
+                n[0, 3] = n2;
+                n[1, 4] = n2;
+                n[2, 5] = n2;
+            }
 
             return n;
         }
