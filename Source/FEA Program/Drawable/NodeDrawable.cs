@@ -13,6 +13,16 @@ namespace FEA_Program.Drawable
         private Color _DefaultFixityColor = Color.Red;
         private Color _SelectedColor = Color.Yellow;
 
+        /// <summary>
+        /// Center coordinates to draw the node at
+        /// </summary>
+        public double[] DrawCoordinates => GetScaledDisplacement_mm(DisplacementScalingFactor);
+
+        /// <summary>
+        /// How much to scale the result displacement by. 0 = show at original position, 1 = show at displaced position
+        /// </summary>
+        public double DisplacementScalingFactor { get; set; } = 0;
+ 
         public bool Selected { get; set; } = false;
         public void Draw()
         {
@@ -30,9 +40,9 @@ namespace FEA_Program.Drawable
             DrawNodeForce(this, forceColor, true);
         }
 
-        public static void DrawNode(Node node, Color color)
+        public static void DrawNode(NodeDrawable node, Color color)
         {
-            var nodeCoords = node.Coords_mm; // Always draw as mm input
+            var nodeCoords = node.DrawCoordinates;
             double[] coords = [0, 0, 0];
 
             // nodeCoords may have less than 3 items 
@@ -58,9 +68,9 @@ namespace FEA_Program.Drawable
                 Primitives.Cube(color, coords, 2);
             }
         }
-        public static void DrawNodeForce(Node node, Color color, bool reaction = false)
+        public static void DrawNodeForce(NodeDrawable node, Color color, bool reaction = false)
         {
-            var nodeCoords = node.Coords_mm; // Always draw as mm input
+            var nodeCoords = node.DrawCoordinates;
             var nodeForce = reaction ? node.ReactionForce : node.Force;
             double[] coords = [0, 0, 0];
             double[] force = [0, 0, 0];
@@ -89,12 +99,11 @@ namespace FEA_Program.Drawable
 
             Primitives.Arrow(color, coords, force, forcelength);
         }
-        public static void DrawNodeFixity(Node node, Color color)
+        public static void DrawNodeFixity(NodeDrawable node, Color color)
         {
             double squareoffset = 1.5d;
 
-
-            var nodeCoords = node.Coords_mm; // Always draw as mm input
+            var nodeCoords = node.DrawCoordinates;
             var nodeFixity = node.Fixity;
             double[] coords = [0, 0, 0];
             int[] fixity = [0, 0, 0];

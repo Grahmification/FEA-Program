@@ -129,12 +129,12 @@ namespace FEA_Program.Models
             ReactionForce = reactionForce;
             SolutionValid = true;
         }
-        public double[] GetScaledDisplacement_mm(double percentage, double scaleFactor)
+        public double[] GetScaledDisplacement_mm(double scaleFactor)
         {
-            var output = new double[Dimension + 1];
+            var output = new double[Dimension];
 
-            for (int i = 0, loopTo = _Coords.Length - 1; i <= loopTo; i++)
-                output[i] = (Coords[i] + Displacement[i] * percentage * scaleFactor) * 1000.0d; // convert to mm
+            for (int i = 0; i < _Coords.Length; i++)
+                output[i] = (Coords[i] + Displacement[i] * scaleFactor) * 1000.0; // convert to mm
 
             return output;
         }

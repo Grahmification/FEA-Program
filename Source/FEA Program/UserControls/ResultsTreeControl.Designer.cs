@@ -36,6 +36,7 @@
             // treeView_main
             // 
             treeView_main.BackColor = Color.LightGray;
+            treeView_main.BorderStyle = BorderStyle.None;
             treeView_main.Dock = DockStyle.Fill;
             treeView_main.Location = new Point(0, 0);
             treeView_main.Name = "treeView_main";

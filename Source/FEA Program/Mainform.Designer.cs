@@ -35,8 +35,8 @@
             TreeNode treeNode4 = new TreeNode("Materials");
             ToolStrip_Upper = new ToolStrip();
             ToolStripDropDownButton_File = new ToolStripDropDownButton();
-            toolStripMenuItem_Save = new ToolStripMenuItem();
             toolStripMenuItem_Load = new ToolStripMenuItem();
+            toolStripMenuItem_Save = new ToolStripMenuItem();
             ToolStripButton_Addnode = new ToolStripButton();
             ToolStripComboBox_ProblemMode = new ToolStripComboBox();
             ToolStripButton_AddMaterial = new ToolStripButton();
@@ -53,6 +53,8 @@
             TreeView_Main = new TreeView();
             TabPage2 = new TabPage();
             resultsTreeControl_main = new UserControls.ResultsTreeControl();
+            tabPage_display = new TabPage();
+            resultDisplaySettingsControl_main = new UserControls.ResultDisplaySettingsControl();
             glControl_main = new OpenTK.GLControl.GLControl();
             ContextMenuStrip_TreeView = new ContextMenuStrip(components);
             ToolStripMenuItem1 = new ToolStripMenuItem();
@@ -66,6 +68,7 @@
             TabControl_Main.SuspendLayout();
             TabPage1.SuspendLayout();
             TabPage2.SuspendLayout();
+            tabPage_display.SuspendLayout();
             ContextMenuStrip_TreeView.SuspendLayout();
             SuspendLayout();
             // 
@@ -86,19 +89,19 @@
             ToolStripDropDownButton_File.Size = new Size(38, 22);
             ToolStripDropDownButton_File.Text = "File";
             // 
-            // toolStripMenuItem_Save
-            // 
-            toolStripMenuItem_Save.Name = "toolStripMenuItem_Save";
-            toolStripMenuItem_Save.Size = new Size(180, 22);
-            toolStripMenuItem_Save.Text = "Save Problem";
-            toolStripMenuItem_Save.Click += toolStripMenuItem_Save_Click;
-            // 
             // toolStripMenuItem_Load
             // 
             toolStripMenuItem_Load.Name = "toolStripMenuItem_Load";
-            toolStripMenuItem_Load.Size = new Size(180, 22);
+            toolStripMenuItem_Load.Size = new Size(151, 22);
             toolStripMenuItem_Load.Text = "Open Problem";
             toolStripMenuItem_Load.Click += toolStripMenuItem_Load_Click;
+            // 
+            // toolStripMenuItem_Save
+            // 
+            toolStripMenuItem_Save.Name = "toolStripMenuItem_Save";
+            toolStripMenuItem_Save.Size = new Size(151, 22);
+            toolStripMenuItem_Save.Text = "Save Problem";
+            toolStripMenuItem_Save.Click += toolStripMenuItem_Save_Click;
             // 
             // ToolStripButton_Addnode
             // 
@@ -202,6 +205,7 @@
             // 
             TabControl_Main.Controls.Add(TabPage1);
             TabControl_Main.Controls.Add(TabPage2);
+            TabControl_Main.Controls.Add(tabPage_display);
             TabControl_Main.Dock = DockStyle.Fill;
             TabControl_Main.Location = new Point(0, 0);
             TabControl_Main.Margin = new Padding(4, 3, 4, 3);
@@ -251,16 +255,38 @@
             TabPage2.Padding = new Padding(4, 3, 4, 3);
             TabPage2.Size = new Size(174, 379);
             TabPage2.TabIndex = 1;
-            TabPage2.Text = "TabPage2";
+            TabPage2.Text = "Results";
             TabPage2.UseVisualStyleBackColor = true;
             // 
             // resultsTreeControl_main
             // 
+            resultsTreeControl_main.BorderStyle = BorderStyle.FixedSingle;
             resultsTreeControl_main.Dock = DockStyle.Fill;
             resultsTreeControl_main.Location = new Point(4, 3);
             resultsTreeControl_main.Name = "resultsTreeControl_main";
             resultsTreeControl_main.Size = new Size(166, 373);
             resultsTreeControl_main.TabIndex = 0;
+            // 
+            // tabPage_display
+            // 
+            tabPage_display.Controls.Add(resultDisplaySettingsControl_main);
+            tabPage_display.Location = new Point(4, 24);
+            tabPage_display.Name = "tabPage_display";
+            tabPage_display.Size = new Size(174, 379);
+            tabPage_display.TabIndex = 2;
+            tabPage_display.Text = "Display";
+            tabPage_display.UseVisualStyleBackColor = true;
+            // 
+            // resultDisplaySettingsControl_main
+            // 
+            resultDisplaySettingsControl_main.BackColor = Color.LightGray;
+            resultDisplaySettingsControl_main.BorderStyle = BorderStyle.FixedSingle;
+            resultDisplaySettingsControl_main.DisplacementEnabled = false;
+            resultDisplaySettingsControl_main.Dock = DockStyle.Fill;
+            resultDisplaySettingsControl_main.Location = new Point(0, 0);
+            resultDisplaySettingsControl_main.Name = "resultDisplaySettingsControl_main";
+            resultDisplaySettingsControl_main.Size = new Size(174, 379);
+            resultDisplaySettingsControl_main.TabIndex = 0;
             // 
             // glControl_main
             // 
@@ -316,6 +342,7 @@
             TabControl_Main.ResumeLayout(false);
             TabPage1.ResumeLayout(false);
             TabPage2.ResumeLayout(false);
+            tabPage_display.ResumeLayout(false);
             ContextMenuStrip_TreeView.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
@@ -347,5 +374,7 @@
         private UserControls.ResultsTreeControl resultsTreeControl_main;
         private ToolStripMenuItem toolStripMenuItem_Save;
         private ToolStripMenuItem toolStripMenuItem_Load;
+        private TabPage tabPage_display;
+        private UserControls.ResultDisplaySettingsControl resultDisplaySettingsControl_main;
     }
 }

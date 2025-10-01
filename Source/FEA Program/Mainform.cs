@@ -13,8 +13,9 @@ namespace FEA_Program
     internal partial class Mainform : Form
     {
         private StressProblem P;
+        private NodeDrawManager _DrawManager = new();
 
-        public CoordinateSystem Coord = new([0,0,0], 10);
+        public CoordinateSystem Coord = new([0, 0, 0], 10);
         public GLControlDraggable GlCont;
 
         public Mainform()
@@ -23,9 +24,13 @@ namespace FEA_Program
 
             InitializeComponent();
 
-            P = new(this, ProblemTypes.Bar_1D);
+            // Setup draw manager
+            _DrawManager.DisplaceScaling = 10000;
+            _DrawManager.RedrawRequired += (s, e) => GlCont?.SubControl.Invalidate();
+            resultDisplaySettingsControl_main.SetDrawManager(_DrawManager);
+            
+            ResetProblem(ProblemTypes.Bar_1D);
         }
-
         private void Mainform_Load(object sender, EventArgs e)
         {
             try
@@ -51,12 +56,34 @@ namespace FEA_Program
             }
         }
 
+
+        private void ResetProblem(ProblemTypes problemType)
+        {
+            if (P is null)
+            {
+                P = new(this, problemType);
+            }
+            else
+            {
+                var materials = P.Materials; // Save materials so they don't change
+                P = new(this, problemType, materials);
+            }
+
+            // Make sure node changes get updated in the draw manager
+            _DrawManager.Nodes = P.Nodes.Nodelist;
+            P.Nodes.NodeListChanged += OnNodeListChanged;
+        }
+        private void OnNodeListChanged(object? sender, SortedDictionary<int, NodeDrawable> e)
+        {
+            _DrawManager.Nodes = [.. e.Values];
+        }
+
+
         public void OnViewDrawStuff(object? sender, bool threeDimensional)
         {
             Coord.Draw(threeDimensional);
 
-            foreach (NodeDrawable N in P.Nodes.Nodelist)
-                N.Draw();
+            _DrawManager.DrawNodes();
 
             foreach (IElementDrawable E in P.Elements.Elemlist)
             {
@@ -145,7 +172,7 @@ namespace FEA_Program
 
             foreach (Node node in P.Nodes.Nodelist)
             {
-                if(node.ForceMagnitude > 0)
+                if (node.ForceMagnitude > 0)
                 {
                     var newNode = new TreeNode($"Force (Node {node.ID})")
                     {
@@ -199,7 +226,7 @@ namespace FEA_Program
             {
                 ToolStripComboBox TSCB = (ToolStripComboBox)sender;
                 var materials = P.Materials; // Save materials - they don't change
-                P = new StressProblem(this, (ProblemTypes)TSCB.SelectedIndex, materials);
+                ResetProblem((ProblemTypes)TSCB.SelectedIndex);
                 GlCont.ThreeDimensional = P.ThreeDimensional;
 
                 ReDrawLists();
