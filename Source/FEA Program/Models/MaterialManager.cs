@@ -18,13 +18,16 @@
 
         public void Add(string Name, double E_GPa, double V, double Sy_MPa, double Sut_MPa, MaterialType subtype)
         {
-
             int ID = CreateMatlId();
-            var mat = new Material(Name, E_GPa, V, Sy_MPa, Sut_MPa, ID, subtype);
-            _Materials.Add(ID, mat);
+            _Materials.Add(ID, new Material(Name, E_GPa, ID, subtype)
+            {
+                V = V,
+                E = E_GPa * Math.Pow(1000, 3),
+                Sy = Sy_MPa * Math.Pow(1000, 2),
+                Sut = Sut_MPa * Math.Pow(1000, 2),
+            });
 
             MaterialListChanged?.Invoke(this, _Materials);
-
         }
         public void Delete(int ID)
         {

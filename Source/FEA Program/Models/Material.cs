@@ -2,7 +2,7 @@
 
 namespace FEA_Program.Models
 {
-    internal class Material(string name, double E_GPa, double v, double sy_MPa, double sut_MPa, int id, MaterialType subtype = MaterialType.Other)
+    internal class Material(string name, double e, int id = Constants.InvalidID, MaterialType subtype = MaterialType.Other)
     {
         public int ID { get; private set; } = id;
         public string Name { get; private set; } = name;
@@ -11,22 +11,22 @@ namespace FEA_Program.Models
         /// <summary>
         /// Youngs modulus in Pa
         /// </summary>
-        public double E { get; set; } = E_GPa * 1000 * 1000 * 1000; // convert to Pa
+        public double E { get; set; } = e;
 
         /// <summary>
         /// Poissons ratio
         /// </summary>
-        public double V { get; set; } = v;
+        public double V { get; set; } = 0;
 
         /// <summary>
         /// Yield strength in Pa
         /// </summary>
-        public double Sy { get; set; } = sy_MPa * 1000 * 1000;
+        public double Sy { get; set; } = 0;
 
         /// <summary>
         /// Ultimate strength in Pa
         /// </summary>
-        public double Sut { get; set; } = sut_MPa * 1000 * 1000;
+        public double Sut { get; set; } = 0;
 
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace FEA_Program.Models
             }
         }
 
-        public static Material DummyMaterial() => new("Dummy matieral", 1, 0, 1, 1, -1);
+        public static Material DummyMaterial() => new("Dummy matieral", 0);
     }
 
     public enum MaterialType

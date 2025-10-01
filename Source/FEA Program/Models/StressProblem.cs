@@ -178,9 +178,9 @@ namespace FEA_Program.Models
             List<Material> materials = [];
             foreach (var item in data.Materials)
             {
-                materials.Add(new Material(item.Name, 0, item.V, 0, 0, item.ID, item.Subtype)
+                materials.Add(new Material(item.Name, item.E, item.ID, item.Subtype)
                 {
-                    E = item.E,
+                    V = item.V,
                     Sy = item.Sy,
                     Sut = item.Sut
                 });
