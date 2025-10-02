@@ -1,5 +1,6 @@
 using FEA_Program.Controls;
 using FEA_Program.Drawable;
+using FEA_Program.Forms;
 using FEA_Program.Graphics;
 using FEA_Program.Models;
 using FEA_Program.SaveData;
@@ -237,6 +238,8 @@ namespace FEA_Program
             }
         }
 
+        // --------------------- Solver related events --------------------------
+
         private void ToolStripButtonSolve_Click(object sender, EventArgs e)
         {
             try
@@ -246,7 +249,12 @@ namespace FEA_Program
                     nodeDOFS.Add(node.ID, node.Dimension);
 
                 SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoordinates), nodeDOFS);
-                DenseVector[] output = Connectivity.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx, true);
+                
+                Solver s = new();
+                s.SolutionStarted += S_SolutionStarted;
+                s.PartiallyReducedCalculated += S_PartiallyReducedCalculated;
+                s.FullyReducedCalculated += S_FullyReducedCalculated;
+                DenseVector[] output = s.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx);
 
                 var displacements = output[0].Values;
                 var reactionForces = output[1].Values;
@@ -264,6 +272,25 @@ namespace FEA_Program
                 FormattedMessageBox.DisplayError(ex);
             }
         }
+
+        private void S_SolutionStarted(object? sender, (Matrix, Matrix, Matrix) e)
+        {
+            // Display matricies for the user
+            var form = new MatrixViewerForm([e.Item1, e.Item2, e.Item3],
+                ["K Matrix", "Q Matrix", "F Matrix"]);
+        }
+        private void S_FullyReducedCalculated(object? sender, (Matrix, Matrix) e)
+        {
+            // Display matricies for the user
+            var form = new MatrixViewerForm([e.Item1, e.Item2], 
+                ["K Matrix Partially Reduced", "F Matrix Partially Reduced"]);
+        }
+        private void S_PartiallyReducedCalculated(object? sender, (Matrix, Matrix) e)
+        {
+            var form = new MatrixViewerForm([e.Item1, e.Item2], 
+                ["K Matrix Fully Reduced", "F Matrix Fully Reduced"]);
+        }
+
 
         private void ToolStripButton_Addnode_Click(object sender, EventArgs e)
         {
