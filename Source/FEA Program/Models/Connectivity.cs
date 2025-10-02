@@ -5,6 +5,9 @@ using MathNet.Numerics.LinearAlgebra.Storage;
 
 namespace FEA_Program.Models
 {
+    /// <summary>
+    /// Manages the lookup table connecting elements and nodes
+    /// </summary>
     internal class Connectivity
     {
         private Dictionary<int, List<int>> _ConnectMatrix = []; // dict key is global element ID, list index is local node ID, list value at index is global node ID
@@ -57,18 +60,12 @@ namespace FEA_Program.Models
             _ConnectMatrix = connectivityMatrix;
         }
 
-
-        private void SortNodeLocalIDs(Dictionary<int, Dictionary<int, double[]>> NodeCoords)
-        {
-
-        }
-        
         /// <summary>
         /// Assembles the global stiffness matrix
         /// </summary>
         /// <param name="K_Matricies">Key = Element ID, Value = Element's K matrix</param>
         /// <param name="nodeDOFs">Key = NodeID, Value = Node DOFs for the given ID</param>
-        /// <returns>The global stiffness matrix</returns>
+        /// <returns>The global stiffness matrix, sorted from the lowest node ID to highest [N1x, N1y, N2x, N2y,....]</returns>
         public SparseMatrix Assemble_K_Mtx(Dictionary<int, DenseMatrix> K_Matricies, Dictionary<int, int> nodeDOFs)
         {
             // ---------------------- Get Total Size of the Problem --------------------------
