@@ -12,6 +12,7 @@ namespace FEA_Program.Models
         public ElementManager Elements { get; private set; }
         public MaterialManager Materials { get; private set; }
         public Connectivity Connect { get; private set; }
+        public Solver Solver { get; private set; } = new Solver();
 
         /// <summary>
         /// which elements are available depending on problem type
@@ -226,6 +227,30 @@ namespace FEA_Program.Models
 
             Elements.ImportElements(elements);
         }
+
+
+        /// <summary>
+        /// Solve the stress problem
+        /// </summary>
+        public bool Solve()
+        {
+            Dictionary<int, int> nodeDOFS = Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Dimension);
+            Dictionary<int, double[]> nodeCoordinates = Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Coordinates);
+
+            var K_Matricies = ElementExtensions.Get_K_Matricies(Elements.Elemlist.Cast<IElement>().ToList(), Connect.ConnectivityMatrix, nodeCoordinates);
+            SparseMatrix K_assembled = Connect.Assemble_K_Matrix(K_Matricies, nodeDOFS);
+            var F_assembled = NodeExtensions.F_Matrix(Nodes.BaseNodelist);
+            var Q_assembled = NodeExtensions.Q_Matrix(Nodes.BaseNodelist);
+
+            DenseVector[] output = Solver.Solve(K_assembled, F_assembled, Q_assembled);
+            Nodes.SetSolution(output[0], output[1]);
+
+            var displacements = output[0].Values;
+
+            // False if there's a bad value
+            return !(displacements.Contains(double.NaN) || displacements.Contains(double.PositiveInfinity) || displacements.Contains(double.NegativeInfinity));
+        }
+
 
         // ---------------------- Event Handlers ----------------------------
 

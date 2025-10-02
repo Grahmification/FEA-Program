@@ -73,6 +73,11 @@ namespace FEA_Program
             // Make sure node changes get updated in the draw manager
             _DrawManager.Nodes = P.Nodes.Nodelist;
             P.Nodes.NodeListChanged += OnNodeListChanged;
+
+            // Link to the solver
+            P.Solver.SolutionStarted += S_SolutionStarted;
+            P.Solver.PartiallyReducedCalculated += S_PartiallyReducedCalculated;
+            P.Solver.FullyReducedCalculated += S_FullyReducedCalculated;
         }
         private void OnNodeListChanged(object? sender, SortedDictionary<int, NodeDrawable> e)
         {
@@ -244,29 +249,14 @@ namespace FEA_Program
         {
             try
             {
-                Dictionary<int, int> nodeDOFS = P.Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Dimension);
-                Dictionary<int, double[]> nodeCoordinates = P.Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Coordinates);
-
-                var K_Matricies = ElementExtensions.Get_K_Matricies(P.Elements.Elemlist.Cast<IElement>().ToList(), P.Connect.ConnectivityMatrix, nodeCoordinates);
-                SparseMatrix K_assembled = P.Connect.Assemble_K_Matrix(K_Matricies, nodeDOFS);
-                var F_assembled = NodeExtensions.F_Matrix(P.Nodes.BaseNodelist);
-                var Q_assembled = NodeExtensions.Q_Matrix(P.Nodes.BaseNodelist);
-
-                Solver s = new();
-                s.SolutionStarted += S_SolutionStarted;
-                s.PartiallyReducedCalculated += S_PartiallyReducedCalculated;
-                s.FullyReducedCalculated += S_FullyReducedCalculated;
-
-                DenseVector[] output = s.Solve(K_assembled, F_assembled, Q_assembled);
-
-                var displacements = output[0].Values;
-                var reactionForces = output[1].Values;
-
-                MessageBox.Show(string.Join(",", displacements), "Displacements");
-                MessageBox.Show(string.Join(",", reactionForces), "Reaction Forces");
-
-                // TODO: Ensure sorting between nodes and results is correct!!!
-                P.Nodes.SetSolution(output[0], output[1]);
+                if (P.Solve())
+                {
+                    FormattedMessageBox.DisplayMessage("Solved Successfully!");
+                }
+                else
+                {
+                    FormattedMessageBox.DisplayMessage("Solution succeeded, but with invalid values. Check for unconstrained degrees of freedom.");
+                }
 
                 resultsTreeControl_main.DrawSolution(P);
             }
