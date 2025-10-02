@@ -1,4 +1,5 @@
 ﻿using FEA_Program.Controls;
+using FEA_Program.Drawable;
 using FEA_Program.Models;
 using FEA_Program.UI;
 
@@ -213,9 +214,9 @@ namespace FEA_Program.UserControls
 
                 // --------------------- Populate Node Comboboxes -------------------------
 
-                foreach (Node Node in _Nodes)
+                foreach (NodeDrawable Node in _Nodes)
                 {
-                    string text = (string)Node.ID.ToString() + " - (" + string.Join(",", Node.Coords_mm) + ")";
+                    string text = (string)Node.ID.ToString() + " - (" + string.Join(",", Node.Coordinates_mm) + ")";
 
                     nodeCollection.Add(text);
 

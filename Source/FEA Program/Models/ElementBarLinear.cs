@@ -53,7 +53,7 @@ namespace FEA_Program.Models
             ValidateLength(nodes, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
 
             //Order from smallest to largest X coordinate
-            nodes = nodes.OrderBy(n => n.Coords[0]).ToList();
+            nodes = nodes.OrderBy(n => n.Coordinates[0]).ToList();
         }
 
         /// <summary>

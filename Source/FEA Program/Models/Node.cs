@@ -4,6 +4,9 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
 {
+    /// <summary>
+    /// A node in an FEA problem with arbitrary degrees of freedom
+    /// </summary>
     internal class Node : INode
     {
         /// <summary>
@@ -11,7 +14,7 @@ namespace FEA_Program.Models
         /// </summary>
         public static int[] ValidDimensions = [1, 2, 3, 6];
 
-        private double[] _Coords; // coordinates in m
+        private double[] _Coordinates; // coordinates in m
         private int[] _Fixity; // 0 = floating, 1 = fixed
         private double[] _Force; // first 3 items  = force [N], last 3 = moments [Nm]
 
@@ -20,18 +23,17 @@ namespace FEA_Program.Models
         /// <summary>
         /// The node dimension 1 = 1D, 2 = 2D, 3 = 3D, 6 = 6D
         /// </summary>
-        public int Dimension { get; private set; }  // first 3 items  = force [N], last 3 = moments [Nm]
+        public int Dimension { get; private set; }
         public int ID { get; private set; }
         public bool SolutionValid { get; private set; } = false;
 
-        public double[] Coords_mm => _Coords.Select(coord => coord * 1000.0d).ToArray();
-        public double[] Coords
+        public double[] Coordinates
         {
-            get { return _Coords; }
+            get { return _Coordinates; }
             set
             {
                 ValidateDimension<double>(value, MethodBase.GetCurrentMethod()?.Name ?? "");
-                _Coords = value;
+                _Coordinates = value;
                 InvalidateSolution();
             }
         }
@@ -45,7 +47,6 @@ namespace FEA_Program.Models
                 InvalidateSolution();
             }
         }
-
         public double[] Force
         {
             get { return _Force; }
@@ -55,7 +56,7 @@ namespace FEA_Program.Models
                 _Force = value;
                 InvalidateSolution();
             }
-        }
+        } // First 3 items  = force [N], last 3 = moments [Nm]
         public double ForceMagnitude
         {
             get
@@ -94,9 +95,10 @@ namespace FEA_Program.Models
                 }
             }
         }
-        public double[] Displacement { get; private set; } // first 3 items  = force [N], last 3 = moments [Nm]
+
+        public double[] Displacement { get; private set; } 
         public double[] ReactionForce { get; private set; } // reaction force in [N], reaction moments in [Nm]
-        public double[] FinalPos => _Coords.Zip(Displacement, (coord, disp) => coord + disp).ToArray();
+        public double[] FinalPos => _Coordinates.Zip(Displacement, (coord, disp) => coord + disp).ToArray();
 
 
         public Node(double[] coords, int[] fixity, int id, int dimension)
@@ -109,10 +111,10 @@ namespace FEA_Program.Models
                 throw new Exception($"Attempted to create element, ID <{id}> with invalid number of dimensions: {dimension}.");
             }
 
-            ValidateDimension<double>(coords, MethodBase.GetCurrentMethod()?.Name ?? "");
-            ValidateDimension<int>(fixity, MethodBase.GetCurrentMethod()?.Name ?? "");
+            ValidateDimension(coords, MethodBase.GetCurrentMethod()?.Name ?? "");
+            ValidateDimension(fixity, MethodBase.GetCurrentMethod()?.Name ?? "");
 
-            _Coords = coords;
+            _Coordinates = coords;
             _Fixity = fixity;
             _Force = new double[dimension];
             Displacement = new double[dimension];
@@ -120,30 +122,23 @@ namespace FEA_Program.Models
         }
         public void Solve(double[] displacement, double[] reactionForce)
         {
-            if (displacement.Length != Dimension | displacement.Length != Dimension)
-            {
-                throw new Exception("Attempted to execute sub <" + MethodBase.GetCurrentMethod().Name + "> for node ID <" + ID.ToString() + "> with input params having different dimensions than specified node dimension.");
-            }
+            ValidateDimension(displacement, MethodBase.GetCurrentMethod()?.Name ?? "");
+            ValidateDimension(reactionForce, MethodBase.GetCurrentMethod()?.Name ?? "");
 
             Displacement = displacement;
             ReactionForce = reactionForce;
             SolutionValid = true;
         }
-        public double[] GetScaledDisplacement_mm(double scaleFactor)
-        {
-            var output = new double[Dimension];
-
-            for (int i = 0; i < _Coords.Length; i++)
-                output[i] = (Coords[i] + Displacement[i] * scaleFactor) * 1000.0; // convert to mm
-
-            return output;
-        }
 
 
         private void InvalidateSolution()
         {
+            // Only raise the event if we're switching from true to false
+            bool solutionWasvalid = SolutionValid; 
             SolutionValid = false;
-            SolutionInvalidated?.Invoke(this, ID);
+
+            if (solutionWasvalid)
+                SolutionInvalidated?.Invoke(this, ID);
         }
         private void ValidateDimension<T>(IReadOnlyCollection<T> collection, string methodName)
         {

@@ -55,7 +55,7 @@ namespace FEA_Program.UserControls
                 // Get node coordinates and displacements associated with the element
                 var nodeIDs = P.Connect.GetElementNodes(element.ID);
                 var nodes = nodeIDs.Select(id => (Node)P.Nodes.GetNode(id)).ToList();
-                var nodesCoords = nodes.Select(n => n.Coords).ToList();
+                var nodesCoords = nodes.Select(n => n.Coordinates).ToList();
                 DenseVector nodeDisplacement = Node.BuildVector(nodes, n => n.Displacement);
 
                 var stress = element.StressMatrix(nodesCoords, nodeDisplacement);

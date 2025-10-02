@@ -126,7 +126,7 @@ namespace FEA_Program.Models
                 {
                     Dimension = node.Dimension,
                     ID = node.ID,
-                    Coords = node.Coords,
+                    Coords = node.Coordinates,
                     Fixity = node.Fixity,
                     Force = node.Force
                 });

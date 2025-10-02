@@ -4,6 +4,6 @@
     {
         public int ID { get; }
         public int Dimension { get; }
-        public double[] Coords { get; set; }
+        public double[] Coordinates { get; set; }
     }
 }

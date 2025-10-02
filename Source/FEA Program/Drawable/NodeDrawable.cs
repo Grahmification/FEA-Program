@@ -14,6 +14,11 @@ namespace FEA_Program.Drawable
         private Color _SelectedColor = Color.Yellow;
 
         /// <summary>
+        /// Get the node coordinates in user units
+        /// </summary>
+        public double[] Coordinates_mm => Coordinates.Select(coord => coord * 1000.0d).ToArray();
+
+        /// <summary>
         /// Center coordinates to draw the node at
         /// </summary>
         public double[] DrawCoordinates => GetScaledDisplacement_mm(DisplacementScalingFactor);
@@ -38,6 +43,15 @@ namespace FEA_Program.Drawable
         {
             var forceColor = Selected ? _SelectedColor : _ReactionForceColor;
             DrawNodeForce(this, forceColor, true);
+        }
+        public double[] GetScaledDisplacement_mm(double scaleFactor)
+        {
+            var output = new double[Dimension];
+
+            for (int i = 0; i < Coordinates.Length; i++)
+                output[i] = (Coordinates[i] + Displacement[i] * scaleFactor) * 1000.0; // convert to mm
+
+            return output;
         }
 
         public static void DrawNode(NodeDrawable node, Color color)

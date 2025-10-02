@@ -30,7 +30,7 @@ namespace FEA_Program.Models
         /// </summary>
         public Dictionary<int, double[]> NodeCoordinates => _Nodes.Values.ToDictionary(
             node => node.ID,    // Key selector: The ID of the Node object
-            node => node.Coords // Value selector: The Coords property of the Node object
+            node => node.Coordinates // Value selector: The Coords property of the Node object
         );
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace FEA_Program.Models
 
             for (int i = 0; i < ids.Count; i++)
             {
-                _Nodes[ids[i]].Coords = coords[i];
+                _Nodes[ids[i]].Coordinates = coords[i];
                 _Nodes[ids[i]].Fixity = fixity[i];
             }
 
@@ -186,7 +186,7 @@ namespace FEA_Program.Models
             foreach (Node node in _Nodes.Values)
             {
                 // This should work regardless of dimension
-                if (node.Coords.Take(node.Dimension).SequenceEqual(coords.Take(node.Dimension)))
+                if (node.Coordinates.Take(node.Dimension).SequenceEqual(coords.Take(node.Dimension)))
                     return true;
             }
 

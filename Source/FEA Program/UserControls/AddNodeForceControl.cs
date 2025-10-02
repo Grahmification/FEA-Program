@@ -1,4 +1,5 @@
 ﻿using FEA_Program.Controls;
+using FEA_Program.Drawable;
 using FEA_Program.Models;
 using FEA_Program.UI;
 
@@ -70,9 +71,9 @@ namespace FEA_Program.UserControls
 
             // ------------------ populate node checklist --------------------
 
-            foreach (Node Node in _Nodes)
+            foreach (NodeDrawable Node in _Nodes)
             {
-                string text = $"{Node.ID} - ({string.Join(",", Node.Coords_mm)})";
+                string text = $"{Node.ID} - ({string.Join(",", Node.Coordinates_mm)})";
                 CheckedListBox_ApplyNodes.Items.Add(text);
             }
 

@@ -134,7 +134,7 @@ namespace FEA_Program
 
             var baseNode = TreeView_Main.Nodes[0];
 
-            foreach (Node node in P.Nodes.Nodelist)
+            foreach (NodeDrawable node in P.Nodes.Nodelist)
             {
                 var newNode = new TreeNode($"Node {node.ID}")
                 {
@@ -142,7 +142,7 @@ namespace FEA_Program
                     ContextMenuStrip = ContextMenuStrip_TreeView
                 };
 
-                newNode.Nodes.Add(new TreeNode($"Pos: {string.Join(",", node.Coords_mm)}"));
+                newNode.Nodes.Add(new TreeNode($"Pos: {string.Join(",", node.Coordinates_mm)}"));
                 newNode.Nodes.Add(new TreeNode($"Fixity: {string.Join(",", node.Fixity)}"));
                 baseNode.Nodes.Add(newNode);
             }
@@ -153,7 +153,7 @@ namespace FEA_Program
 
             foreach (IElement element in P.Elements.Elemlist)
             {
-                var nodeCoords = P.Connect.GetElementNodes(element.ID).Select(NodeID => P.Nodes.GetNode(NodeID).Coords).ToList();
+                var nodeCoords = P.Connect.GetElementNodes(element.ID).Select(NodeID => P.Nodes.GetNode(NodeID).Coordinates).ToList();
 
                 var newNode = new TreeNode($"Element {element.ID}")
                 {
