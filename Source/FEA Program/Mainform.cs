@@ -151,7 +151,7 @@ namespace FEA_Program
 
             baseNode = TreeView_Main.Nodes[1];
 
-            foreach (IElement element in P.Elements.Elemlist)
+            foreach (IElementDrawable element in P.Elements.Elemlist)
             {
                 var nodeCoords = P.Connect.GetElementNodes(element.ID).Select(NodeID => P.Nodes.GetNode(NodeID).Coordinates).ToList();
 
@@ -247,7 +247,8 @@ namespace FEA_Program
                 Dictionary<int, int> nodeDOFS = P.Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Dimension);
                 Dictionary<int, double[]> nodeCoordinates = P.Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Coordinates);
 
-                SparseMatrix K_assembled = P.Connect.Assemble_K_Matrix(P.Elements.Get_K_Matricies(P.Connect.ConnectivityMatrix, nodeCoordinates), nodeDOFS);
+                var K_Matricies = ElementExtensions.Get_K_Matricies(P.Elements.Elemlist.Cast<IElement>().ToList(), P.Connect.ConnectivityMatrix, nodeCoordinates);
+                SparseMatrix K_assembled = P.Connect.Assemble_K_Matrix(K_Matricies, nodeDOFS);
                 var F_assembled = NodeExtensions.F_Matrix(P.Nodes.BaseNodelist);
                 var Q_assembled = NodeExtensions.Q_Matrix(P.Nodes.BaseNodelist);
 

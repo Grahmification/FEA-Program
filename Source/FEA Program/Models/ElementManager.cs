@@ -1,5 +1,4 @@
 ﻿using FEA_Program.Drawable;
-using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
 {
@@ -77,29 +76,6 @@ namespace FEA_Program.Models
         }
 
         /// <summary>
-        /// Gets K matricies for all elements
-        /// </summary>
-        /// <param name="connectionMatrix">Global connectivity matrix [Element ID, Node IDs]</param>
-        /// <param name="nodeCoordinates">Node coordinates [Node ID, coordinates]</param>
-        /// <returns>[Element ID, Element K Matrix]</returns>
-        public Dictionary<int, DenseMatrix> Get_K_Matricies(Dictionary<int, int[]> connectionMatrix, Dictionary<int, double[]> nodeCoordinates)
-        {
-            var output = new Dictionary<int, DenseMatrix>();
-
-            foreach (int elementID in connectionMatrix.Keys) // iterate through each element
-            {
-                var elementNodeCoords = new List<double[]>();
-
-                foreach (int NodeID in connectionMatrix[elementID]) // get the coordinates of each node in the element
-                    elementNodeCoords.Add(nodeCoordinates[NodeID]);
-
-                output.Add(elementID, _Bar1Elements[elementID].K_Matrix(elementNodeCoords));
-            }
-
-            return output;
-        }
-
-        /// <summary>
         /// Import a dataset, usually when loading from a file
         /// </summary>
         /// <param name="elements"></param>
@@ -141,7 +117,7 @@ namespace FEA_Program.Models
         {
             return elementType switch
             {
-                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinear(1, 0, Material.DummyMaterial()).Name,
+                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinearDrawable(1, 0, Material.DummyMaterial()).Name,
                 _ => "",
             };
         }

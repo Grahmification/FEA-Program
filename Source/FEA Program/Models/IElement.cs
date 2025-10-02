@@ -6,7 +6,7 @@ namespace FEA_Program.Models
     {
         int ID { get; }
         Material Material { get; set; }
-        string Name { get; }
+
         int NumOfNodes { get; }
         int NodeDOFs { get; }
         int ElementDOFs { get; }

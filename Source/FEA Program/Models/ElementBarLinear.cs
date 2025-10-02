@@ -7,7 +7,6 @@ namespace FEA_Program.Models
     {
         private double _Area = 0; // x-section area in m^2
 
-        public string Name => "Bar_Linear";
         public ElementTypes ElementType => ElementTypes.BarLinear;
         public override int NumOfNodes => 2;
         public override int NodeDOFs { get; protected set; } = 1;
@@ -31,10 +30,10 @@ namespace FEA_Program.Models
         public ElementBarLinear(double area, int id, Material material, int nodeDOFs = 1) : base(id, material)
         {
             if (area <= 0)
-                throw new ArgumentException($"Cannot create {Name} element with non-positive area.");
+                throw new ArgumentException($"Cannot create {ElementType} element with non-positive area.");
 
             if (nodeDOFs != 1 & nodeDOFs != 2 & nodeDOFs != 3)
-                throw new ArgumentException($"Cannot create {Name} element with {nodeDOFs} DOFs. Unsupported");
+                throw new ArgumentException($"Cannot create {ElementType} element with {nodeDOFs} DOFs. Unsupported");
 
             NodeDOFs = nodeDOFs;
             _Area = area;

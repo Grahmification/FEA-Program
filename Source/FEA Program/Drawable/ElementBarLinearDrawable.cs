@@ -9,6 +9,8 @@ namespace FEA_Program.Drawable
         private readonly Color _DefaultColor = Color.Green;
         private readonly Color _SelectedColor = Constants.SelectedColor;
 
+        public string Name => "Bar Linear";
+
         public bool Selected { get; set; } = false;
 
         /// <summary>
@@ -16,7 +18,7 @@ namespace FEA_Program.Drawable
         /// </summary>
         public Color[] Colors { get; private set; } = [];
 
-        public ElementBarLinearDrawable(double area, int ID, Material material, int nodeDOFs) : base(area, ID, material, nodeDOFs) 
+        public ElementBarLinearDrawable(double area, int ID, Material material, int nodeDOFs = 1) : base(area, ID, material, nodeDOFs) 
         {
             Colors = new Color[NumOfNodes]; // Need to have a color for each node in the element
             SetColor(_DefaultColor); // Initially set all corners to the default color
