@@ -53,7 +53,7 @@ namespace FEA_Program.UserControls
                 };
 
                 // Get node coordinates and displacements associated with the element
-                var nodeIDs = P.Connect.ElementNodes(element.ID);
+                var nodeIDs = P.Connect.GetElementNodes(element.ID);
                 var nodes = nodeIDs.Select(id => (Node)P.Nodes.GetNode(id)).ToList();
                 var nodesCoords = nodes.Select(n => n.Coords).ToList();
                 DenseVector nodeDisplacement = Node.BuildVector(nodes, n => n.Displacement);

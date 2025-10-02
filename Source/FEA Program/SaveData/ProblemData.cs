@@ -10,7 +10,7 @@ namespace FEA_Program.SaveData
         public List<NodeProblemData> Nodes { get; set; } = [];
         public List<ElementProblemData> Elements { get; set; } = [];
         public List<MaterialSaveData> Materials { get; set; } = [];
-        public Dictionary<int, List<int>> ConnectivityMatrix { get; set; } = [];
+        public Dictionary<int, int[]> ConnectivityMatrix { get; set; } = [];
 
         public ProblemTypes ProblemType { get; set; } = ProblemTypes.Bar_1D;
     }

@@ -89,7 +89,7 @@ namespace FEA_Program
             foreach (IElementDrawable E in P.Elements.Elemlist)
             {
                 var nodeCoords = new List<double[]>();
-                foreach (int NodeID in P.Connect.ElementNodes(E.ID))
+                foreach (int NodeID in P.Connect.GetElementNodes(E.ID))
                     nodeCoords.Add(P.Nodes.GetNode(NodeID).DrawCoordinates);
 
                 E.Draw(nodeCoords);
@@ -153,7 +153,7 @@ namespace FEA_Program
 
             foreach (IElement element in P.Elements.Elemlist)
             {
-                var nodeCoords = P.Connect.ElementNodes(element.ID).Select(NodeID => P.Nodes.GetNode(NodeID).Coords).ToList();
+                var nodeCoords = P.Connect.GetElementNodes(element.ID).Select(NodeID => P.Nodes.GetNode(NodeID).Coords).ToList();
 
                 var newNode = new TreeNode($"Element {element.ID}")
                 {
@@ -248,7 +248,7 @@ namespace FEA_Program
                 foreach (INode node in P.Nodes.Nodelist)
                     nodeDOFS.Add(node.ID, node.Dimension);
 
-                SparseMatrix K_assembled = P.Connect.Assemble_K_Mtx(P.Elements.Get_K_Matricies(P.Connect.ConnectMatrix, P.Nodes.NodeCoordinates), nodeDOFS);
+                SparseMatrix K_assembled = P.Connect.Assemble_K_Matrix(P.Elements.Get_K_Matricies(P.Connect.ConnectivityMatrix, P.Nodes.NodeCoordinates), nodeDOFS);
                 
                 Solver s = new();
                 s.SolutionStarted += S_SolutionStarted;

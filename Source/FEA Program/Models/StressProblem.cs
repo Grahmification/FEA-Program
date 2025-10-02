@@ -163,7 +163,7 @@ namespace FEA_Program.Models
             }
 
             // ------------------- Other --------------------
-            output.ConnectivityMatrix = Connect.ConnectMatrix;
+            output.ConnectivityMatrix = Connect.ConnectivityMatrix;
             output.ProblemType = ProblemType;
 
             return output;
@@ -172,7 +172,7 @@ namespace FEA_Program.Models
         {
             ProblemType = data.ProblemType;
             // This should be done early as other things raise events which might affect it
-            Connect.ImportMatrix(data.ConnectivityMatrix);
+            Connect = new Connectivity(data.ConnectivityMatrix);
 
             // ----------- Import Materials ---------------
             List<Material> materials = [];
@@ -249,7 +249,7 @@ namespace FEA_Program.Models
 
             // Sort the node IDs accordingly for the given element type
             Elements.GetElement(elementID).SortNodeOrder(ref nodes);
-            var sortedIDs = nodes.Select(node => node.ID).ToList();
+            var sortedIDs = nodes.Select(node => node.ID).ToArray();
 
             Connect.AddConnection(elementID, sortedIDs);
         }
@@ -270,7 +270,7 @@ namespace FEA_Program.Models
         /// <param name="nodeID"></param>
         private void RemoveHangingElements(int nodeID)
         {
-            var ElementsToDelete = Connect.NodeElements(nodeID);
+            var ElementsToDelete = Connect.GetNodeElements(nodeID);
             Elements.Delete(ElementsToDelete);
         }
     }

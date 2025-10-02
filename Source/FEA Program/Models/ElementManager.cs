@@ -82,7 +82,7 @@ namespace FEA_Program.Models
         /// <param name="connectionMatrix">Global connectivity matrix [Element ID, Node IDs]</param>
         /// <param name="nodeCoordinates">Node coordinates [Node ID, coordinates]</param>
         /// <returns>[Element ID, Element K Matrix]</returns>
-        public Dictionary<int, DenseMatrix> Get_K_Matricies(Dictionary<int, List<int>> connectionMatrix, Dictionary<int, double[]> nodeCoordinates)
+        public Dictionary<int, DenseMatrix> Get_K_Matricies(Dictionary<int, int[]> connectionMatrix, Dictionary<int, double[]> nodeCoordinates)
         {
             var output = new Dictionary<int, DenseMatrix>();
 

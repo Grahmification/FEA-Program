@@ -7,54 +7,66 @@ namespace FEA_Program.Models
     /// </summary>
     internal class Connectivity
     {
-        private Dictionary<int, List<int>> _ConnectMatrix = []; // dict key is global element ID, list index is local node ID, list value at index is global node ID
+        /// <summary>
+        /// The connectivity matrix.
+        /// Key is the element ID.
+        /// Array index is local node ID within the element
+        /// Array value at index is global node ID.
+        /// </summary>
+        public Dictionary<int, int[]> ConnectivityMatrix { get; private set; } = [];
 
-        public Dictionary<int, List<int>> ConnectMatrix => _ConnectMatrix;
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="connectivityMatrix">Optionally specify a starting matrix</param>
+        public Connectivity(Dictionary<int, int[]>? connectivityMatrix = null)
+        {
+            ConnectivityMatrix = connectivityMatrix ?? [];
+        }
 
         /// <summary>
         /// Gets global node IDs that a element is using
         /// </summary>
         /// <param name="elementID">The element ID</param>
         /// <returns>IDs of nodes contained in the element</returns>
-        public List<int> ElementNodes(int elementID) => _ConnectMatrix[elementID];
+        public int[] GetElementNodes(int elementID) => ConnectivityMatrix[elementID];
 
         /// <summary>
         /// Returns all of the element ID's attached to a global node ID
         /// </summary>
         /// <param name="nodeID">The global node ID</param>
         /// <returns>IDs of any elements using the node</returns>
-        public List<int> NodeElements(int nodeID)
+        public List<int> GetNodeElements(int nodeID)
         {
-            var output = new List<int>();
-
-            foreach (KeyValuePair<int, List<int>> KVP in _ConnectMatrix)
-            {
-                if (KVP.Value.Contains(nodeID)) // check if the nodeID is used in the element
-                {
-                    output.Add(KVP.Key); // if so add the element ID to the output
-                }
-            }
-
-            output.Sort(); // sort the output for good measure (lowest element ID comes first)
-            return output;
-        }
-
-        public void AddConnection(int elementID, List<int> nodeIDs)
-        {
-            _ConnectMatrix.Add(elementID, nodeIDs);
-        } // nodeIDs need to be sorted in the correct local order for the element
-        public void RemoveConnection(int elementID)
-        {
-            _ConnectMatrix.Remove(elementID);
+            // Use LINQ to select the Key (Element ID) 
+            // for every KeyValuePair where the Value (int[]) contains the nodeID.
+            return ConnectivityMatrix
+                .Where(kvp => kvp.Value.Contains(nodeID))
+                .Select(kvp => kvp.Key)
+                .OrderBy(key => key) // Sorts the element IDs for good measure (lowest element ID comes first)
+                .ToList();
         }
 
         /// <summary>
-        /// Import a dataset, usually when loading from a file
+        /// Adds a connection to the connectivity matrix.
+        ///  NodeIDs need to be sorted in the correct local order for the element
         /// </summary>
-        /// <param name="connectivityMatrix"></param>
-        public void ImportMatrix(Dictionary<int, List<int>> connectivityMatrix)
+        /// <param name="elementID">The element</param>
+        /// <param name="nodeIDs">The node IDs in the element</param>
+        public void AddConnection(int elementID, int[] nodeIDs)
         {
-            _ConnectMatrix = connectivityMatrix;
+            ConnectivityMatrix.Add(elementID, nodeIDs);
+        }
+
+        /// <summary>
+        /// Removes a connection from the connectivity matrix
+        /// </summary>
+        /// <param name="elementID">The element to remove</param>
+        /// <returns></returns>
+        public bool RemoveConnection(int elementID)
+        {
+            return ConnectivityMatrix.Remove(elementID);
         }
 
         /// <summary>
@@ -63,7 +75,7 @@ namespace FEA_Program.Models
         /// <param name="K_Matricies">Key = Element ID, Value = Element's K matrix</param>
         /// <param name="nodeDOFs">Key = NodeID, Value = Node DOFs for the given ID</param>
         /// <returns>The global stiffness matrix, sorted from the lowest node ID to highest [N1x, N1y, N2x, N2y,....]</returns>
-        public SparseMatrix Assemble_K_Mtx(Dictionary<int, DenseMatrix> K_Matricies, Dictionary<int, int> nodeDOFs)
+        public SparseMatrix Assemble_K_Matrix(Dictionary<int, DenseMatrix> K_Matricies, Dictionary<int, int> nodeDOFs)
         {
             // ---------------------- Get Total Size of the Problem --------------------------
 
@@ -100,7 +112,7 @@ namespace FEA_Program.Models
             foreach (KeyValuePair<int, DenseMatrix> elementID_and_K in K_Matricies)
             {
                 // 1. get node ID's - assume in correct order
-                var elementNodeIDs = ElementNodes(elementID_and_K.Key);
+                var elementNodeIDs = GetElementNodes(elementID_and_K.Key);
 
                 // 2. Allocate Regions of the K Matrix for Each Element
                 var nodeKmtxIndicies = new Dictionary<int, int[]>(); // holds which regions of the k matrix are claimed by each node
@@ -146,5 +158,5 @@ namespace FEA_Program.Models
             return output;
         }
 
-    } // need to call functions in here from element/node events upon creation/deletion
+    }
 }
