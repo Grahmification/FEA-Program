@@ -244,17 +244,19 @@ namespace FEA_Program
         {
             try
             {
-                var nodeDOFS = new Dictionary<int, int>();
-                foreach (INode node in P.Nodes.Nodelist)
-                    nodeDOFS.Add(node.ID, node.Dimension);
+                Dictionary<int, int> nodeDOFS = P.Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Dimension);
+                Dictionary<int, double[]> nodeCoordinates = P.Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Coordinates);
 
-                SparseMatrix K_assembled = P.Connect.Assemble_K_Matrix(P.Elements.Get_K_Matricies(P.Connect.ConnectivityMatrix, P.Nodes.NodeCoordinates), nodeDOFS);
-                
+                SparseMatrix K_assembled = P.Connect.Assemble_K_Matrix(P.Elements.Get_K_Matricies(P.Connect.ConnectivityMatrix, nodeCoordinates), nodeDOFS);
+                var F_assembled = NodeExtensions.F_Matrix(P.Nodes.BaseNodelist);
+                var Q_assembled = NodeExtensions.Q_Matrix(P.Nodes.BaseNodelist);
+
                 Solver s = new();
                 s.SolutionStarted += S_SolutionStarted;
                 s.PartiallyReducedCalculated += S_PartiallyReducedCalculated;
                 s.FullyReducedCalculated += S_FullyReducedCalculated;
-                DenseVector[] output = s.Solve(K_assembled, P.Nodes.F_Mtx, P.Nodes.Q_Mtx);
+
+                DenseVector[] output = s.Solve(K_assembled, F_assembled, Q_assembled);
 
                 var displacements = output[0].Values;
                 var reactionForces = output[1].Values;

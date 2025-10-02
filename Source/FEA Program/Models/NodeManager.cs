@@ -25,29 +25,6 @@ namespace FEA_Program.Models
         /// </summary>
         public List<Node> BaseNodelist => Nodelist.Cast<Node>().ToList();
 
-        /// <summary>
-        /// Gets coords of all nodes sorted by ID
-        /// </summary>
-        public Dictionary<int, double[]> NodeCoordinates => _Nodes.Values.ToDictionary(
-            node => node.ID,    // Key selector: The ID of the Node object
-            node => node.Coordinates // Value selector: The Coords property of the Node object
-        );
-
-        /// <summary>
-        /// The overall number of node dimensions
-        /// </summary>
-        public int ProblemSize => _Nodes.Values.Sum(node => node.Dimension);
- 
-        /// <summary>
-        /// Gets the global force vector, sorted from smallest to largest node ID
-        /// </summary>
-        public DenseVector F_Mtx => Node.BuildVector(BaseNodelist, n => n.Force);
-
-        /// <summary>
-        /// Gets the global fixity vector, sorted from smallest to largest node ID
-        /// </summary>
-        public DenseVector Q_Mtx => Node.BuildVector(BaseNodelist, n => Array.ConvertAll(n.Fixity, x => (double)x));
-
         // ---------------------- Public Methods ----------------------------
 
         public NodeDrawable GetNode(int ID) => _Nodes[ID];
@@ -154,23 +131,7 @@ namespace FEA_Program.Models
         /// <param name="R">The global reaction force vector</param>
         public void SetSolution(DenseVector Q, DenseVector R)
         {
-            int index = 0;
-
-            foreach (Node node in Nodelist)
-            {
-                var nodeDisplacements = new double[node.Dimension];
-                var nodeReactions = new double[node.Dimension];
-
-                for (int i = 0; i < node.Dimension; i++)
-                {
-                    nodeDisplacements[i] = Q[index];
-                    nodeReactions[i] = R[index];
-                    index++;
-                }
-
-                node.Solve(nodeDisplacements, nodeReactions);
-            }
-
+            NodeExtensions.ApplySolution(BaseNodelist, Q, R);
             NodesChanged?.Invoke(this, [.. _Nodes.Keys]);
         }
         

@@ -56,7 +56,7 @@ namespace FEA_Program.UserControls
                 var nodeIDs = P.Connect.GetElementNodes(element.ID);
                 var nodes = nodeIDs.Select(id => (Node)P.Nodes.GetNode(id)).ToList();
                 var nodesCoords = nodes.Select(n => n.Coordinates).ToList();
-                DenseVector nodeDisplacement = Node.BuildVector(nodes, n => n.Displacement);
+                DenseVector nodeDisplacement = NodeExtensions.BuildVector(nodes, n => n.Displacement);
 
                 var stress = element.StressMatrix(nodesCoords, nodeDisplacement);
                 var endDispl = element.Interpolated_Displacement([1], nodeDisplacement);
