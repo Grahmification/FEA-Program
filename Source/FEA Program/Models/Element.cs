@@ -113,8 +113,12 @@ namespace FEA_Program.Models
 
         protected void InvalidateSolution()
         {
+            // Only raise the event if we're switching from true to false
+            bool solutionWasvalid = SolutionValid;
             SolutionValid = false;
-            SolutionInvalidated?.Invoke(this, ID);
+
+            if (solutionWasvalid)
+                SolutionInvalidated?.Invoke(this, ID);
         }
 
         protected void ValidateLength<T>(IReadOnlyCollection<T> coordinates, int targetLength, string? methodName)
