@@ -3,70 +3,21 @@ using MathNet.Numerics.LinearAlgebra.Double;
 namespace FEA_Program.Models
 {
     /// <summary>
-    /// Manages the lookup table connecting elements and nodes
+    /// Functions for managing the connections between elements and nodes
     /// </summary>
     internal class Connectivity
     {
         /// <summary>
-        /// The connectivity matrix.
-        /// Key is the element ID.
-        /// Array index is local node ID within the element
-        /// Array value at index is global node ID.
+        /// Assembles the matrix defining links between elements and nodes
         /// </summary>
-        public Dictionary<int, int[]> ConnectivityMatrix { get; private set; } = [];
-
-
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        /// <param name="connectivityMatrix">Optionally specify a starting matrix</param>
-        public Connectivity(Dictionary<int, int[]>? connectivityMatrix = null)
+        /// <param name="elements">The list of elements to assemble for</param>
+        /// <returns>The connectivity matrix. Key is the element ID. Array index is local node ID within the element. Array value at index is global node ID.</returns>
+        public static Dictionary<int, int[]> Get_Connectivity_Matrix(List<IElement> elements)
         {
-            ConnectivityMatrix = connectivityMatrix ?? [];
-        }
-
-        /// <summary>
-        /// Gets global node IDs that a element is using
-        /// </summary>
-        /// <param name="elementID">The element ID</param>
-        /// <returns>IDs of nodes contained in the element</returns>
-        public int[] GetElementNodes(int elementID) => ConnectivityMatrix[elementID];
-
-        /// <summary>
-        /// Returns all of the element ID's attached to a global node ID
-        /// </summary>
-        /// <param name="nodeID">The global node ID</param>
-        /// <returns>IDs of any elements using the node</returns>
-        public List<int> GetNodeElements(int nodeID)
-        {
-            // Use LINQ to select the Key (Element ID) 
-            // for every KeyValuePair where the Value (int[]) contains the nodeID.
-            return ConnectivityMatrix
-                .Where(kvp => kvp.Value.Contains(nodeID))
-                .Select(kvp => kvp.Key)
-                .OrderBy(key => key) // Sorts the element IDs for good measure (lowest element ID comes first)
-                .ToList();
-        }
-
-        /// <summary>
-        /// Adds a connection to the connectivity matrix.
-        ///  NodeIDs need to be sorted in the correct local order for the element
-        /// </summary>
-        /// <param name="elementID">The element</param>
-        /// <param name="nodeIDs">The node IDs in the element</param>
-        public void AddConnection(int elementID, int[] nodeIDs)
-        {
-            ConnectivityMatrix.Add(elementID, nodeIDs);
-        }
-
-        /// <summary>
-        /// Removes a connection from the connectivity matrix
-        /// </summary>
-        /// <param name="elementID">The element to remove</param>
-        /// <returns></returns>
-        public bool RemoveConnection(int elementID)
-        {
-            return ConnectivityMatrix.Remove(elementID);
+            return elements.ToDictionary(
+                element => element.ID,                                  // Key Selector: Use the element's ID
+                element => element.Nodes.Select(n => n.ID).ToArray()    // Value Selector: Use LINQ to convert the list of nodes to an array of node IDs
+            );
         }
 
         /// <summary>
@@ -74,8 +25,9 @@ namespace FEA_Program.Models
         /// </summary>
         /// <param name="K_Matricies">Key = Element ID, Value = Element's K matrix</param>
         /// <param name="nodeDOFs">Key = NodeID, Value = Node DOFs for the given ID</param>
+        /// <param name="connectivity">Key = Element ID, Value = Node IDs linked to the element</param>
         /// <returns>The global stiffness matrix, sorted from the lowest node ID to highest [N1x, N1y, N2x, N2y,....]</returns>
-        public SparseMatrix Assemble_K_Matrix(Dictionary<int, DenseMatrix> K_Matricies, Dictionary<int, int> nodeDOFs)
+        public static SparseMatrix Assemble_K_Matrix(Dictionary<int, DenseMatrix> K_Matricies, Dictionary<int, int> nodeDOFs, Dictionary<int, int[]> connectivity)
         {
             // ---------------------- Get Total Size of the Problem --------------------------
 
@@ -112,7 +64,7 @@ namespace FEA_Program.Models
             foreach (KeyValuePair<int, DenseMatrix> elementID_and_K in K_Matricies)
             {
                 // 1. get node ID's - assume in correct order
-                var elementNodeIDs = GetElementNodes(elementID_and_K.Key);
+                var elementNodeIDs = connectivity[elementID_and_K.Key];
 
                 // 2. Allocate Regions of the K Matrix for Each Element
                 var nodeKmtxIndicies = new Dictionary<int, int[]>(); // holds which regions of the k matrix are claimed by each node

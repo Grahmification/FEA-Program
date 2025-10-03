@@ -11,7 +11,6 @@ namespace FEA_Program.Models
         public NodeManager Nodes { get; private set; }
         public ElementManager Elements { get; private set; }
         public MaterialManager Materials { get; private set; }
-        public Connectivity Connect { get; private set; }
         public Solver Solver { get; private set; } = new Solver();
 
         /// <summary>
@@ -105,13 +104,9 @@ namespace FEA_Program.Models
             Elements.ElementListChanged += (s, e) => OnListRedrawNeeded();
             Elements.ElementChanged += (s, e) => OnListRedrawNeeded();
             Elements.ElementChanged_RedrawOnly += OnScreenRedrawOnlyNeeded;
-            Elements.ElementAdded += OnElementCreation;
-            Elements.ElementDeleted += OnElementDeletion;
 
             Materials = materials ?? new MaterialManager();
             Materials.MaterialListChanged += (s, e) => OnListRedrawNeeded();
-
-            Connect = new Connectivity();
 
             Loadedform = form;
             ProblemType = Type;
@@ -165,7 +160,6 @@ namespace FEA_Program.Models
             }
 
             // ------------------- Other --------------------
-            output.ConnectivityMatrix = Connect.ConnectivityMatrix;
             output.ProblemType = ProblemType;
 
             return output;
@@ -173,8 +167,6 @@ namespace FEA_Program.Models
         public void LoadData(ProblemData data)
         {
             ProblemType = data.ProblemType;
-            // This should be done early as other things raise events which might affect it
-            Connect = new Connectivity(data.ConnectivityMatrix);
 
             // ----------- Import Materials ---------------
             List<Material> materials = [];
@@ -239,11 +231,11 @@ namespace FEA_Program.Models
         /// </summary>
         public bool Solve()
         {
-            Dictionary<int, int> nodeDOFS = Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Dimension);
-            Dictionary<int, double[]> nodeCoordinates = Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Coordinates);
-
             var K_Matricies = Elements.Elemlist.ToDictionary(element => element.ID, element => element.K_Matrix());
-            SparseMatrix K_assembled = Connect.Assemble_K_Matrix(K_Matricies, nodeDOFS);
+            var nodeDOFS = Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Dimension);
+            var connectivityMatrix = Connectivity.Get_Connectivity_Matrix(Elements.Elemlist.Cast<IElement>().ToList());
+
+            SparseMatrix K_assembled = Connectivity.Assemble_K_Matrix(K_Matricies, nodeDOFS, connectivityMatrix);
             var F_assembled = NodeExtensions.F_Matrix(Nodes.BaseNodelist);
             var Q_assembled = NodeExtensions.Q_Matrix(Nodes.BaseNodelist);
 
@@ -270,15 +262,6 @@ namespace FEA_Program.Models
         }
 
 
-        private void OnElementCreation(object? sender, int elementID)
-        {
-            var nodeIDs = Elements.GetElement(elementID).Nodes.Select(node => node.ID).ToArray();
-            Connect.AddConnection(elementID, nodeIDs);
-        }
-        private void OnElementDeletion(object? sender, IElement e)
-        {
-            Connect.RemoveConnection(e.ID);
-        }
         private void OnNodeDeletion(object? sender, INode e)
         {
             RemoveHangingElements(e.ID);
@@ -292,8 +275,13 @@ namespace FEA_Program.Models
         /// <param name="nodeID"></param>
         private void RemoveHangingElements(int nodeID)
         {
-            var ElementsToDelete = Connect.GetNodeElements(nodeID);
-            Elements.Delete(ElementsToDelete);
+            // Elements where any of the nodes matches the given ID
+            List<int> elementsToDelete = Elements.Elemlist
+                .Where(element => element.Nodes.Any(n => n.ID == nodeID))
+                .Select(element => element.ID)
+                .ToList();
+
+            Elements.Delete(elementsToDelete);
         }
     }
 
