@@ -140,6 +140,7 @@ namespace FEA_Program.Models
                 {
                     ID = element.ID,
                     MaterialID = element.Material.ID,
+                    NodeIDs = element.Nodes.Select(n => n.ID).ToArray(),
                     NodeDOFs = element.NodeDOFs,
                     ElementType = element.ElementType,
                     ElementArgs = element.ElementArgs,
@@ -207,8 +208,7 @@ namespace FEA_Program.Models
             foreach (var item in data.Elements)
             {
                 var elementMaterial = Materials.GetMaterial(item.MaterialID);
-                var elementNodeIds = data.ConnectivityMatrix[item.ID];
-                List<NodeDrawable> elementNodes = elementNodeIds
+                List<NodeDrawable> elementNodes = item.NodeIDs
                     .Select(nodeId => nodes[nodeId])
                     .ToList();
 
