@@ -21,7 +21,7 @@ namespace FEA_Program.Models
         public void Add(int nodeDOFs, Type elementType, List<NodeDrawable> nodes, double[] elementArgs, Material material)
         {
             IElementDrawable? newElement = null;
-            int newElemID = CreateUniqueId();
+            int newElemID = IDClass.CreateUniqueId(_Bar1Elements.Values.Cast<IHasID>().ToList());
 
             // ------------------ Determine type of element ----------------------
 
@@ -80,19 +80,6 @@ namespace FEA_Program.Models
             }
 
             ElementListChanged?.Invoke(this, _Bar1Elements);
-        }
-
-
-        // ---------------------- Private Helpers ----------------------------
-
-        private int CreateUniqueId()
-        {
-            int newID = 1;
-
-            while (_Bar1Elements.ContainsKey(newID))
-                newID += 1;
-
-            return newID;
         }
 
         // ---------------------- Static Methods ----------------------------

@@ -7,7 +7,7 @@ namespace FEA_Program.Models
     /// <summary>
     /// A node in an FEA problem with arbitrary degrees of freedom
     /// </summary>
-    internal class Node : INode
+    internal class Node : IDClass, INode
     {
         /// <summary>
         /// Provides a list of available dimsensions for error checking
@@ -24,7 +24,6 @@ namespace FEA_Program.Models
         /// The node dimension 1 = 1D, 2 = 2D, 3 = 3D, 6 = 6D
         /// </summary>
         public int Dimension { get; private set; }
-        public int ID { get; private set; }
         public bool SolutionValid { get; private set; } = false;
 
         public double[] Coordinates
@@ -101,9 +100,8 @@ namespace FEA_Program.Models
         public double[] FinalPos => _Coordinates.Zip(Displacement, (coord, disp) => coord + disp).ToArray();
 
 
-        public Node(double[] coords, int[] fixity, int id, int dimension)
+        public Node(double[] coords, int[] fixity, int id, int dimension) : base(id)
         {
-            ID = id;
             Dimension = dimension;
 
             if (!ValidDimensions.Contains(dimension))

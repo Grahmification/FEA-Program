@@ -18,7 +18,7 @@
 
         public void Add(string Name, double E_GPa, double V, double Sy_MPa, double Sut_MPa, MaterialType subtype)
         {
-            int ID = CreateMatlId();
+            int ID = IDClass.CreateUniqueId(_Materials.Values.Cast<IHasID>().ToList());
             _Materials.Add(ID, new Material(Name, E_GPa, ID, subtype)
             {
                 V = V,
@@ -56,17 +56,5 @@
             MaterialListChanged?.Invoke(this, _Materials);
         }
 
-        // ---------------------- Private Helpers ----------------------------
-
-        private int CreateMatlId()
-        {
-            int NewID = 1;
-            bool IDUnique = false;
-
-            while (_Materials.Keys.Contains(NewID))
-                NewID += 1;
-
-            return NewID;
-        }
     }
 }

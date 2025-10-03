@@ -51,7 +51,8 @@ namespace FEA_Program.Models
                     throw new Exception("Tried to create node at location where one already exists. Nodes cannot be in identical locations.");
                 }
 
-                var newnode = new NodeDrawable(coords[i], fixity[i], CreateNodeId(), dimensions[i]);
+                int ID = IDClass.CreateUniqueId(_Nodes.Values.Cast<IHasID>().ToList());
+                var newnode = new NodeDrawable(coords[i], fixity[i], ID, dimensions[i]);
                 _Nodes.Add(newnode.ID, newnode);
                 NodeAdded?.Invoke(this, newnode);
             }
@@ -154,15 +155,6 @@ namespace FEA_Program.Models
             return false;
         }
 
-        private int CreateNodeId()
-        {
-            int NewID = 1;
-
-            while (_Nodes.Keys.Contains(NewID))
-                NewID += 1;
-
-            return NewID;
-        }
     }
 
 }

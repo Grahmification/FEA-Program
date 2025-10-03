@@ -5,7 +5,7 @@ namespace FEA_Program.Models
     /// <summary>
     /// Base element subclass - common between all types of elements
     /// </summary>
-    internal abstract class Element
+    internal abstract class Element: IDClass
     {
         private readonly INode[] _nodes;
         private Material _Material;
@@ -13,7 +13,6 @@ namespace FEA_Program.Models
         
         public event EventHandler<int>? SolutionInvalidated;
 
-        public int ID { get; private set; }
         public Material Material
         {
             get { return _Material; }
@@ -25,7 +24,7 @@ namespace FEA_Program.Models
         public int NodeDOFs { get; private set; }
         public int ElementDOFs => NumOfNodes * NodeDOFs;
 
-        public Element(int id, List<INode> nodes, Material material, int nodeDOFs)
+        public Element(int id, List<INode> nodes, Material material, int nodeDOFs) : base(id)
         {
             NodeDOFs = nodeDOFs; // This needs to be set before validation
             
@@ -35,7 +34,6 @@ namespace FEA_Program.Models
             _nodes = [.. nodes];
 
             _Material = material;
-            ID = id;
         }
 
         // ---------------- General matrix methods ----------------

@@ -2,9 +2,8 @@
 
 namespace FEA_Program.Models
 {
-    internal class Material(string name, double e, int id = Constants.InvalidID, MaterialType subtype = MaterialType.Other)
+    internal class Material(string name, double e, int id = Constants.InvalidID, MaterialType subtype = MaterialType.Other) : IDClass(id)
     {
-        public int ID { get; private set; } = id;
         public string Name { get; private set; } = name;
         public MaterialType Subtype { get; set; } = subtype;
 
