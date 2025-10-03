@@ -233,9 +233,9 @@ namespace FEA_Program.Models
         {
             var K_Matricies = Elements.Elemlist.ToDictionary(element => element.ID, element => element.K_Matrix());
             var nodeDOFS = Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Dimension);
-            var connectivityMatrix = Connectivity.Get_Connectivity_Matrix(Elements.Elemlist.Cast<IElement>().ToList());
+            var connectivityMatrix = ElementExtensions.Get_Connectivity_Matrix(Elements.Elemlist.Cast<IElement>().ToList());
 
-            SparseMatrix K_assembled = Connectivity.Assemble_K_Matrix(K_Matricies, nodeDOFS, connectivityMatrix);
+            SparseMatrix K_assembled = ElementExtensions.Assemble_K_Matrix(K_Matricies, nodeDOFS, connectivityMatrix);
             var F_assembled = NodeExtensions.F_Matrix(Nodes.BaseNodelist);
             var Q_assembled = NodeExtensions.Q_Matrix(Nodes.BaseNodelist);
 

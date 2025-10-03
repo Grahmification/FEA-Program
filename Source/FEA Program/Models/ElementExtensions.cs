@@ -3,9 +3,9 @@ using MathNet.Numerics.LinearAlgebra.Double;
 namespace FEA_Program.Models
 {
     /// <summary>
-    /// Functions for managing the connections between elements and nodes
+    /// Extra functionality for working with elements
     /// </summary>
-    internal class Connectivity
+    internal class ElementExtensions
     {
         /// <summary>
         /// Assembles the matrix defining links between elements and nodes
