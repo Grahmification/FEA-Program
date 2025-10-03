@@ -4,7 +4,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
 {
-    internal class StressProblem
+    internal class ProblemManager
     {
         public Mainform Loadedform { get; private set; }
         public ProblemTypes ProblemType { get; private set; }
@@ -91,7 +91,7 @@ namespace FEA_Program.Models
         }
 
         // ---------------------- Public Methods ----------------------------
-        public StressProblem(Mainform form, ProblemTypes Type, MaterialManager? materials = null)
+        public ProblemManager(Mainform form, ProblemTypes Type, MaterialManager? materials = null)
         {
             Nodes = new NodeManager();
             Nodes.NodeListChanged += (s, e) => OnListRedrawNeeded();

@@ -9,7 +9,7 @@ namespace FEA_Program.UserControls
             InitializeComponent();
         }
 
-        public void DrawSolution(StressProblem P)
+        public void DrawSolution(ProblemManager P)
         {
             var tree = treeView_main;
             tree.Nodes.Clear();

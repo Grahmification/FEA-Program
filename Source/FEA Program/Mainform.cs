@@ -13,7 +13,7 @@ namespace FEA_Program
 {
     internal partial class Mainform : Form
     {
-        private StressProblem P;
+        private ProblemManager P;
         private NodeDrawManager _DrawManager = new();
 
         public CoordinateSystem Coord = new([0, 0, 0], 10);
