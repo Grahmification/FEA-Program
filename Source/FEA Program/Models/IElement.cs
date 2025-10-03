@@ -11,6 +11,7 @@ namespace FEA_Program.Models
         int NodeDOFs { get; }
         int ElementDOFs { get; }
         ElementTypes ElementType { get; }
+        public IReadOnlyList<INode> Nodes { get; }
 
         /// <summary>
         /// Element body force in N/m^3 [X, Y, Z]^T
@@ -32,12 +33,6 @@ namespace FEA_Program.Models
         // ---------------- Pre solution methods ----------------
 
         /// <summary>
-        /// Sorts the nodes for the correct ordering in the element
-        /// </summary>
-        /// <param name="nodes">The list to sort in place</param>
-        void SortNodeOrder(ref List<INode> nodes);
-
-        /// <summary>
         /// Sets the element body force
         /// </summary>
         /// <param name="forcePerVol">The body force matrix</param>
@@ -52,30 +47,26 @@ namespace FEA_Program.Models
         /// <summary>
         /// Gets the element length
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        double Length(List<double[]> nodeCoordinates);
+        double Length();
 
         /// <summary>
         /// Gets the element stiffness matrix
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        DenseMatrix K_Matrix(List<double[]> nodeCoordinates);
+        DenseMatrix K_Matrix();
 
         /// <summary>
         /// Gets the element body force matrix
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        DenseVector BodyForceMatrix(List<double[]> nodeCoordinates);
+        DenseVector BodyForceMatrix();
 
         /// <summary>
         /// Gets the element traction force matrix
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        DenseVector TractionForceMatrix(List<double[]> nodeCoordinates);
+        DenseVector TractionForceMatrix();
 
         // ---------------- Post solution methods ----------------
 
@@ -83,18 +74,15 @@ namespace FEA_Program.Models
         /// Gets a displacement or position at the given location inside the element
         /// </summary>
         /// <param name="localCoords">Local coordinates inside the element to calculate the displacement</param>
-        /// <param name="globalNodeQ">Global node displacement or position matrix for nodes in this element</param>
         /// <returns></returns>
-        DenseVector Interpolated_Displacement(double[] localCoords, DenseVector globalNodeQ);
+        DenseVector Interpolated_Displacement(double[] localCoords);
 
         /// <summary>
         /// Gets the element stress matrix
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
-        /// <param name="globalNodeQ">Global node displacement matrix</param>
         /// <param name="localCoords">Optional local coordinates inside the element</param>
         /// <returns></returns>
-        DenseVector StressMatrix(List<double[]> nodeCoordinates, DenseVector globalNodeQ, double[]? localCoords = null);
+        DenseVector StressMatrix(double[]? localCoords = null);
 
     }
 

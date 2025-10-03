@@ -81,5 +81,29 @@ namespace FEA_Program.Models
             return output;
         }
 
+        /// <summary>
+        /// Builds a sequenctial vector from a collection of nodes
+        /// </summary>
+        /// <param name="nodes">The nodes</param>
+        /// <param name="selector">The node property to get</param>
+        /// <returns>The vector with each node sequentially appended</returns>
+        public static DenseVector BuildVector(List<INode> nodes, Func<INode, double[]> selector)
+        {       
+            int outputSize = nodes.Sum(node => node.Dimension);
+            var output = new DenseVector(outputSize);
+            int currentRow = 0;
+
+            foreach (var node in nodes)
+            {
+                var values = selector(node);
+                for (int i = 0; i < node.Dimension; i++)
+                {
+                    output[currentRow++] = values[i];
+                }
+            }
+
+            return output;
+        }
+
     }
 }

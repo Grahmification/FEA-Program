@@ -1,5 +1,4 @@
 ﻿using MathNet.Numerics.LinearAlgebra.Double;
-using System.Reflection;
 
 namespace FEA_Program.Models
 {
@@ -8,6 +7,7 @@ namespace FEA_Program.Models
     /// </summary>
     internal abstract class Element
     {
+        private readonly INode[] _nodes;
         private Material _Material;
         private bool _ReadyToSolve = false; // is true if the nodes of the element are set up properly
         
@@ -19,13 +19,21 @@ namespace FEA_Program.Models
             get { return _Material; }
             set { _Material = value; InvalidateSolution(); }
         } // flags the solution invalid if set
+        public IReadOnlyList<INode> Nodes => _nodes;
         public bool SolutionValid { get; protected set; } = false; // is true if the solution for the element is correct
         public abstract int NumOfNodes { get; }
-        public abstract int NodeDOFs { get; protected set; }
+        public int NodeDOFs { get; private set; }
         public int ElementDOFs => NumOfNodes * NodeDOFs;
 
-        public Element(int id, Material material)
+        public Element(int id, List<INode> nodes, Material material, int nodeDOFs)
         {
+            NodeDOFs = nodeDOFs; // This needs to be set before validation
+            
+            // Prepare the nodes
+            ValidateNodes(nodes); // Sanity check them
+            SortNodeOrder(ref nodes); // Sort them
+            _nodes = [.. nodes];
+
             _Material = material;
             ID = id;
         }
@@ -35,50 +43,43 @@ namespace FEA_Program.Models
         /// <summary>
         /// Gets the element stiffness matrix
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        public DenseMatrix K_Matrix(List<double[]> nodeCoordinates)
+        public DenseMatrix K_Matrix()
         {
-            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
-
             var K_local = new DenseMatrix(2, 2);
             K_local[0, 0] = 1;
             K_local[1, 0] = -1;
             K_local[0, 1] = -1;
             K_local[1, 1] = 1;
 
-            var B = B_Matrix(nodeCoordinates);
+            var B = B_Matrix();
             var D = D_Matrix();
 
             // K = Scaling * [B]^T * [D] * [B] 
-            return (DenseMatrix)(StiffnessScalingFactor(nodeCoordinates) * B.TransposeThisAndMultiply(D * B));
+            return (DenseMatrix)(StiffnessScalingFactor() * B.TransposeThisAndMultiply(D * B));
         }
 
         /// <summary>
         /// Gets the element stress vector
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
-        /// <param name="globalNodeQ">Global node displacement vector</param>
         /// <param name="localCoords">Optional local coordinates inside the element</param>
         /// <returns></returns>
-        public DenseVector StressMatrix(List<double[]> nodeCoordinates, DenseVector globalNodeQ, double[]? localCoords = null)
+        public DenseVector StressMatrix(double[]? localCoords = null)
         {
-            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
-            ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
+            DenseVector globalNodeQ = NodeExtensions.BuildVector([.. _nodes], (n) => n.Displacement);
 
             // Stress = [D] * [B] * [Q]
-            return D_Matrix() * B_Matrix(nodeCoordinates) * globalNodeQ;
+            return D_Matrix() * B_Matrix() * globalNodeQ;
         }
 
         /// <summary>
         /// Gets a displacement or position at the given location inside the element
         /// </summary>
         /// <param name="localCoords">Local coordinates inside the element to calculate the displacement</param>
-        /// <param name="globalNodeQ">Global node displacement or position matrix for nodes in this element</param>
         /// <returns></returns>
-        public DenseVector Interpolated_Displacement(double[] localCoords, DenseVector globalNodeQ)
+        public DenseVector Interpolated_Displacement(double[] localCoords)
         {
-            ValidateLength(globalNodeQ.Values, ElementDOFs, MethodBase.GetCurrentMethod()?.Name);
+            DenseVector globalNodeQ = NodeExtensions.BuildVector([.. _nodes], (n) => n.Displacement);
             return N_Matrix(localCoords) * globalNodeQ;
         }
 
@@ -87,14 +88,13 @@ namespace FEA_Program.Models
         /// <summary>
         /// Gets the scaling factor for the element's K matrix
         /// </summary>
-        protected abstract double StiffnessScalingFactor(List<double[]> nodeCoordinates);
+        protected abstract double StiffnessScalingFactor();
 
         /// <summary>
         /// Gets the element strain / displacement matrix
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        protected abstract DenseMatrix B_Matrix(List<double[]> nodeCoordinates);
+        protected abstract DenseMatrix B_Matrix();
 
         /// <summary>
         /// Get the material's constitutive matrix for the given element
@@ -109,7 +109,23 @@ namespace FEA_Program.Models
         /// <returns></returns>
         protected abstract DenseMatrix N_Matrix(double[] localCoords);
 
+        /// <summary>
+        /// Sorts the nodes for the correct ordering in the element
+        /// </summary>
+        /// <param name="nodes">The list to sort in place</param>
+        protected abstract void SortNodeOrder(ref List<INode> nodes);
+
         // ---------------- Helper methods ----------------
+
+        private void ValidateNodes(List<INode> nodes)
+        {
+            if (nodes.Count != NumOfNodes)
+                throw new ArgumentException($"Cannot create element. {nodes.Count} nodes were specified, but element requires {NumOfNodes}.");
+
+            foreach(INode node in nodes)
+                if(node.Dimension != NodeDOFs)
+                    throw new ArgumentException($"Cannot create element. Node {node.ID} has {node.Dimension} DOFs, but element requires {NodeDOFs}.");
+        }
 
         protected void InvalidateSolution()
         {

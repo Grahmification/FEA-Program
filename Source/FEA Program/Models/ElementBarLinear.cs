@@ -9,7 +9,6 @@ namespace FEA_Program.Models
 
         public ElementTypes ElementType => ElementTypes.BarLinear;
         public override int NumOfNodes => 2;
-        public override int NodeDOFs { get; protected set; } = 1;
 
         /// <summary>
         /// Element body force in N/m^3 [X, Y, Z]^T
@@ -27,7 +26,7 @@ namespace FEA_Program.Models
         public double[] ElementArgs { get => [_Area]; set => _Area = value[0]; }
 
 
-        public ElementBarLinear(double area, int id, Material material, int nodeDOFs = 1) : base(id, material)
+        public ElementBarLinear(double area, int id, List<INode> nodes, Material material, int nodeDOFs = 1) : base(id, nodes, material, nodeDOFs)
         {
             if (area <= 0)
                 throw new ArgumentException($"Cannot create {ElementType} element with non-positive area.");
@@ -35,25 +34,12 @@ namespace FEA_Program.Models
             if (nodeDOFs != 1 & nodeDOFs != 2 & nodeDOFs != 3)
                 throw new ArgumentException($"Cannot create {ElementType} element with {nodeDOFs} DOFs. Unsupported");
 
-            NodeDOFs = nodeDOFs;
             _Area = area;
             BodyForce = new DenseVector(NodeDOFs);
             TractionForce = new DenseVector(NodeDOFs);
         }
 
         // ---------------- Public methods ----------------
-
-        /// <summary>
-        /// Sorts the nodes for the correct ordering in the element
-        /// </summary>
-        /// <param name="nodes">The list to sort in place</param>
-        public void SortNodeOrder(ref List<INode> nodes)
-        {
-            ValidateLength(nodes, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
-
-            //Order from smallest to largest X coordinate
-            nodes = nodes.OrderBy(n => n.Coordinates[0]).ToList();
-        }
 
         /// <summary>
         /// Sets the element body force
@@ -80,23 +66,18 @@ namespace FEA_Program.Models
         /// <summary>
         /// Gets the element length
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        public double Length(List<double[]> nodeCoordinates)
+        public double Length()
         {
-            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
-            return Geometry.Length(nodeCoordinates[1], nodeCoordinates[0]);
+            return Geometry.Length(Nodes[1].Coordinates, Nodes[0].Coordinates);
         }
 
         /// <summary>
         /// Gets the element body force matrix
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        public DenseVector BodyForceMatrix(List<double[]> nodeCoordinates)
+        public DenseVector BodyForceMatrix()
         {
-            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
-
             var local_body = new DenseMatrix(ElementDOFs, NodeDOFs);
             if (NodeDOFs == 1)
             {
@@ -122,18 +103,15 @@ namespace FEA_Program.Models
             }
 
             // [Fb] = 0.5 * A * L * [body_local] * [body force]
-            return (DenseVector)(0.5 * _Area * Length(nodeCoordinates) * local_body.Multiply(BodyForce));
+            return (DenseVector)(0.5 * _Area * Length() * local_body.Multiply(BodyForce));
         }
 
         /// <summary>
         /// Gets the element traction force matrix
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        public DenseVector TractionForceMatrix(List<double[]> nodeCoordinates)
+        public DenseVector TractionForceMatrix()
         {
-            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
-
             var local_traction = new DenseMatrix(ElementDOFs, NodeDOFs);
             if (NodeDOFs == 1)
             {
@@ -159,35 +137,42 @@ namespace FEA_Program.Models
             }
 
             // [Ft] = 0.5 * L * [body_traction] * [traction force]
-            return (DenseVector)(0.5 * Length(nodeCoordinates) * local_traction.Multiply(TractionForce));
+            return (DenseVector)(0.5 * Length() * local_traction.Multiply(TractionForce));
         }
 
         // ---------------- Base override methods ----------------
 
         /// <summary>
+        /// Sorts the nodes for the correct ordering in the element
+        /// </summary>
+        /// <param name="nodes">The list to sort in place</param>
+        protected override void SortNodeOrder(ref List<INode> nodes)
+        {
+            //Order from smallest to largest X coordinate
+            nodes = nodes.OrderBy(n => n.Coordinates[0]).ToList();
+        }
+
+        /// <summary>
         /// Gets the scaling factor for the element's K matrix
         /// </summary>
-        protected override double StiffnessScalingFactor(List<double[]> nodeCoordinates)
+        protected override double StiffnessScalingFactor()
         {
-            return Length(nodeCoordinates) * _Area;
+            return Length() * _Area;
         }
 
         /// <summary>
         /// Gets the element strain / displacement matrix
         /// </summary>
-        /// <param name="nodeCoordinates">Node coordinates, starting with element node 1</param>
         /// <returns></returns>
-        protected override DenseMatrix B_Matrix(List<double[]> nodeCoordinates)
+        protected override DenseMatrix B_Matrix()
         {
-            ValidateLength(nodeCoordinates, NumOfNodes, MethodBase.GetCurrentMethod()?.Name);
-
             // Always B = [-1 1]*1/(x2-x1) for a 1D element
             var B_local = new DenseMatrix(1, 2); 
             B_local[0, 0] = -1.0;
             B_local[0, 1] = 1.0;
             
             // Convert to global coordinates and scale by the length to get the global B matrix
-            return B_local * M_Matrix(nodeCoordinates) * (1.0 / Length(nodeCoordinates));
+            return B_local * M_Matrix() * (1.0 / Length());
         }
 
         /// <summary>
@@ -248,9 +233,8 @@ namespace FEA_Program.Models
         /// <summary>
         /// Get the transformation matrix from global node coordinates to local node coordinates for higher DOF elements
         /// </summary>
-        /// <param name="nodeCoordinates"></param>
         /// <returns></returns>
-        private DenseMatrix M_Matrix(List<double[]> nodeCoordinates)
+        private DenseMatrix M_Matrix()
         {
             if(NodeDOFs == 1)
             {
@@ -258,7 +242,7 @@ namespace FEA_Program.Models
             }
             else if (NodeDOFs == 2) 
             {
-                (var l, var m, _) = Geometry.ComputeDirectionCosines(nodeCoordinates[1], nodeCoordinates[0]);
+                (var l, var m, _) = Geometry.ComputeDirectionCosines(Nodes[1].Coordinates, Nodes[0].Coordinates);
                 var matrix = new DenseMatrix(2, 4);
                 matrix[0, 0] = l;
                 matrix[0, 1] = m;
@@ -268,7 +252,7 @@ namespace FEA_Program.Models
             }
             else // Node DOFs == 3
             {
-                (var l, var m, var n) = Geometry.ComputeDirectionCosines(nodeCoordinates[1], nodeCoordinates[0]);
+                (var l, var m, var n) = Geometry.ComputeDirectionCosines(Nodes[1].Coordinates, Nodes[0].Coordinates);
                 var matrix = new DenseMatrix(2, 6);
                 matrix[0, 0] = l;
                 matrix[0, 1] = m;

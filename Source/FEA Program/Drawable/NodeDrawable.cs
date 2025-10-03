@@ -167,5 +167,11 @@ namespace FEA_Program.Drawable
                 }
             }
         }
+
+        /// <summary>
+        /// Gets an empty node for reference use
+        /// </summary>
+        /// <returns></returns>
+        public static new NodeDrawable DummyNode(int dimension = 1) => new(new double[dimension], new int[dimension], Constants.InvalidID, dimension);
     }
 }

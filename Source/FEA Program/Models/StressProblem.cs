@@ -190,29 +190,34 @@ namespace FEA_Program.Models
             Materials.ImportMaterials(materials);
 
             // ----------- Import Nodes ---------------
-            List<NodeDrawable> nodes = [];
+            Dictionary<int, NodeDrawable> nodes = [];
  
             foreach (var item in data.Nodes)
             {
-                nodes.Add(new NodeDrawable(item.Coords, item.Fixity, item.ID, item.Dimension)
+                nodes.Add(item.ID, new NodeDrawable(item.Coords, item.Fixity, item.ID, item.Dimension)
                 {
                     Force = item.Force
                 });
             }
 
-            Nodes.ImportNodes(nodes);
+            Nodes.ImportNodes([.. nodes.Values]);
 
             // ----------- Import Elements ---------------
             List<IElementDrawable> elements = [];
             foreach (var item in data.Elements)
             {
                 var elementMaterial = Materials.GetMaterial(item.MaterialID);
+                var elementNodeIds = data.ConnectivityMatrix[item.ID];
+                List<NodeDrawable> elementNodes = elementNodeIds
+                    .Select(nodeId => nodes[nodeId])
+                    .ToList();
+
                 IElementDrawable? element = null;
 
                 switch (item.ElementType)
                 {
                     case ElementTypes.BarLinear:
-                        element = new ElementBarLinearDrawable(1, item.ID, elementMaterial, item.NodeDOFs)
+                        element = new ElementBarLinearDrawable(1, item.ID, elementNodes, elementMaterial, item.NodeDOFs)
                         {
                             ElementArgs = item.ElementArgs
                         };
@@ -237,7 +242,7 @@ namespace FEA_Program.Models
             Dictionary<int, int> nodeDOFS = Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Dimension);
             Dictionary<int, double[]> nodeCoordinates = Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Coordinates);
 
-            var K_Matricies = ElementExtensions.Get_K_Matricies(Elements.Elemlist.Cast<IElement>().ToList(), Connect.ConnectivityMatrix, nodeCoordinates);
+            var K_Matricies = ElementExtensions.Get_K_Matricies(Elements.Elemlist.Cast<IElement>().ToList());
             SparseMatrix K_assembled = Connect.Assemble_K_Matrix(K_Matricies, nodeDOFS);
             var F_assembled = NodeExtensions.F_Matrix(Nodes.BaseNodelist);
             var Q_assembled = NodeExtensions.Q_Matrix(Nodes.BaseNodelist);
@@ -265,18 +270,10 @@ namespace FEA_Program.Models
         }
 
 
-        private void OnElementCreation(int elementID, List<int> nodeIDs)
+        private void OnElementCreation(object? sender, int elementID)
         {
-            var nodes = new List<INode>();
-
-            foreach (int ID in nodeIDs)
-                nodes.Add(Nodes.GetNode(ID));
-
-            // Sort the node IDs accordingly for the given element type
-            Elements.GetElement(elementID).SortNodeOrder(ref nodes);
-            var sortedIDs = nodes.Select(node => node.ID).ToArray();
-
-            Connect.AddConnection(elementID, sortedIDs);
+            var nodeIDs = Elements.GetElement(elementID).Nodes.Select(node => node.ID).ToArray();
+            Connect.AddConnection(elementID, nodeIDs);
         }
         private void OnElementDeletion(object? sender, IElement e)
         {

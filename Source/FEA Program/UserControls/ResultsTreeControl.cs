@@ -1,5 +1,4 @@
 ﻿using FEA_Program.Models;
-using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.UserControls
 {
@@ -52,14 +51,8 @@ namespace FEA_Program.UserControls
                     Tag = element.ID,
                 };
 
-                // Get node coordinates and displacements associated with the element
-                var nodeIDs = P.Connect.GetElementNodes(element.ID);
-                var nodes = nodeIDs.Select(id => (Node)P.Nodes.GetNode(id)).ToList();
-                var nodesCoords = nodes.Select(n => n.Coordinates).ToList();
-                DenseVector nodeDisplacement = NodeExtensions.BuildVector(nodes, n => n.Displacement);
-
-                var stress = element.StressMatrix(nodesCoords, nodeDisplacement);
-                var endDispl = element.Interpolated_Displacement([1], nodeDisplacement);
+                var stress = element.StressMatrix();
+                var endDispl = element.Interpolated_Displacement([1]);
 
                 newNode.Nodes.Add(new TreeNode($"Stress: {string.Join(",", stress.Values)}"));
                 newNode.Nodes.Add(new TreeNode($"Interpolated end displ:  {string.Join(",", endDispl.Values)}"));

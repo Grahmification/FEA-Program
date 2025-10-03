@@ -8,6 +8,6 @@ namespace FEA_Program.Drawable
 
         public bool Selected { get; set; }
 
-        public void Draw(List<double[]> nodeCoords);
+        public void Draw();
     }
 }

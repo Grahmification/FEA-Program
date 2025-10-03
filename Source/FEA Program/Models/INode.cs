@@ -5,5 +5,6 @@
         public int ID { get; }
         public int Dimension { get; }
         public double[] Coordinates { get; set; }
+        public double[] Displacement { get; }
     }
 }

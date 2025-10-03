@@ -93,11 +93,7 @@ namespace FEA_Program
 
             foreach (IElementDrawable E in P.Elements.Elemlist)
             {
-                var nodeCoords = new List<double[]>();
-                foreach (int NodeID in P.Connect.GetElementNodes(E.ID))
-                    nodeCoords.Add(P.Nodes.GetNode(NodeID).DrawCoordinates);
-
-                E.Draw(nodeCoords);
+                E.Draw();
             }
         }
         public void ViewUpdated(object? sender, GLControlViewUpdatedEventArgs e)
@@ -158,8 +154,6 @@ namespace FEA_Program
 
             foreach (IElementDrawable element in P.Elements.Elemlist)
             {
-                var nodeCoords = P.Connect.GetElementNodes(element.ID).Select(NodeID => P.Nodes.GetNode(NodeID).Coordinates).ToList();
-
                 var newNode = new TreeNode($"Element {element.ID}")
                 {
                     Tag = element.ID
@@ -168,7 +162,7 @@ namespace FEA_Program
                 newNode.Nodes.Add(new TreeNode($"Type: {element.Name}"));
                 //newNode.Nodes.Add(new TreeNode("Area: " & (Units.Convert(Units.AllUnits.m_squared, element.Ar, Units.AllUnits.mm_squared)) & Units.UnitStrings(Units.AllUnits.mm_squared)(0)))
                 newNode.Nodes.Add(new TreeNode($"Material: {element.Material.Name}"));
-                newNode.Nodes.Add(new TreeNode($"Length: {element.Length(nodeCoords)}"));
+                newNode.Nodes.Add(new TreeNode($"Length: {element.Length()}"));
                 baseNode.Nodes.Add(newNode);
             }
 
@@ -352,7 +346,12 @@ namespace FEA_Program
 
             var material = P.Materials.GetMaterial(Mat);
             int nodeDOFs = P.AvailableNodeDOFs;
-            P.Elements.Add(nodeDOFs, Type, NodeIDs, ElementArgs, material);
+
+            List<NodeDrawable> nodes = NodeIDs
+                .Select(P.Nodes.GetNode)
+                .ToList();
+
+            P.Elements.Add(nodeDOFs, Type, nodes, ElementArgs, material);
 
         }
 

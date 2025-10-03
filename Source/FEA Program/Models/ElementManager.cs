@@ -9,8 +9,7 @@ namespace FEA_Program.Models
         public event EventHandler<Dictionary<int, IElementDrawable>>? ElementListChanged;  // Length of Elementlist has changed
         public event EventHandler<int>? ElementChanged; // Element has changed such that list needs to be updated & screen redrawn
         public event EventHandler? ElementChanged_RedrawOnly; // Element has changed such that screen only needs to be redrawn
-        public event ElementAddedEventHandler? ElementAdded;
-        public delegate void ElementAddedEventHandler(int ElemID, List<int> NodeIDs); // dont use for redrawing lists or screen
+        public event EventHandler<int>? ElementAdded; // dont use for redrawing lists or screen
         public event EventHandler<IElementDrawable>? ElementDeleted;  // dont use for redrawing lists or screen
 
         // ---------------------- Public Properties ----------------------------
@@ -19,7 +18,7 @@ namespace FEA_Program.Models
 
         // ---------------------- Public Methods ----------------------------
 
-        public void Add(int nodeDOFs, Type elementType, List<int> nodeIDs, double[] elementArgs, Material material)
+        public void Add(int nodeDOFs, Type elementType, List<NodeDrawable> nodes, double[] elementArgs, Material material)
         {
             IElementDrawable? newElement = null;
             int newElemID = CreateUniqueId();
@@ -28,7 +27,7 @@ namespace FEA_Program.Models
 
             if (ReferenceEquals(elementType, typeof(ElementBarLinear))) // linear bar element
             {
-                newElement = new ElementBarLinearDrawable(elementArgs[0], newElemID, material, nodeDOFs);
+                newElement = new ElementBarLinearDrawable(elementArgs[0], newElemID, nodes, material, nodeDOFs);
             }
             else
             {
@@ -36,17 +35,10 @@ namespace FEA_Program.Models
                 throw new Exception("Tried to add element with unsupported type.");
             }  
 
-            // -------------------- check for errors and if valid add then raise events -----------------
-
-            if (nodeIDs.Count != newElement.NumOfNodes) // check if the right number of nodes are listed
-            {
-                throw new ArgumentException($"Tried to add element of type <{elementType}> with {nodeIDs.Count} nodes. Should have {NumOfNodes(newElement.GetType())} nodes.");
-            }
-
             if (newElement is not null) // more error checking
             {
                 _Bar1Elements.Add(newElement.ID, newElement);
-                ElementAdded?.Invoke(newElement.ID, nodeIDs);
+                ElementAdded?.Invoke(this, newElement.ID);
                 ElementListChanged?.Invoke(this, _Bar1Elements);
             }
         } // nodeIDs only used to raise event about generation
@@ -109,7 +101,7 @@ namespace FEA_Program.Models
         {
             return elementType switch
             {
-                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinear(1, 0, Material.DummyMaterial()).NumOfNodes,
+                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinear(1, 0, [Node.DummyNode(), Node.DummyNode()], Material.DummyMaterial()).NumOfNodes,
                 _ => 0,
             };
         }
@@ -117,7 +109,7 @@ namespace FEA_Program.Models
         {
             return elementType switch
             {
-                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinearDrawable(1, 0, Material.DummyMaterial()).Name,
+                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinearDrawable(1, 0, [NodeDrawable.DummyNode(), NodeDrawable.DummyNode()],Material.DummyMaterial()).Name,
                 _ => "",
             };
         }

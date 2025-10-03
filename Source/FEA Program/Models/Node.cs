@@ -148,5 +148,10 @@ namespace FEA_Program.Models
             }
         }
 
+        /// <summary>
+        /// Gets an empty node for reference use
+        /// </summary>
+        /// <returns></returns>
+        public static Node DummyNode(int dimension = 1) => new(new double[dimension], new int[dimension], Constants.InvalidID, dimension);
     }
 }
