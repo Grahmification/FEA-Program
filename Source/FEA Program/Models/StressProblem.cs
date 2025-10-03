@@ -242,7 +242,7 @@ namespace FEA_Program.Models
             Dictionary<int, int> nodeDOFS = Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Dimension);
             Dictionary<int, double[]> nodeCoordinates = Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Coordinates);
 
-            var K_Matricies = ElementExtensions.Get_K_Matricies(Elements.Elemlist.Cast<IElement>().ToList());
+            var K_Matricies = Elements.Elemlist.ToDictionary(element => element.ID, element => element.K_Matrix());
             SparseMatrix K_assembled = Connect.Assemble_K_Matrix(K_Matricies, nodeDOFS);
             var F_assembled = NodeExtensions.F_Matrix(Nodes.BaseNodelist);
             var Q_assembled = NodeExtensions.Q_Matrix(Nodes.BaseNodelist);
