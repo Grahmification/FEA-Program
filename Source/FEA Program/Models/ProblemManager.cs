@@ -7,16 +7,17 @@ namespace FEA_Program.Models
     internal class ProblemManager
     {
         public Mainform Loadedform { get; private set; }
-        public ProblemTypes ProblemType { get; private set; }
+        public StressProblem Problem { get; private set; } = new();
+
         public NodeManager Nodes { get; private set; }
         public ElementManager Elements { get; private set; }
         public MaterialManager Materials { get; private set; }
-        public Solver Solver { get; private set; } = new Solver();
+
 
         /// <summary>
         /// which elements are available depending on problem type
         /// </summary>
-        public Type[]? AvailableElements => ProblemType switch
+        public Type[]? AvailableElements => Problem.ProblemType switch
         {
             ProblemTypes.Bar_1D => new[] { typeof(ElementBarLinear) },
             ProblemTypes.Truss_3D => new[] { typeof(ElementBarLinear) },
@@ -28,7 +29,7 @@ namespace FEA_Program.Models
         /// <summary>
         /// Which node DOF should be used for given problem type
         /// </summary>
-        public int AvailableNodeDOFs => ProblemType switch
+        public int AvailableNodeDOFs => Problem.ProblemType switch
         {
             // Case for 1 DOFs
             ProblemTypes.Bar_1D or ProblemTypes.Beam_1D => 1,
@@ -43,7 +44,7 @@ namespace FEA_Program.Models
         /// <summary>
         /// Whether the screen should be 3D based on the problem type
         /// </summary>
-        public bool ThreeDimensional => ProblemType switch
+        public bool ThreeDimensional => Problem.ProblemType switch
         {
             // Combine cases that return false using the 'or' pattern
             ProblemTypes.Bar_1D or ProblemTypes.Beam_1D => false,
@@ -91,14 +92,12 @@ namespace FEA_Program.Models
         }
 
         // ---------------------- Public Methods ----------------------------
-        public ProblemManager(Mainform form, ProblemTypes Type, MaterialManager? materials = null)
+        public ProblemManager(Mainform form, MaterialManager? materials = null)
         {
             Nodes = new NodeManager();
             Nodes.NodeListChanged += (s, e) => OnListRedrawNeeded();
             Nodes.NodesChanged += (s, e) => OnListRedrawNeeded();
             Nodes.NodeChanged_RedrawOnly += OnScreenRedrawOnlyNeeded;
-            Nodes.NodeDeleted += OnNodeDeletion;
-
 
             Elements = new ElementManager();
             Elements.ElementListChanged += (s, e) => OnListRedrawNeeded();
@@ -109,8 +108,14 @@ namespace FEA_Program.Models
             Materials.MaterialListChanged += (s, e) => OnListRedrawNeeded();
 
             Loadedform = form;
-            ProblemType = Type;
         }
+        public void InitializeProblem(ProblemTypes problemType)
+        {
+            Problem = new StressProblem(problemType);
+            Nodes.Problem = Problem;
+            Elements.Problem = Problem;
+        }
+
         public ProblemData GetSaveData()
         {
             var output = new ProblemData();
@@ -160,13 +165,13 @@ namespace FEA_Program.Models
             }
 
             // ------------------- Other --------------------
-            output.ProblemType = ProblemType;
+            output.ProblemType = Problem.ProblemType;
 
             return output;
         }
         public void LoadData(ProblemData data)
         {
-            ProblemType = data.ProblemType;
+            InitializeProblem(data.ProblemType);
 
             // ----------- Import Materials ---------------
             List<Material> materials = [];
@@ -225,30 +230,6 @@ namespace FEA_Program.Models
             Elements.ImportElements(elements);
         }
 
-
-        /// <summary>
-        /// Solve the stress problem
-        /// </summary>
-        public bool Solve()
-        {
-            var K_Matricies = Elements.Elemlist.ToDictionary(element => element.ID, element => element.K_Matrix());
-            var nodeDOFS = Nodes.Nodelist.ToDictionary(n => n.ID, n => n.Dimension);
-            var connectivityMatrix = ElementExtensions.Get_Connectivity_Matrix(Elements.Elemlist.Cast<IElement>().ToList());
-
-            SparseMatrix K_assembled = ElementExtensions.Assemble_K_Matrix(K_Matricies, nodeDOFS, connectivityMatrix);
-            var F_assembled = NodeExtensions.F_Matrix(Nodes.BaseNodelist);
-            var Q_assembled = NodeExtensions.Q_Matrix(Nodes.BaseNodelist);
-
-            DenseVector[] output = Solver.Solve(K_assembled, F_assembled, Q_assembled);
-            Nodes.SetSolution(output[0], output[1]);
-
-            var displacements = output[0].Values;
-
-            // False if there's a bad value
-            return !(displacements.Contains(double.NaN) || displacements.Contains(double.PositiveInfinity) || displacements.Contains(double.NegativeInfinity));
-        }
-
-
         // ---------------------- Event Handlers ----------------------------
 
         private void OnListRedrawNeeded()
@@ -261,28 +242,6 @@ namespace FEA_Program.Models
             Loadedform.GlCont.SubControl.Invalidate();
         }
 
-
-        private void OnNodeDeletion(object? sender, INode e)
-        {
-            RemoveHangingElements(e.ID);
-        }
-
-        // ---------------------- Private Helpers ----------------------------
-
-        /// <summary>
-        /// Deletes elements if a node is deleted and leaves one hanging
-        /// </summary>
-        /// <param name="nodeID"></param>
-        private void RemoveHangingElements(int nodeID)
-        {
-            // Elements where any of the nodes matches the given ID
-            List<int> elementsToDelete = Elements.Elemlist
-                .Where(element => element.Nodes.Any(n => n.ID == nodeID))
-                .Select(element => element.ID)
-                .ToList();
-
-            Elements.Delete(elementsToDelete);
-        }
     }
 
     public enum ProblemTypes

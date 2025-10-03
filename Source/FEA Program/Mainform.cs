@@ -62,22 +62,24 @@ namespace FEA_Program
         {
             if (P is null)
             {
-                P = new(this, problemType);
+                P = new(this);
             }
             else
             {
                 var materials = P.Materials; // Save materials so they don't change
-                P = new(this, problemType, materials);
+                P = new(this, materials);
             }
+
+            P.InitializeProblem(problemType);
 
             // Make sure node changes get updated in the draw manager
             _DrawManager.Nodes = P.Nodes.Nodelist;
             P.Nodes.NodeListChanged += OnNodeListChanged;
 
             // Link to the solver
-            P.Solver.SolutionStarted += S_SolutionStarted;
-            P.Solver.PartiallyReducedCalculated += S_PartiallyReducedCalculated;
-            P.Solver.FullyReducedCalculated += S_FullyReducedCalculated;
+            P.Problem.Solver.SolutionStarted += S_SolutionStarted;
+            P.Problem.Solver.PartiallyReducedCalculated += S_PartiallyReducedCalculated;
+            P.Problem.Solver.FullyReducedCalculated += S_FullyReducedCalculated;
         }
         private void OnNodeListChanged(object? sender, SortedDictionary<int, NodeDrawable> e)
         {
@@ -243,7 +245,7 @@ namespace FEA_Program
         {
             try
             {
-                if (P.Solve())
+                if (P.Problem.Solve())
                 {
                     FormattedMessageBox.DisplayMessage("Solved Successfully!");
                 }
@@ -328,7 +330,7 @@ namespace FEA_Program
                 foreach (Type ElemType in P.AvailableElements)
                     ElementArgsList.Add(ElementManager.ElementArgs(ElemType));
 
-                var UC = new AddElementControl(P.AvailableElements, ElementArgsList, P.Materials.MaterialList, P.Nodes.BaseNodelist);
+                var UC = new AddElementControl(P.AvailableElements, ElementArgsList, P.Materials.MaterialList, P.Nodes.Nodelist.Cast<Node>().ToList());
                 UC.ElementAddFormSuccess += ElemAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
                 DisplaySideBarMenuControl(UC);
@@ -359,7 +361,7 @@ namespace FEA_Program
         {
             try
             {
-                var UC = new AddNodeForceControl(P.AvailableNodeDOFs, P.Nodes.BaseNodelist);
+                var UC = new AddNodeForceControl(P.AvailableNodeDOFs, P.Nodes.Nodelist.Cast<Node>().ToList());
                 UC.NodeForceAddFormSuccess += NodeForceAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
                 DisplaySideBarMenuControl(UC);
@@ -435,6 +437,11 @@ namespace FEA_Program
                         ToolStripComboBox_ProblemMode.SelectedIndex = (int)saveData.ProblemType;
 
                         P.LoadData(saveData);
+
+                        // Link events back to the solver - it will have reset
+                        P.Problem.Solver.SolutionStarted += S_SolutionStarted;
+                        P.Problem.Solver.PartiallyReducedCalculated += S_PartiallyReducedCalculated;
+                        P.Problem.Solver.FullyReducedCalculated += S_FullyReducedCalculated;
                     }
                 }
             }

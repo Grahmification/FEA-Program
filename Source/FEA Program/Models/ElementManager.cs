@@ -9,10 +9,9 @@ namespace FEA_Program.Models
         public event EventHandler<Dictionary<int, IElementDrawable>>? ElementListChanged;  // Length of Elementlist has changed
         public event EventHandler<int>? ElementChanged; // Element has changed such that list needs to be updated & screen redrawn
         public event EventHandler? ElementChanged_RedrawOnly; // Element has changed such that screen only needs to be redrawn
-        public event EventHandler<int>? ElementAdded; // dont use for redrawing lists or screen
-        public event EventHandler<IElementDrawable>? ElementDeleted;  // dont use for redrawing lists or screen
 
         // ---------------------- Public Properties ----------------------------
+        public StressProblem Problem { get; set; } = new();
 
         public List<IElementDrawable> Elemlist => _Bar1Elements.Values.ToList();
 
@@ -21,7 +20,7 @@ namespace FEA_Program.Models
         public void Add(int nodeDOFs, Type elementType, List<NodeDrawable> nodes, double[] elementArgs, Material material)
         {
             IElementDrawable? newElement = null;
-            int newElemID = IDClass.CreateUniqueId(_Bar1Elements.Values.Cast<IHasID>().ToList());
+            int newElemID = IDClass.CreateUniqueId(Problem.Elements.Cast<IHasID>().ToList());
 
             // ------------------ Determine type of element ----------------------
 
@@ -38,7 +37,7 @@ namespace FEA_Program.Models
             if (newElement is not null) // more error checking
             {
                 _Bar1Elements.Add(newElement.ID, newElement);
-                ElementAdded?.Invoke(this, newElement.ID);
+                Problem.AddElement(newElement);
                 ElementListChanged?.Invoke(this, _Bar1Elements);
             }
         } // nodeIDs only used to raise event about generation
@@ -46,9 +45,8 @@ namespace FEA_Program.Models
         {
             foreach (int id in elementIDs)
             {
-                var deleteElement = _Bar1Elements[id]; // save temporarily so we can raise event after deletion
                 _Bar1Elements.Remove(id);
-                ElementDeleted?.Invoke(this, deleteElement);
+                Problem.RemoveElement(id);
             }
 
             if (elementIDs.Count > 0)
@@ -56,7 +54,6 @@ namespace FEA_Program.Models
                 ElementListChanged?.Invoke(this, _Bar1Elements);
             }
         }
-        public IElement GetElement(int id) => _Bar1Elements[id];
         public void SelectElements(bool selected, int[]? ids = null)
         {
             // If IDs isn't specified, select all elements
@@ -77,6 +74,7 @@ namespace FEA_Program.Models
             foreach (var element in elements)
             {
                 _Bar1Elements[element.ID] = element;
+                Problem.AddElement(element);
             }
 
             ElementListChanged?.Invoke(this, _Bar1Elements);

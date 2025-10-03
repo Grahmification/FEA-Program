@@ -1,5 +1,4 @@
 using FEA_Program.Drawable;
-using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
 {
@@ -10,23 +9,16 @@ namespace FEA_Program.Models
         public event EventHandler<SortedDictionary<int, NodeDrawable>>? NodeListChanged;  // Length of nodelist has changed
         public event EventHandler<List<int>>? NodesChanged; // Node has changed such that list needs to be updated & screen redrawn
         public event EventHandler? NodeChanged_RedrawOnly; // Node has changed such that screen only needs to be redrawn
-        public event EventHandler<INode>? NodeAdded; // dont use for redrawing lists or screen
-        public event EventHandler<INode>? NodeDeleted; // dont use for redrawing lists or screen
 
         // ---------------------- Public Properties ----------------------------
+        public StressProblem Problem { get; set; } = new();
 
         /// <summary>
         /// Gets all nodes, sorted from smallest to largest ID
         /// </summary>
         public List<NodeDrawable> Nodelist => _Nodes.Values.ToList();
 
-        /// <summary>
-        /// Gets all base nodes, sorted from smallest to largest ID
-        /// </summary>
-        public List<Node> BaseNodelist => Nodelist.Cast<Node>().ToList();
-
         // ---------------------- Public Methods ----------------------------
-
         public NodeDrawable GetNode(int ID) => _Nodes[ID];
         public void SelectNodes(bool selected, int[]? ids = null)
         {
@@ -46,15 +38,11 @@ namespace FEA_Program.Models
 
             for (int i = 0; i < coords.Count; i++)
             {
-                if (ExistsAtLocation(coords[i])) // dont want to create node where one already is
-                {
-                    throw new Exception("Tried to create node at location where one already exists. Nodes cannot be in identical locations.");
-                }
+                int ID = IDClass.CreateUniqueId(Problem.Nodes.Cast<IHasID>().ToList());
 
-                int ID = IDClass.CreateUniqueId(_Nodes.Values.Cast<IHasID>().ToList());
                 var newnode = new NodeDrawable(coords[i], fixity[i], ID, dimensions[i]);
                 _Nodes.Add(newnode.ID, newnode);
-                NodeAdded?.Invoke(this, newnode);
+                Problem.AddNode(newnode);
             }
 
             NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
@@ -97,9 +85,8 @@ namespace FEA_Program.Models
         {
             foreach (int NodeID in ids) // remove node from list
             {
-                var node = _Nodes[NodeID];
                 _Nodes.Remove(NodeID);
-                NodeDeleted?.Invoke(this, node);
+                Problem.RemoveNode(NodeID);
             }
 
             if (ids.Count > 0)
@@ -119,40 +106,10 @@ namespace FEA_Program.Models
             foreach(NodeDrawable node in nodes)
             {
                 _Nodes[node.ID] = node;
+                Problem.AddNode(node);
             }
 
             NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
-        }
-
-
-        /// <summary>
-        /// Sets the solution for all nodes
-        /// </summary>
-        /// <param name="Q">The global displacement vector</param>
-        /// <param name="R">The global reaction force vector</param>
-        public void SetSolution(DenseVector Q, DenseVector R)
-        {
-            NodeExtensions.ApplySolution(BaseNodelist, Q, R);
-            NodesChanged?.Invoke(this, [.. _Nodes.Keys]);
-        }
-        
-        // ---------------------- Private Helpers ----------------------------
-
-        /// <summary>
-        /// Returns true if a node already exists at the given location
-        /// </summary>
-        /// <param name="coords"></param>
-        /// <returns></returns>
-        private bool ExistsAtLocation(double[] coords)
-        {
-            foreach (Node node in _Nodes.Values)
-            {
-                // This should work regardless of dimension
-                if (node.Coordinates.Take(node.Dimension).SequenceEqual(coords.Take(node.Dimension)))
-                    return true;
-            }
-
-            return false;
         }
 
     }
