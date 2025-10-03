@@ -58,51 +58,23 @@ namespace FEA_Program.Models
 
 
         /// <summary>
-        /// Builds a sequenctial vector from a collection of nodes
+        /// Builds a sequential vector from a collection of nodes by concatenating the double[] 
+        /// returned by the selector for each node.
         /// </summary>
-        /// <param name="nodes">The nodes</param>
-        /// <param name="selector">The node property to get</param>
-        /// <returns>The vector with each node sequentially appended</returns>
-        public static DenseVector BuildVector(List<Node> nodes, Func<Node, double[]> selector)
+        /// <typeparam name="TNode">The type of the node, must implement INode.</typeparam>
+        /// <param name="nodes">The collection of nodes.</param>
+        /// <param name="selector">The node property (double[]) to get.</param>
+        /// <returns>A DenseVector with all selected values sequentially appended.</returns>
+        public static DenseVector BuildVector<TNode>(IEnumerable<TNode> nodes, Func<TNode, double[]> selector) where TNode : INode
         {
-            int outputSize = nodes.Sum(node => node.Dimension);
-            var output = new DenseVector(outputSize);
-            int currentRow = 0;
+            // Use LINQ's SelectMany to flatten the arrays returned by the selector 
+            // into a single sequence of double values.
+            double[] vectorData = nodes
+                .SelectMany(selector) // Applies selector to each node and flattens the results
+                .ToArray();           // Converts the resulting sequence into a single array
 
-            foreach (var node in nodes)
-            {
-                var values = selector(node);
-                for (int i = 0; i < node.Dimension; i++)
-                {
-                    output[currentRow++] = values[i];
-                }
-            }
-
-            return output;
-        }
-
-        /// <summary>
-        /// Builds a sequenctial vector from a collection of nodes
-        /// </summary>
-        /// <param name="nodes">The nodes</param>
-        /// <param name="selector">The node property to get</param>
-        /// <returns>The vector with each node sequentially appended</returns>
-        public static DenseVector BuildVector(List<INode> nodes, Func<INode, double[]> selector)
-        {       
-            int outputSize = nodes.Sum(node => node.Dimension);
-            var output = new DenseVector(outputSize);
-            int currentRow = 0;
-
-            foreach (var node in nodes)
-            {
-                var values = selector(node);
-                for (int i = 0; i < node.Dimension; i++)
-                {
-                    output[currentRow++] = values[i];
-                }
-            }
-
-            return output;
+            // Create the DenseVector from the combined array
+            return new DenseVector(vectorData);
         }
 
     }
