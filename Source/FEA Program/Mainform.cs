@@ -12,7 +12,7 @@ using OpenTK.Mathematics;
 
 namespace FEA_Program
 {
-    internal partial class Mainform : Form, INodeEditView
+    internal partial class Mainform : Form, IMainView
     {
         private ProblemManager P;
         private NodeDrawManager _DrawManager = new();
@@ -22,14 +22,14 @@ namespace FEA_Program
 
 
         public event EventHandler? NodeAddRequest;
-        public event EventHandler<(NodeDrawable, bool)>? NodeEditConfirmed;
-
+        public event EventHandler<int>? NodeEditRequest;
 
         public Mainform()
         {
             Load += Mainform_Load;
 
             InitializeComponent();
+            ToolStripButton_Addnode.Click += (_, _) => NodeAddRequest?.Invoke(this, new());
 
             // Setup draw manager
             _DrawManager.DisplaceScaling = 10000;
@@ -38,8 +38,7 @@ namespace FEA_Program
 
             P = new(this);
             P.Nodes.NodeListChanged += OnNodeListChanged; // Make sure node changes get updated in the draw manager
-
-            P.Nodes.AddEditView(this);
+            P.Nodes.AddMainView(this);
         }
         private void Mainform_Load(object sender, EventArgs e)
         {
@@ -274,28 +273,12 @@ namespace FEA_Program
                 ["K Matrix Fully Reduced", "F Matrix Fully Reduced"]);
         }
 
-
-        private void ToolStripButton_Addnode_Click(object sender, EventArgs e)
+        public INodeEditView ShowNodeEditView(NodeDrawable node, bool edit)
         {
-            try
-            {
-                NodeAddRequest?.Invoke(this, new());
-            }
-            catch (Exception ex)
-            {
-                FormattedMessageBox.DisplayError(ex);
-            }
+            var view = new AddNodeControl(node, edit);
+            DisplaySideBarMenuControl(view);
+            return view;
         }
-
-        public void ShowNodeEditView(NodeDrawable node, bool edit)
-        {
-            var uc = new AddNodeControl(node, edit);
-            uc.NodeAddFormSuccess += (_, e) => NodeEditConfirmed?.Invoke(this, e);
-
-            DisplaySideBarMenuControl(uc);
-        }
-
-
 
         private void ToolStripButton_AddMaterial_Click(object sender, EventArgs e)
         {

@@ -8,14 +8,14 @@ namespace FEA_Program.UserControls
     /// <summary>
     /// Menu for adding new nodes. Will resize for the node DOFs
     /// </summary>
-    internal partial class AddNodeControl : UserControl
+    internal partial class AddNodeControl : UserControl, INodeEditView
     {
         private readonly NodeDrawable _node;
         
         private readonly List<NumericalInputTextBox> _TextBoxes = [];
         private readonly List<CheckBox> _CheckBoxes = [];
 
-        public event EventHandler<(NodeDrawable, bool)>? NodeAddFormSuccess;
+        public event EventHandler<NodeDrawable>? NodeEditConfirmed;
 
         public bool Editing { get; private set; } = false;
 
@@ -100,7 +100,7 @@ namespace FEA_Program.UserControls
                     _node.Coordinates = coords;
                     _node.Fixity = fixity;
 
-                    NodeAddFormSuccess?.Invoke(this, (_node, Editing));
+                    NodeEditConfirmed?.Invoke(this, _node);
                 }
 
                 this.Dispose();

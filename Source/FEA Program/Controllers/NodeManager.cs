@@ -1,12 +1,13 @@
 using FEA_Program.Drawable;
 using FEA_Program.Models;
+using FEA_Program.UI;
 using FEA_Program.UserControls;
 
 namespace FEA_Program.Controllers
 {
     internal class NodeManager
     {
-        private readonly List<INodeEditView> _editViews = [];
+        private readonly List<IMainView> _mainViews = [];
         
         private readonly SortedDictionary<int, NodeDrawable> _Nodes = []; // reference nodes by ID, always sorting from smallest to largest ID
 
@@ -21,47 +22,6 @@ namespace FEA_Program.Controllers
         /// Gets all nodes, sorted from smallest to largest ID
         /// </summary>
         public List<NodeDrawable> Nodelist => _Nodes.Values.ToList();
-
-        // ---------------------- Public Methods - Views ----------------------------
-        public void AddEditView(INodeEditView view)
-        {
-            view.NodeAddRequest += OnAddNodeRequest;
-            _editViews.Add(view);
-        }
-        private void OnAddNodeRequest(object? sender, EventArgs e)
-        {
-            if(sender is not null) 
-            {
-                var view = (INodeEditView)sender;
-
-                // Create a new node, but don't add it yet until after the form confirms
-                int dimension = Problem.AvailableNodeDOFs;
-                int Id = IDClass.CreateUniqueId(Problem.Nodes.Cast<IHasID>().ToList());
-                var newNode = new NodeDrawable(new double[dimension], new int[dimension], Id, dimension);
-
-                view.NodeEditConfirmed += OnNodeEditsConfirmed;
-                view.ShowNodeEditView(newNode, false);
-            }
-        }
-        private void OnNodeEditsConfirmed(object? sender, (NodeDrawable, bool) e)
-        {
-            if (sender is not null)
-            {
-                var view = (INodeEditView)sender;
-                view.NodeEditConfirmed -= OnNodeEditsConfirmed;
-
-                // If we're not editing
-                if (!e.Item2)
-                {
-                    var newNode = e.Item1;
-                    
-                    _Nodes.Add(newNode.ID, newNode);
-                    Problem.AddNode(newNode);
-
-                    NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
-                }
-            }
-        }
 
         // ---------------------- Public Methods ----------------------------
         public NodeDrawable GetNode(int ID) => _Nodes[ID];
@@ -127,6 +87,57 @@ namespace FEA_Program.Controllers
             }
 
             NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
+        }
+
+        // ---------------------- Public Methods - Views ----------------------------
+        public void AddMainView(IMainView view)
+        {
+            view.NodeAddRequest += OnAddNodeRequest;
+            _mainViews.Add(view);
+        }
+
+        // ---------------------- View Event handlers ----------------------------
+        private void OnAddNodeRequest(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (sender is not null)
+                {
+                    var view = (IMainView)sender;
+
+                    // Create a new node, but don't add it yet until after the form confirms
+                    int dimension = Problem.AvailableNodeDOFs;
+                    int Id = IDClass.CreateUniqueId(Problem.Nodes.Cast<IHasID>().ToList());
+                    var newNode = new NodeDrawable(new double[dimension], new int[dimension], Id, dimension);
+
+                    var editView = view.ShowNodeEditView(newNode, false);
+                    editView.NodeEditConfirmed += OnNodeEditsConfirmed;
+                }
+            }
+            catch (Exception ex)
+            {
+                FormattedMessageBox.DisplayError(ex);
+            }
+        }
+        private void OnNodeEditsConfirmed(object? sender, NodeDrawable e)
+        {
+            if (sender is not null)
+            {
+                var view = (INodeEditView)sender;
+
+                // If we're not editing
+                if (!view.Editing)
+                {
+                    var newNode = e;
+                    Problem.AddNode(newNode); // This must be done first because it validates the node parameters
+                    _Nodes.Add(newNode.ID, newNode);
+
+                    NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
+                }
+
+                // This must be done at the end in case node creation fails
+                view.NodeEditConfirmed -= OnNodeEditsConfirmed;
+            }
         }
 
     }

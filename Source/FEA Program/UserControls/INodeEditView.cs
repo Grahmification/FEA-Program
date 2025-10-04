@@ -7,10 +7,8 @@ namespace FEA_Program.UserControls
     /// </summary>
     internal interface INodeEditView
     {
+        public event EventHandler<NodeDrawable>? NodeEditConfirmed;
 
-        public event EventHandler? NodeAddRequest;
-        public event EventHandler<(NodeDrawable, bool)>? NodeEditConfirmed;
-
-        public void ShowNodeEditView(NodeDrawable node, bool edit);
+        public bool Editing { get; }
     }
 }

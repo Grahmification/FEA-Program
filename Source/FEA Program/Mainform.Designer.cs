@@ -109,7 +109,6 @@
             ToolStripButton_Addnode.Name = "ToolStripButton_Addnode";
             ToolStripButton_Addnode.Size = new Size(65, 22);
             ToolStripButton_Addnode.Text = "Add Node";
-            ToolStripButton_Addnode.Click += ToolStripButton_Addnode_Click;
             // 
             // ToolStripComboBox_ProblemMode
             // 
