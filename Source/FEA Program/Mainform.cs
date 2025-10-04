@@ -29,8 +29,9 @@ namespace FEA_Program
             _DrawManager.DisplaceScaling = 10000;
             _DrawManager.RedrawRequired += (s, e) => GlCont?.SubControl.Invalidate();
             resultDisplaySettingsControl_main.SetDrawManager(_DrawManager);
-            
-            ResetProblem(ProblemTypes.Bar_1D);
+
+            P = new(this);
+            P.Nodes.NodeListChanged += OnNodeListChanged; // Make sure node changes get updated in the draw manager
         }
         private void Mainform_Load(object sender, EventArgs e)
         {
@@ -60,21 +61,7 @@ namespace FEA_Program
 
         private void ResetProblem(ProblemTypes problemType)
         {
-            if (P is null)
-            {
-                P = new(this);
-            }
-            else
-            {
-                var materials = P.Materials; // Save materials so they don't change
-                P = new(this, materials);
-            }
-
-            P.InitializeProblem(problemType);
-
-            // Make sure node changes get updated in the draw manager
-            _DrawManager.Nodes = P.Nodes.Nodelist;
-            P.Nodes.NodeListChanged += OnNodeListChanged;
+            P.ResetProblem(problemType);
 
             // Link to the solver
             P.Problem.Solver.SolutionStarted += S_SolutionStarted;
@@ -227,7 +214,6 @@ namespace FEA_Program
             try
             {
                 ToolStripComboBox TSCB = (ToolStripComboBox)sender;
-                var materials = P.Materials; // Save materials - they don't change
                 ResetProblem((ProblemTypes)TSCB.SelectedIndex);
                 GlCont.ThreeDimensional = P.ThreeDimensional;
 

@@ -92,7 +92,7 @@ namespace FEA_Program.Models
         }
 
         // ---------------------- Public Methods ----------------------------
-        public ProblemManager(Mainform form, MaterialManager? materials = null)
+        public ProblemManager(Mainform form)
         {
             Nodes = new NodeManager();
             Nodes.NodeListChanged += (s, e) => OnListRedrawNeeded();
@@ -104,14 +104,16 @@ namespace FEA_Program.Models
             Elements.ElementChanged += (s, e) => OnListRedrawNeeded();
             Elements.ElementChanged_RedrawOnly += OnScreenRedrawOnlyNeeded;
 
-            Materials = materials ?? new MaterialManager();
+            Materials = new MaterialManager();
             Materials.MaterialListChanged += (s, e) => OnListRedrawNeeded();
 
             Loadedform = form;
         }
-        public void InitializeProblem(ProblemTypes problemType)
+        public void ResetProblem(ProblemTypes problemType)
         {
             Problem = new StressProblem(problemType);
+            Nodes.Reset();
+            Elements.Reset();
             Nodes.Problem = Problem;
             Elements.Problem = Problem;
         }
@@ -171,7 +173,7 @@ namespace FEA_Program.Models
         }
         public void LoadData(ProblemData data)
         {
-            InitializeProblem(data.ProblemType);
+            ResetProblem(data.ProblemType);
 
             // ----------- Import Materials ---------------
             List<Material> materials = [];

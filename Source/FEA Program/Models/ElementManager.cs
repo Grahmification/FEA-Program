@@ -64,6 +64,12 @@ namespace FEA_Program.Models
             ElementChanged_RedrawOnly?.Invoke(this, new());
         }
 
+        public void Reset()
+        {
+            _Bar1Elements.Clear();
+            ElementListChanged?.Invoke(this, _Bar1Elements);
+        }
+
         /// <summary>
         /// Import a dataset, usually when loading from a file
         /// </summary>

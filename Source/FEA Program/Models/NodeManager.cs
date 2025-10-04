@@ -94,6 +94,11 @@ namespace FEA_Program.Models
                 NodeListChanged?.Invoke(this, _Nodes);
             }
         }
+        public void Reset()
+        {
+            _Nodes.Clear();
+            NodeListChanged?.Invoke(this, _Nodes);
+        }
 
         /// <summary>
         /// Import a dataset, usually when loading from a file
