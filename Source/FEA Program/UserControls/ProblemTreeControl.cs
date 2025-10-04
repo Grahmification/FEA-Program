@@ -8,6 +8,16 @@ namespace FEA_Program.UserControls
 {
     internal partial class ProblemTreeControl : UserControl
     {
+        private List<TreeNode> _nodeItems = [];
+        private List<TreeNode> _elementItems = [];
+        private List<TreeNode> _forceItems = [];
+        private List<TreeNode> _materialItems = [];
+
+
+        public event EventHandler<int>? NodeDeleteRequest;
+        public event EventHandler<int>? ElementDeleteRequest;
+
+
         public ProblemTreeControl()
         {
             InitializeComponent();
@@ -17,6 +27,10 @@ namespace FEA_Program.UserControls
         {
             var tree = treeView_main;
             tree.Nodes.Clear();
+            _forceItems.Clear();
+            _elementItems.Clear();
+            _materialItems.Clear();
+            _nodeItems.Clear();
 
             // ---------------------- Add base level ------------------------
 
@@ -36,12 +50,12 @@ namespace FEA_Program.UserControls
                 var newNode = new TreeNode($"Node {node.ID}")
                 {
                     Tag = node.ID,
-                    ContextMenuStrip = contextMenuStrip_Nodes
                 };
 
                 newNode.Nodes.Add(new TreeNode($"Pos: {string.Join(",", node.Coordinates_mm)}"));
                 newNode.Nodes.Add(new TreeNode($"Fixity: {string.Join(",", node.Fixity)}"));
                 baseNode.Nodes.Add(newNode);
+                _nodeItems.Add(newNode);
             }
 
             // ------------------ Add Elements --------------------
@@ -60,6 +74,7 @@ namespace FEA_Program.UserControls
                 newNode.Nodes.Add(new TreeNode($"Material: {element.Material.Name}"));
                 newNode.Nodes.Add(new TreeNode($"Length: {element.Length()}"));
                 baseNode.Nodes.Add(newNode);
+                _elementItems.Add(newNode);
             }
 
             // ------------------ Add forces --------------------
@@ -73,12 +88,12 @@ namespace FEA_Program.UserControls
                     var newNode = new TreeNode($"Force (Node {node.ID})")
                     {
                         Tag = node.ID,
-                        ContextMenuStrip = contextMenuStrip_Forces
                     };
 
                     newNode.Nodes.Add(new TreeNode($"Magnitude [N]: {node.ForceMagnitude}"));
                     newNode.Nodes.Add(new TreeNode($"Components [N]: {string.Join(",", node.Force)}"));
                     baseNode.Nodes.Add(newNode);
+                    _forceItems.Add(newNode);
                 }
             }
 
@@ -91,7 +106,6 @@ namespace FEA_Program.UserControls
                 var newNode = new TreeNode(mat.Name)
                 {
                     Tag = mat.ID,
-                    ContextMenuStrip = contextMenuStrip_Materials
                 };
 
                 newNode.Nodes.Add(new TreeNode($"E (GPa): {mat.E_GPa}"));
@@ -100,6 +114,7 @@ namespace FEA_Program.UserControls
                 newNode.Nodes.Add(new TreeNode($"Sut (MPa) {mat.Sut_MPa}: "));
                 newNode.Nodes.Add(new TreeNode($"Type : {Enum.GetName(typeof(MaterialType), mat.Subtype)}"));
                 baseNode.Nodes.Add(newNode);
+                _materialItems.Add(newNode);
             }
 
             // Expand base level nodes
@@ -144,13 +159,47 @@ namespace FEA_Program.UserControls
                 }
 
                 // End If
-                else if (InputManager.IsButtonDown(MouseButtons.Right))
+                else if (e.Button == MouseButtons.Right)
                 {
+                    HandleRightClick(Tree, e);
                 }
             }
             catch (Exception ex)
             {
                 FormattedMessageBox.DisplayError(ex);
+            }
+        }
+
+        private void HandleRightClick(TreeView tree, TreeNodeMouseClickEventArgs e)
+        {
+            tree.SelectedNode = e.Node;
+
+            // A node was selected
+            if (_nodeItems.Contains(e.Node) || _elementItems.Contains(e.Node))
+            {
+                // Store the node in the ContextMenuStrip's Tag property
+                contextMenuStrip_Edit.Tag = e.Node;
+                contextMenuStrip_Edit.Show(tree, e.Location);
+            }
+        }
+
+        private void toolStripMenuItem_Delete_Click(object sender, EventArgs e)
+        {
+            // The ToolStripItem is the sender, its Parent is the ContextMenuStrip
+            ContextMenuStrip? menu = ((ToolStripMenuItem)sender).Owner as ContextMenuStrip;
+
+            if (menu != null && menu.Tag is TreeNode clickedNode)
+            {
+                // A node was selected
+                if (_nodeItems.Contains(clickedNode))
+                {
+                    NodeDeleteRequest?.Invoke(this, (int)clickedNode.Tag);
+                }
+                // An element was selected
+                else if (_elementItems.Contains(clickedNode))
+                {
+                    ElementDeleteRequest?.Invoke(this, (int)clickedNode.Tag);
+                }
             }
         }
     }

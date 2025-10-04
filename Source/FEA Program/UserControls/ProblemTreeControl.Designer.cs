@@ -29,18 +29,15 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            TreeNode treeNode5 = new TreeNode("Nodes");
-            TreeNode treeNode6 = new TreeNode("Elements");
-            TreeNode treeNode7 = new TreeNode("Forces");
-            TreeNode treeNode8 = new TreeNode("Materials");
+            TreeNode treeNode1 = new TreeNode("Nodes");
+            TreeNode treeNode2 = new TreeNode("Elements");
+            TreeNode treeNode3 = new TreeNode("Forces");
+            TreeNode treeNode4 = new TreeNode("Materials");
             treeView_main = new TreeView();
-            contextMenuStrip_Nodes = new ContextMenuStrip(components);
-            contextMenuStrip_Elements = new ContextMenuStrip(components);
-            contextMenuStrip_Forces = new ContextMenuStrip(components);
-            contextMenuStrip_Materials = new ContextMenuStrip(components);
+            contextMenuStrip_Edit = new ContextMenuStrip(components);
             toolStripMenuItem_nodeEdit = new ToolStripMenuItem();
             toolStripMenuItem_NodeDelete = new ToolStripMenuItem();
-            contextMenuStrip_Nodes.SuspendLayout();
+            contextMenuStrip_Edit.SuspendLayout();
             SuspendLayout();
             // 
             // treeView_main
@@ -51,51 +48,37 @@
             treeView_main.FullRowSelect = true;
             treeView_main.Location = new Point(0, 0);
             treeView_main.Name = "treeView_main";
-            treeNode5.Name = "Node0";
-            treeNode5.Text = "Nodes";
-            treeNode6.Name = "Node1";
-            treeNode6.Text = "Elements";
-            treeNode7.Name = "Node2";
-            treeNode7.Text = "Forces";
-            treeNode8.Name = "Node3";
-            treeNode8.Text = "Materials";
-            treeView_main.Nodes.AddRange(new TreeNode[] { treeNode5, treeNode6, treeNode7, treeNode8 });
+            treeNode1.Name = "Node0";
+            treeNode1.Text = "Nodes";
+            treeNode2.Name = "Node1";
+            treeNode2.Text = "Elements";
+            treeNode3.Name = "Node2";
+            treeNode3.Text = "Forces";
+            treeNode4.Name = "Node3";
+            treeNode4.Text = "Materials";
+            treeView_main.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2, treeNode3, treeNode4 });
             treeView_main.Size = new Size(212, 415);
             treeView_main.TabIndex = 0;
             treeView_main.NodeMouseClick += TreeView_Main_NodeMouseClick;
             // 
-            // contextMenuStrip_Nodes
+            // contextMenuStrip_Edit
             // 
-            contextMenuStrip_Nodes.Items.AddRange(new ToolStripItem[] { toolStripMenuItem_nodeEdit, toolStripMenuItem_NodeDelete });
-            contextMenuStrip_Nodes.Name = "contextMenuStrip_Nodes";
-            contextMenuStrip_Nodes.Size = new Size(181, 70);
-            // 
-            // contextMenuStrip_Elements
-            // 
-            contextMenuStrip_Elements.Name = "contextMenuStrip_Elements";
-            contextMenuStrip_Elements.Size = new Size(61, 4);
-            // 
-            // contextMenuStrip_Forces
-            // 
-            contextMenuStrip_Forces.Name = "contextMenuStrip_Forces";
-            contextMenuStrip_Forces.Size = new Size(61, 4);
-            // 
-            // contextMenuStrip_Materials
-            // 
-            contextMenuStrip_Materials.Name = "contextMenuStrip_Materials";
-            contextMenuStrip_Materials.Size = new Size(61, 4);
+            contextMenuStrip_Edit.Items.AddRange(new ToolStripItem[] { toolStripMenuItem_nodeEdit, toolStripMenuItem_NodeDelete });
+            contextMenuStrip_Edit.Name = "contextMenuStrip_Nodes";
+            contextMenuStrip_Edit.Size = new Size(108, 48);
             // 
             // toolStripMenuItem_nodeEdit
             // 
             toolStripMenuItem_nodeEdit.Name = "toolStripMenuItem_nodeEdit";
-            toolStripMenuItem_nodeEdit.Size = new Size(180, 22);
+            toolStripMenuItem_nodeEdit.Size = new Size(107, 22);
             toolStripMenuItem_nodeEdit.Text = "Edit";
             // 
             // toolStripMenuItem_NodeDelete
             // 
             toolStripMenuItem_NodeDelete.Name = "toolStripMenuItem_NodeDelete";
-            toolStripMenuItem_NodeDelete.Size = new Size(180, 22);
+            toolStripMenuItem_NodeDelete.Size = new Size(107, 22);
             toolStripMenuItem_NodeDelete.Text = "Delete";
+            toolStripMenuItem_NodeDelete.Click += toolStripMenuItem_Delete_Click;
             // 
             // ProblemTreeControl
             // 
@@ -104,18 +87,15 @@
             Controls.Add(treeView_main);
             Name = "ProblemTreeControl";
             Size = new Size(212, 415);
-            contextMenuStrip_Nodes.ResumeLayout(false);
+            contextMenuStrip_Edit.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
 
         private TreeView treeView_main;
-        private ContextMenuStrip contextMenuStrip_Nodes;
+        private ContextMenuStrip contextMenuStrip_Edit;
         private ToolStripMenuItem toolStripMenuItem_nodeEdit;
         private ToolStripMenuItem toolStripMenuItem_NodeDelete;
-        private ContextMenuStrip contextMenuStrip_Elements;
-        private ContextMenuStrip contextMenuStrip_Forces;
-        private ContextMenuStrip contextMenuStrip_Materials;
     }
 }

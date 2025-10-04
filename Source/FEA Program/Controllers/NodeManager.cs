@@ -53,18 +53,23 @@ namespace FEA_Program.Controllers
 
             NodesChanged?.Invoke(this, IDs);
         }
-        public void Delete(List<int> ids)
+        public int[] Delete(List<int> ids)
         {
+            List<int> elementIds = [];
+
             foreach (int NodeID in ids) // remove node from list
             {
                 _Nodes.Remove(NodeID);
-                Problem.RemoveNode(NodeID);
+                elementIds.AddRange(Problem.RemoveNode(NodeID));
             }
 
             if (ids.Count > 0)
             {
                 NodeListChanged?.Invoke(this, _Nodes);
             }
+
+            // Return any elements that were deleted in the process
+            return [.. elementIds];
         }
         public void Reset()
         {
