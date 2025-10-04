@@ -1,5 +1,6 @@
 ﻿using FEA_Program.Controls;
 using FEA_Program.Models;
+using FEA_Program.Drawable;
 using FEA_Program.UI;
 
 namespace FEA_Program.UserControls
@@ -9,28 +10,36 @@ namespace FEA_Program.UserControls
     /// </summary>
     internal partial class AddNodeControl : UserControl
     {
-        private readonly int _DOFs = 0;
-        private readonly string[] _DOFNames = ["X", "Y", "Z"];
-
-        private readonly int _labelX = 6;
-        private readonly int _labelY = 60;
-        private readonly int _YIncrement = 25;
-
+        private readonly NodeDrawable _node;
+        
         private readonly List<NumericalInputTextBox> _TextBoxes = [];
         private readonly List<CheckBox> _CheckBoxes = [];
 
-        public event NodeAddFormSuccessEventHandler? NodeAddFormSuccess;
-        public delegate void NodeAddFormSuccessEventHandler(AddNodeControl sender, List<double[]> Coords, List<int[]> Fixity, List<int> Dimensions);
+        public event EventHandler<(NodeDrawable, bool)>? NodeAddFormSuccess;
 
-        public AddNodeControl(int nodeDOFs)
+        public bool Editing { get; private set; } = false;
+
+        public AddNodeControl(NodeDrawable node, bool editing = false)
         {
+            _node = node;
+            Editing = editing;
+            
+            InitializeComponent();
+            InitializeTextBoxes(node.Dimension);
+            ValidateEntry();
+        }
+
+        private void InitializeTextBoxes(int nodeDOFs)
+        {
+            string[] _DOFNames = ["X", "Y", "Z"];
+
+            int _labelX = 6;
+            int _labelY = 60;
+            int _YIncrement = 25;
+
             int[] _FirstLabelPos = [_labelX, _labelY];
             int[] _FirstTextBoxPos = [_labelX + 26, _labelY - 2];
             int[] _FirstCheckBoxPos = [_labelX + 140, _labelY - 4];
-
-            InitializeComponent();
-
-            _DOFs = nodeDOFs;
 
             for (int i = 0; i < nodeDOFs; i++)
             {
@@ -47,7 +56,8 @@ namespace FEA_Program.UserControls
                 // ---------------- add textbox ---------------------
                 var txt = new NumericalInputTextBox(100, new Point(_FirstTextBoxPos[0], _FirstTextBoxPos[1] + _YIncrement * i), Units.DataUnitType.Length, Units.AllUnits.mm)
                 {
-                    Tag = i
+                    Value = _node.Coordinates[i],
+                    Tag = i,
                 };
                 txt.TextChanged += OnTextFieldChanged;
                 _TextBoxes.Add(txt);
@@ -56,7 +66,7 @@ namespace FEA_Program.UserControls
                 // -------------- add checkbox -------------------
                 var CK = new CheckBox
                 {
-                    Checked = false,
+                    Checked = _node.Fixity[i] != 0,
                     Anchor = AnchorStyles.Top | AnchorStyles.Right,
                     Location = new Point(_FirstCheckBoxPos[0], _FirstCheckBoxPos[1] + _YIncrement * i),
                     Tag = i
@@ -67,8 +77,6 @@ namespace FEA_Program.UserControls
                 // ------------ move buttons down ----------------
                 Button_FixAll.Location = new Point(Button_FixAll.Location.X, Button_FixAll.Location.Y + _YIncrement);
                 Button_UnfixAll.Location = new Point(Button_UnfixAll.Location.X, Button_UnfixAll.Location.Y + _YIncrement);
-
-                ValidateEntry();
             }
         }
 
@@ -80,16 +88,19 @@ namespace FEA_Program.UserControls
 
                 if (ReferenceEquals(sendbtn, Button_Accept))
                 {
-                    var coords = new double[_DOFs];
-                    var fixity = new int[_DOFs];
+                    var coords = new double[_node.Dimension];
+                    var fixity = new int[_node.Dimension];
 
-                    for (int i = 0; i < _DOFs; i++)
+                    for (int i = 0; i < _node.Dimension; i++)
                     {
                         coords[i] = _TextBoxes[i].Value;
                         fixity[i] = _CheckBoxes[i].Checked ? 1 : 0;
                     }
 
-                    NodeAddFormSuccess?.Invoke(this, [coords], [fixity], [_DOFs]);
+                    _node.Coordinates = coords;
+                    _node.Fixity = fixity;
+
+                    NodeAddFormSuccess?.Invoke(this, (_node, Editing));
                 }
 
                 this.Dispose();

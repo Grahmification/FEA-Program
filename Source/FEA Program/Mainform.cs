@@ -12,13 +12,18 @@ using OpenTK.Mathematics;
 
 namespace FEA_Program
 {
-    internal partial class Mainform : Form
+    internal partial class Mainform : Form, INodeEditView
     {
         private ProblemManager P;
         private NodeDrawManager _DrawManager = new();
 
         public CoordinateSystem Coord = new([0, 0, 0], 10);
         public GLControlDraggable GlCont;
+
+
+        public event EventHandler? NodeAddRequest;
+        public event EventHandler<(NodeDrawable, bool)>? NodeEditConfirmed;
+
 
         public Mainform()
         {
@@ -33,6 +38,8 @@ namespace FEA_Program
 
             P = new(this);
             P.Nodes.NodeListChanged += OnNodeListChanged; // Make sure node changes get updated in the draw manager
+
+            P.Nodes.AddEditView(this);
         }
         private void Mainform_Load(object sender, EventArgs e)
         {
@@ -272,21 +279,23 @@ namespace FEA_Program
         {
             try
             {
-                var uc = new AddNodeControl(P.AvailableNodeDOFs);
-                uc.NodeAddFormSuccess += NodeAddFormSuccess;
-
-                DisplaySideBarMenuControl(uc);
+                NodeAddRequest?.Invoke(this, new());
             }
             catch (Exception ex)
             {
                 FormattedMessageBox.DisplayError(ex);
             }
         }
-        private void NodeAddFormSuccess(AddNodeControl sender, List<double[]> Coords, List<int[]> Fixity, List<int> Dimensions)
+
+        public void ShowNodeEditView(NodeDrawable node, bool edit)
         {
-            sender.NodeAddFormSuccess -= NodeAddFormSuccess;
-            P.Nodes.AddNodes(Coords, Fixity, Dimensions);
+            var uc = new AddNodeControl(node, edit);
+            uc.NodeAddFormSuccess += (_, e) => NodeEditConfirmed?.Invoke(this, e);
+
+            DisplaySideBarMenuControl(uc);
         }
+
+
 
         private void ToolStripButton_AddMaterial_Click(object sender, EventArgs e)
         {

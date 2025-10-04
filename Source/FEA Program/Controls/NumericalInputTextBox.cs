@@ -19,6 +19,10 @@ namespace FEA_Program.Controls
 
                 return ConvertInput();
             }
+            set
+            {
+                Text = ConvertValueTo(value);
+            }
         }
 
         public NumericalInputTextBox(int Width, Point Location, Units.DataUnitType unitType, Units.AllUnits DefaultInputUnit)
@@ -26,14 +30,8 @@ namespace FEA_Program.Controls
             _unitType = unitType;
             _DefaultInputUnit = DefaultInputUnit;
 
-            if ((int)DefaultInputUnit == -1 | (int)unitType == -1)
-            {
-                this.Text = "0.000";
-            }
-            else
-            {
-                this.Text = "0.000" + Units.UnitStrings(DefaultInputUnit)[0];
-            }
+            Value = 0;
+
 
             this.Width = Width;
             this.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
@@ -151,6 +149,19 @@ namespace FEA_Program.Controls
                 } // if no specific type specified need to convert from the default input type
             }
             return output;
+        }
+        private string ConvertValueTo(double value)
+        {       
+            // Unit is invalid
+            if ((int)_DefaultInputUnit == -1 | (int)_unitType == -1)
+            {
+                return $"{value:F3}";
+            }
+            else
+            {
+                value = Units.Convert(Units.DefaultUnit(_unitType), value, _DefaultInputUnit);
+                return $"{value:F3}{Units.UnitStrings(_DefaultInputUnit)[0]}";
+            }
         }
 
     }

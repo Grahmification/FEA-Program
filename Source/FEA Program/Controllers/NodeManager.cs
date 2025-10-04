@@ -1,10 +1,13 @@
 using FEA_Program.Drawable;
 using FEA_Program.Models;
+using FEA_Program.UserControls;
 
 namespace FEA_Program.Controllers
 {
     internal class NodeManager
     {
+        private readonly List<INodeEditView> _editViews = [];
+        
         private readonly SortedDictionary<int, NodeDrawable> _Nodes = []; // reference nodes by ID, always sorting from smallest to largest ID
 
         public event EventHandler<SortedDictionary<int, NodeDrawable>>? NodeListChanged;  // Length of nodelist has changed
@@ -19,6 +22,47 @@ namespace FEA_Program.Controllers
         /// </summary>
         public List<NodeDrawable> Nodelist => _Nodes.Values.ToList();
 
+        // ---------------------- Public Methods - Views ----------------------------
+        public void AddEditView(INodeEditView view)
+        {
+            view.NodeAddRequest += OnAddNodeRequest;
+            _editViews.Add(view);
+        }
+        private void OnAddNodeRequest(object? sender, EventArgs e)
+        {
+            if(sender is not null) 
+            {
+                var view = (INodeEditView)sender;
+
+                // Create a new node, but don't add it yet until after the form confirms
+                int dimension = Problem.AvailableNodeDOFs;
+                int Id = IDClass.CreateUniqueId(Problem.Nodes.Cast<IHasID>().ToList());
+                var newNode = new NodeDrawable(new double[dimension], new int[dimension], Id, dimension);
+
+                view.NodeEditConfirmed += OnNodeEditsConfirmed;
+                view.ShowNodeEditView(newNode, false);
+            }
+        }
+        private void OnNodeEditsConfirmed(object? sender, (NodeDrawable, bool) e)
+        {
+            if (sender is not null)
+            {
+                var view = (INodeEditView)sender;
+                view.NodeEditConfirmed -= OnNodeEditsConfirmed;
+
+                // If we're not editing
+                if (!e.Item2)
+                {
+                    var newNode = e.Item1;
+                    
+                    _Nodes.Add(newNode.ID, newNode);
+                    Problem.AddNode(newNode);
+
+                    NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
+                }
+            }
+        }
+
         // ---------------------- Public Methods ----------------------------
         public NodeDrawable GetNode(int ID) => _Nodes[ID];
         public void SelectNodes(bool selected, int[]? ids = null)
@@ -29,39 +73,6 @@ namespace FEA_Program.Controllers
             foreach (int item in ids)
                 _Nodes[item].Selected = selected;
             NodeChanged_RedrawOnly?.Invoke(this, new());
-        }
-        public void AddNodes(List<double[]> coords, List<int[]> fixity, List<int> dimensions)
-        {
-            if (coords.Count != fixity.Count | coords.Count != dimensions.Count)
-            {
-                throw new ArgumentException("Tried to create node with unmatched lengths of input values.");
-            }
-
-            for (int i = 0; i < coords.Count; i++)
-            {
-                int ID = IDClass.CreateUniqueId(Problem.Nodes.Cast<IHasID>().ToList());
-
-                var newnode = new NodeDrawable(coords[i], fixity[i], ID, dimensions[i]);
-                _Nodes.Add(newnode.ID, newnode);
-                Problem.AddNode(newnode);
-            }
-
-            NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
-        }
-        public void EditNode(List<double[]> coords, List<int[]> fixity, List<int> ids)
-        {
-            if (coords.Count != fixity.Count | coords.Count != ids.Count)
-            {
-                throw new ArgumentException("Tried to apply node edits with unmatched lengths of input values.");
-            }
-
-            for (int i = 0; i < ids.Count; i++)
-            {
-                _Nodes[ids[i]].Coordinates = coords[i];
-                _Nodes[ids[i]].Fixity = fixity[i];
-            }
-
-            NodesChanged?.Invoke(this, ids);
         }
 
         /// <summary>
