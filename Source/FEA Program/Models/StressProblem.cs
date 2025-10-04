@@ -167,4 +167,11 @@ namespace FEA_Program.Models
         }
 
     }
+
+    public enum ProblemTypes
+    {
+        Bar_1D,
+        Beam_1D,
+        Truss_3D
+    }
 }

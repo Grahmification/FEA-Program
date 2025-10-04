@@ -1,8 +1,9 @@
 ﻿using FEA_Program.Drawable;
+using FEA_Program.Models;
 using FEA_Program.SaveData;
 using MathNet.Numerics.LinearAlgebra.Double;
 
-namespace FEA_Program.Models
+namespace FEA_Program.Controllers
 {
     internal class ProblemManager
     {
@@ -123,7 +124,7 @@ namespace FEA_Program.Models
             var output = new ProblemData();
 
             // ------------------- Nodes --------------------
-            foreach(var node in Nodes.Nodelist) 
+            foreach (var node in Nodes.Nodelist)
             {
                 output.Nodes.Add(new NodeProblemData
                 {
@@ -159,8 +160,8 @@ namespace FEA_Program.Models
                     ID = item.ID,
                     Name = item.Name,
                     Subtype = item.Subtype,
-                    E= item.E,
-                    V= item.V,
+                    E = item.E,
+                    V = item.V,
                     Sy = item.Sy,
                     Sut = item.Sut,
                 });
@@ -191,7 +192,7 @@ namespace FEA_Program.Models
 
             // ----------- Import Nodes ---------------
             Dictionary<int, NodeDrawable> nodes = [];
- 
+
             foreach (var item in data.Nodes)
             {
                 nodes.Add(item.ID, new NodeDrawable(item.Coords, item.Fixity, item.ID, item.Dimension)
@@ -244,12 +245,5 @@ namespace FEA_Program.Models
             Loadedform.GlCont.SubControl.Invalidate();
         }
 
-    }
-
-    public enum ProblemTypes
-    {
-        Bar_1D,
-        Beam_1D,
-        Truss_3D
     }
 }

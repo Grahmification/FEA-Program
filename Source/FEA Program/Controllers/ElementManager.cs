@@ -1,6 +1,7 @@
 ﻿using FEA_Program.Drawable;
+using FEA_Program.Models;
 
-namespace FEA_Program.Models
+namespace FEA_Program.Controllers
 {
     internal class ElementManager
     {
@@ -32,7 +33,7 @@ namespace FEA_Program.Models
             {
                 // dont want to add anything to the list or raise events
                 throw new Exception("Tried to add element with unsupported type.");
-            }  
+            }
 
             if (newElement is not null) // more error checking
             {
@@ -100,7 +101,7 @@ namespace FEA_Program.Models
         {
             return elementType switch
             {
-                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinearDrawable(1, 0, [NodeDrawable.DummyNode(), NodeDrawable.DummyNode()],Material.DummyMaterial()).Name,
+                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinearDrawable(1, 0, [NodeDrawable.DummyNode(), NodeDrawable.DummyNode()], Material.DummyMaterial()).Name,
                 _ => "",
             };
         }

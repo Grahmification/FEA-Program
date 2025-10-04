@@ -1,4 +1,6 @@
-﻿namespace FEA_Program.Models
+﻿using FEA_Program.Models;
+
+namespace FEA_Program.Controllers
 {
     internal class MaterialManager
     {

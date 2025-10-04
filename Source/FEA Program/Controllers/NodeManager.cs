@@ -1,6 +1,7 @@
 using FEA_Program.Drawable;
+using FEA_Program.Models;
 
-namespace FEA_Program.Models
+namespace FEA_Program.Controllers
 {
     internal class NodeManager
     {
@@ -62,7 +63,7 @@ namespace FEA_Program.Models
 
             NodesChanged?.Invoke(this, ids);
         }
-        
+
         /// <summary>
         /// Sets node forces
         /// </summary>
@@ -108,7 +109,7 @@ namespace FEA_Program.Models
         {
             _Nodes.Clear();
 
-            foreach(NodeDrawable node in nodes)
+            foreach (NodeDrawable node in nodes)
             {
                 _Nodes[node.ID] = node;
                 Problem.AddNode(node);

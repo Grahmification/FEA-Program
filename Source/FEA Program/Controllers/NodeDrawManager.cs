@@ -1,6 +1,6 @@
 ﻿using FEA_Program.Drawable;
 
-namespace FEA_Program.Models
+namespace FEA_Program.Controllers
 {
     /// <summary>
     /// Handles drawing the nodes in the 3D display
@@ -38,7 +38,7 @@ namespace FEA_Program.Models
 
             if (DrawDisplaced)
             {
-                nodeDrawScaling = (DisplacePercentage / 100.0) * DisplaceScaling;
+                nodeDrawScaling = DisplacePercentage / 100.0 * DisplaceScaling;
             }
 
             foreach (NodeDrawable N in Nodes)
