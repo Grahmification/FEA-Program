@@ -3,9 +3,9 @@
 namespace FEA_Program.UserControls
 {
     /// <summary>
-    /// Generic definition for the main program view
+    /// Generic definition a view that displays editors
     /// </summary>
-    internal interface IMainView
+    internal interface IEditorDisplayView
     {
         public event EventHandler? NodeAddRequest;
 

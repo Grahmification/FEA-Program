@@ -12,7 +12,7 @@ namespace FEA_Program.UserControls
         private readonly TreeNode _forceRootItem;
         private readonly TreeNode _materialRootItem;
 
-        public event EventHandler<int>? NodeAddRequest;
+        public event EventHandler? NodeAddRequest;
         public event EventHandler<int>? NodeEditRequest;
         public event EventHandler<int>? NodeDeleteRequest;
         public event EventHandler<int>? ElementDeleteRequest;

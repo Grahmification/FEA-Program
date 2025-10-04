@@ -7,7 +7,7 @@ namespace FEA_Program.Controllers
 {
     internal class NodeManager
     {
-        private readonly List<IMainView> _mainViews = [];
+        private  IEditorDisplayView? _editorDisplayView = null;
         private readonly List<INodeDisplayView> _displayViews = [];
 
         private readonly SortedDictionary<int, NodeDrawable> _Nodes = []; // reference nodes by ID, always sorting from smallest to largest ID
@@ -98,15 +98,15 @@ namespace FEA_Program.Controllers
         }
 
         // ---------------------- Public Methods - Views ----------------------------
-        public void AddMainView(IMainView view)
+        public void SetEditorDisplayView(IEditorDisplayView view)
         {
             view.NodeAddRequest += OnAddNodeRequest;
-            _mainViews.Add(view);
+            _editorDisplayView = view;
         }
-
         public void AddDisplayView(INodeDisplayView view)
         {
-            //view.NodeEditRequest += OnEditNodeRequest;
+            view.NodeAddRequest += OnAddNodeRequest;
+            view.NodeEditRequest += OnEditNodeRequest;
             view.NodeDeleteRequest += OnDeleteNodeRequest;
             _displayViews.Add(view);
         }
@@ -118,15 +118,14 @@ namespace FEA_Program.Controllers
             {
                 if (sender is not null)
                 {
-                    var view = (IMainView)sender;
-
                     // Create a new node, but don't add it yet until after the form confirms
                     int dimension = Problem.AvailableNodeDOFs;
                     int Id = IDClass.CreateUniqueId(Problem.Nodes.Cast<IHasID>().ToList());
                     var newNode = new NodeDrawable(new(new double[dimension], new int[dimension], Id, dimension));
 
-                    var editView = view.ShowNodeEditView(newNode, false);
-                    editView.NodeEditConfirmed += OnNodeEditsConfirmed;
+                    var editView = _editorDisplayView?.ShowNodeEditView(newNode, false);
+                    if (editView != null)
+                        editView.NodeEditConfirmed += OnNodeEditsConfirmed;
                 }
             }
             catch (Exception ex)
@@ -134,42 +133,17 @@ namespace FEA_Program.Controllers
                 FormattedMessageBox.DisplayError(ex);
             }
         }
-        private void OnNodeEditsConfirmed(object? sender, NodeDrawable e)
-        {
-            if (sender is not null)
-            {
-                var view = (INodeEditView)sender;
-
-                // If we're not editing
-                if (!view.Editing)
-                {
-                    var newNode = e.Node;
-                    Problem.AddNode(newNode); // This must be done first because it validates the node parameters
-                    _Nodes.Add(newNode.ID, e);
-
-                    DisplayNodes();
-                }
-
-                // This must be done at the end in case node creation fails
-                view.NodeEditConfirmed -= OnNodeEditsConfirmed;
-            }
-        }
-
         private void OnEditNodeRequest(object? sender, int e)
         {
             try
             {
                 if (sender is not null)
                 {
-                    var view = (IMainView)sender;
+                    var editNode = _Nodes[e];
 
-                    // Create a new node, but don't add it yet until after the form confirms
-                    int dimension = Problem.AvailableNodeDOFs;
-                    int Id = IDClass.CreateUniqueId(Problem.Nodes.Cast<IHasID>().ToList());
-                    var newNode = new NodeDrawable(new(new double[dimension], new int[dimension], Id, dimension));
-
-                    var editView = view.ShowNodeEditView(newNode, false);
-                    editView.NodeEditConfirmed += OnNodeEditsConfirmed;
+                    var editView = _editorDisplayView?.ShowNodeEditView(editNode, true);
+                    if (editView != null)
+                        editView.NodeEditConfirmed += OnNodeEditsConfirmed;
                 }
             }
             catch (Exception ex)
@@ -192,6 +166,27 @@ namespace FEA_Program.Controllers
             catch (Exception ex)
             {
                 FormattedMessageBox.DisplayError(ex);
+            }
+        }
+
+        private void OnNodeEditsConfirmed(object? sender, NodeDrawable e)
+        {
+            if (sender is not null)
+            {
+                var view = (INodeEditView)sender;
+
+                // If we're not editing
+                if (!view.Editing)
+                {
+                    var newNode = e.Node;
+                    Problem.AddNode(newNode); // This must be done first because it validates the node parameters
+                    _Nodes.Add(newNode.ID, e);
+
+                    DisplayNodes();
+                }
+
+                // This must be done at the end in case node creation fails
+                view.NodeEditConfirmed -= OnNodeEditsConfirmed;
             }
         }
 

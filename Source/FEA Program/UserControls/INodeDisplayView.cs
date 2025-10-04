@@ -7,7 +7,7 @@ namespace FEA_Program.UserControls
     /// </summary>
     internal interface INodeDisplayView
     {
-        public event EventHandler<int>? NodeAddRequest;
+        public event EventHandler? NodeAddRequest;
         public event EventHandler<int>? NodeEditRequest;
         public event EventHandler<int>? NodeDeleteRequest;
 

@@ -12,7 +12,7 @@ using OpenTK.Mathematics;
 
 namespace FEA_Program
 {
-    internal partial class Mainform : Form, IMainView
+    internal partial class Mainform : Form, IEditorDisplayView
     {
         private ProblemManager P;
         private NodeDrawManager _DrawManager = new();
@@ -20,9 +20,8 @@ namespace FEA_Program
         public CoordinateSystem Coord = new([0, 0, 0], 10);
         public GLControlDraggable GlCont;
 
-
         public event EventHandler? NodeAddRequest;
-        public event EventHandler<int>? NodeEditRequest;
+
 
         public Mainform()
         {
@@ -39,7 +38,7 @@ namespace FEA_Program
 
             P = new(this);
             P.Nodes.NodeListChanged += OnNodeListChanged; // Make sure node changes get updated in the draw manager
-            P.Nodes.AddMainView(this);
+            P.Nodes.SetEditorDisplayView(this);
             P.Nodes.AddDisplayView(TreeView_Main);
         }
         private void Mainform_Load(object sender, EventArgs e)
