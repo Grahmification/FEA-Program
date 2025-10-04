@@ -181,9 +181,9 @@ namespace FEA_Program.Controllers
                     var newNode = e.Node;
                     Problem.AddNode(newNode); // This must be done first because it validates the node parameters
                     _Nodes.Add(newNode.ID, e);
-
-                    DisplayNodes();
                 }
+
+                DisplayNodes();
 
                 // This must be done at the end in case node creation fails
                 view.NodeEditConfirmed -= OnNodeEditsConfirmed;

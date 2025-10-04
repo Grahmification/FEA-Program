@@ -27,6 +27,9 @@ namespace FEA_Program.UserControls
             InitializeComponent();
             InitializeTextBoxes(node.Node.Dimension);
             ValidateEntry();
+
+            if (editing)
+                Label_title.Text = "Edit Node";
         }
 
         private void InitializeTextBoxes(int nodeDOFs)

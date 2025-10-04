@@ -204,5 +204,25 @@ namespace FEA_Program.UserControls
                 }
             }
         }
+
+        private void toolStripMenuItem_nodeEdit_Click(object sender, EventArgs e)
+        {
+            // The ToolStripItem is the sender, its Parent is the ContextMenuStrip
+            ContextMenuStrip? menu = ((ToolStripMenuItem)sender).Owner as ContextMenuStrip;
+
+            if (menu != null && menu.Tag is TreeNode clickedNode)
+            {
+                // A node was selected
+                if (_nodeRootItem.Nodes.Contains(clickedNode))
+                {
+                    NodeEditRequest?.Invoke(this, (int)clickedNode.Tag);
+                }
+                // An element was selected
+                else if (_elementRootItem.Nodes.Contains(clickedNode))
+                {
+
+                }
+            }
+        }
     }
 }

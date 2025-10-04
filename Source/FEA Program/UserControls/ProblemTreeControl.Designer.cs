@@ -65,18 +65,19 @@
             // 
             contextMenuStrip_Edit.Items.AddRange(new ToolStripItem[] { toolStripMenuItem_nodeEdit, toolStripMenuItem_NodeDelete });
             contextMenuStrip_Edit.Name = "contextMenuStrip_Nodes";
-            contextMenuStrip_Edit.Size = new Size(108, 48);
+            contextMenuStrip_Edit.Size = new Size(181, 70);
             // 
             // toolStripMenuItem_nodeEdit
             // 
             toolStripMenuItem_nodeEdit.Name = "toolStripMenuItem_nodeEdit";
-            toolStripMenuItem_nodeEdit.Size = new Size(107, 22);
+            toolStripMenuItem_nodeEdit.Size = new Size(180, 22);
             toolStripMenuItem_nodeEdit.Text = "Edit";
+            toolStripMenuItem_nodeEdit.Click += toolStripMenuItem_nodeEdit_Click;
             // 
             // toolStripMenuItem_NodeDelete
             // 
             toolStripMenuItem_NodeDelete.Name = "toolStripMenuItem_NodeDelete";
-            toolStripMenuItem_NodeDelete.Size = new Size(107, 22);
+            toolStripMenuItem_NodeDelete.Size = new Size(180, 22);
             toolStripMenuItem_NodeDelete.Text = "Delete";
             toolStripMenuItem_NodeDelete.Click += toolStripMenuItem_Delete_Click;
             // 

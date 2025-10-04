@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Label1 = new Label();
+            Label_title = new Label();
             Button_Accept = new Button();
             Button_Cancel = new Button();
             Label2 = new Label();
@@ -37,17 +37,17 @@
             Button_UnfixAll = new Button();
             SuspendLayout();
             // 
-            // Label1
+            // Label_title
             // 
-            Label1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            Label1.AutoSize = true;
-            Label1.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            Label1.Location = new Point(4, 6);
-            Label1.Margin = new Padding(4, 0, 4, 0);
-            Label1.Name = "Label1";
-            Label1.Size = new Size(88, 20);
-            Label1.TabIndex = 0;
-            Label1.Text = "Add Node";
+            Label_title.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            Label_title.AutoSize = true;
+            Label_title.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            Label_title.Location = new Point(4, 6);
+            Label_title.Margin = new Padding(4, 0, 4, 0);
+            Label_title.Name = "Label_title";
+            Label_title.Size = new Size(88, 20);
+            Label_title.TabIndex = 0;
+            Label_title.Text = "Add Node";
             // 
             // Button_Accept
             // 
@@ -133,7 +133,7 @@
             Controls.Add(Label2);
             Controls.Add(Button_Cancel);
             Controls.Add(Button_Accept);
-            Controls.Add(Label1);
+            Controls.Add(Label_title);
             Margin = new Padding(4, 3, 4, 3);
             Name = "AddNodeControl";
             Size = new Size(203, 436);
@@ -143,7 +143,7 @@
 
         #endregion
 
-        internal Label Label1;
+        internal Label Label_title;
         internal Button Button_Accept;
         internal Button Button_Cancel;
         internal Label Label2;
