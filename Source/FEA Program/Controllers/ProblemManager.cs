@@ -71,6 +71,7 @@ namespace FEA_Program.Controllers
             Nodes.NodeListChanged += (s, e) => OnListRedrawNeeded();
             Nodes.NodesChanged += (s, e) => OnListRedrawNeeded();
             Nodes.NodeChanged_RedrawOnly += OnScreenRedrawOnlyNeeded;
+            Nodes.HangingElementsFound += OnHangingElementsFound;
 
             Elements = new ElementManager();
             Elements.ElementListChanged += (s, e) => OnListRedrawNeeded();
@@ -215,6 +216,16 @@ namespace FEA_Program.Controllers
         private void OnScreenRedrawOnlyNeeded(object? sender, EventArgs e)
         {
             Loadedform.GlCont.SubControl.Invalidate();
+        }
+
+        /// <summary>
+        /// Fires when nodes were deleted, leaving hanging elements
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnHangingElementsFound(object? sender, int[] e)
+        {
+            Elements.Delete([.. e]);
         }
 
     }

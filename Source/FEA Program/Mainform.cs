@@ -30,7 +30,6 @@ namespace FEA_Program
 
             InitializeComponent();
             ToolStripButton_Addnode.Click += (_, _) => NodeAddRequest?.Invoke(this, new());
-            TreeView_Main.NodeDeleteRequest += OnNodeDeleteRequest;
             TreeView_Main.ElementDeleteRequest += OnElementDeleteRequest;
 
             // Setup draw manager
@@ -41,6 +40,7 @@ namespace FEA_Program
             P = new(this);
             P.Nodes.NodeListChanged += OnNodeListChanged; // Make sure node changes get updated in the draw manager
             P.Nodes.AddMainView(this);
+            P.Nodes.AddDisplayView(TreeView_Main);
         }
         private void Mainform_Load(object sender, EventArgs e)
         {
@@ -118,16 +118,10 @@ namespace FEA_Program
         // -------------------- Main Treeview --------------------------
         public void ReDrawLists()
         {
-            TreeView_Main.DisplayNodes(P.Nodes.Nodelist);
             TreeView_Main.DisplayElements(P.Elements.Elemlist);
             TreeView_Main.DisplayMaterials(P.Materials.MaterialList);
         }
 
-        private void OnNodeDeleteRequest(object? sender, int e)
-        {
-            var removedElementIDs = P.Nodes.Delete([e]);
-            P.Elements.Delete([.. removedElementIDs]);
-        }
         private void OnElementDeleteRequest(object? sender, int e)
         {
             P.Elements.Delete([e]);

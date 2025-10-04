@@ -9,8 +9,6 @@ namespace FEA_Program.UserControls
     {
         public event EventHandler? NodeAddRequest;
 
-        public event EventHandler<int>? NodeEditRequest;
-
         public INodeEditView ShowNodeEditView(NodeDrawable node, bool edit);
     }
 }

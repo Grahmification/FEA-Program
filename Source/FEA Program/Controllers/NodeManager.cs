@@ -8,12 +8,15 @@ namespace FEA_Program.Controllers
     internal class NodeManager
     {
         private readonly List<IMainView> _mainViews = [];
-        
+        private readonly List<INodeDisplayView> _displayViews = [];
+
         private readonly SortedDictionary<int, NodeDrawable> _Nodes = []; // reference nodes by ID, always sorting from smallest to largest ID
 
         public event EventHandler<SortedDictionary<int, NodeDrawable>>? NodeListChanged;  // Length of nodelist has changed
         public event EventHandler<List<int>>? NodesChanged; // Node has changed such that list needs to be updated & screen redrawn
         public event EventHandler? NodeChanged_RedrawOnly; // Node has changed such that screen only needs to be redrawn
+
+        public event EventHandler<int[]>? HangingElementsFound; // Node has been deleted and left hanging elements
 
         // ---------------------- Public Properties ----------------------------
         public StressProblem Problem { get; set; } = new();
@@ -65,7 +68,7 @@ namespace FEA_Program.Controllers
 
             if (ids.Count > 0)
             {
-                NodeListChanged?.Invoke(this, _Nodes);
+                DisplayNodes();
             }
 
             // Return any elements that were deleted in the process
@@ -74,7 +77,7 @@ namespace FEA_Program.Controllers
         public void Reset()
         {
             _Nodes.Clear();
-            NodeListChanged?.Invoke(this, _Nodes);
+            DisplayNodes();
         }
 
         /// <summary>
@@ -91,7 +94,7 @@ namespace FEA_Program.Controllers
                 Problem.AddNode(node);
             }
 
-            NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
+            DisplayNodes();
         }
 
         // ---------------------- Public Methods - Views ----------------------------
@@ -99,6 +102,13 @@ namespace FEA_Program.Controllers
         {
             view.NodeAddRequest += OnAddNodeRequest;
             _mainViews.Add(view);
+        }
+
+        public void AddDisplayView(INodeDisplayView view)
+        {
+            //view.NodeEditRequest += OnEditNodeRequest;
+            view.NodeDeleteRequest += OnDeleteNodeRequest;
+            _displayViews.Add(view);
         }
 
         // ---------------------- View Event handlers ----------------------------
@@ -137,12 +147,64 @@ namespace FEA_Program.Controllers
                     Problem.AddNode(newNode); // This must be done first because it validates the node parameters
                     _Nodes.Add(newNode.ID, e);
 
-                    NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
+                    DisplayNodes();
                 }
 
                 // This must be done at the end in case node creation fails
                 view.NodeEditConfirmed -= OnNodeEditsConfirmed;
             }
+        }
+
+        private void OnEditNodeRequest(object? sender, int e)
+        {
+            try
+            {
+                if (sender is not null)
+                {
+                    var view = (IMainView)sender;
+
+                    // Create a new node, but don't add it yet until after the form confirms
+                    int dimension = Problem.AvailableNodeDOFs;
+                    int Id = IDClass.CreateUniqueId(Problem.Nodes.Cast<IHasID>().ToList());
+                    var newNode = new NodeDrawable(new(new double[dimension], new int[dimension], Id, dimension));
+
+                    var editView = view.ShowNodeEditView(newNode, false);
+                    editView.NodeEditConfirmed += OnNodeEditsConfirmed;
+                }
+            }
+            catch (Exception ex)
+            {
+                FormattedMessageBox.DisplayError(ex);
+            }
+        }
+        private void OnDeleteNodeRequest(object? sender, int e)
+        {
+            try
+            {
+                if (sender is not null)
+                {
+                    var elementIDs = Delete([e]);
+
+                    if (elementIDs.Length > 0)
+                        HangingElementsFound?.Invoke(this, elementIDs);
+                }
+            }
+            catch (Exception ex)
+            {
+                FormattedMessageBox.DisplayError(ex);
+            }
+        }
+
+        // ---------------------- Private Helpers ----------------------------
+
+        private void DisplayNodes()
+        {
+            foreach (INodeDisplayView view in _displayViews)
+            {
+                view.DisplayNodes(Nodelist);
+            }
+
+            NodeListChanged?.Invoke(this, _Nodes);
         }
 
     }

@@ -5,13 +5,15 @@ using FEA_Program.UI;
 
 namespace FEA_Program.UserControls
 {
-    internal partial class ProblemTreeControl : UserControl
+    internal partial class ProblemTreeControl : UserControl, INodeDisplayView
     {
         private readonly TreeNode _nodeRootItem;
         private readonly TreeNode _elementRootItem;
         private readonly TreeNode _forceRootItem;
         private readonly TreeNode _materialRootItem;
 
+        public event EventHandler<int>? NodeAddRequest;
+        public event EventHandler<int>? NodeEditRequest;
         public event EventHandler<int>? NodeDeleteRequest;
         public event EventHandler<int>? ElementDeleteRequest;
 
