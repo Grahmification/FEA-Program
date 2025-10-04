@@ -314,10 +314,10 @@ namespace FEA_Program
             {
                 var ElementArgsList = new List<Dictionary<string, Units.DataUnitType>>();
 
-                foreach (Type ElemType in P.AvailableElements)
+                foreach (Type ElemType in P.Problem.AvailableElements)
                     ElementArgsList.Add(ElementManager.ElementArgs(ElemType));
 
-                var UC = new AddElementControl(P.AvailableElements, ElementArgsList, P.Materials.MaterialList, P.Nodes.Nodelist.Cast<Node>().ToList());
+                var UC = new AddElementControl(P.Problem.AvailableElements, ElementArgsList, P.Materials.MaterialList, P.Nodes.Nodelist.Cast<Node>().ToList());
                 UC.ElementAddFormSuccess += ElemAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
                 DisplaySideBarMenuControl(UC);
@@ -334,7 +334,7 @@ namespace FEA_Program
             sender.NodeSelectionUpdated -= FeatureAddFormNodeSelectionChanged;
 
             var material = P.Materials.GetMaterial(Mat);
-            int nodeDOFs = P.AvailableNodeDOFs;
+            int nodeDOFs = P.Problem.AvailableNodeDOFs;
 
             List<NodeDrawable> nodes = NodeIDs
                 .Select(P.Nodes.GetNode)
@@ -348,7 +348,7 @@ namespace FEA_Program
         {
             try
             {
-                var UC = new AddNodeForceControl(P.AvailableNodeDOFs, P.Nodes.Nodelist.Cast<Node>().ToList());
+                var UC = new AddNodeForceControl(P.Problem.AvailableNodeDOFs, P.Nodes.Nodelist.Cast<Node>().ToList());
                 UC.NodeForceAddFormSuccess += NodeForceAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
                 DisplaySideBarMenuControl(UC);

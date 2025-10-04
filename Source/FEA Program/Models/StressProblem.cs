@@ -21,6 +21,33 @@ namespace FEA_Program.Models
         public List<IElement> Elements => _Elements.Values.ToList();
         public List<Node> Nodes => _Nodes.Values.ToList();
 
+        /// <summary>
+        /// which elements are available depending on problem type
+        /// </summary>
+        public Type[] AvailableElements => ProblemType switch
+        {
+            ProblemTypes.Bar_1D => new[] { typeof(ElementBarLinear) },
+            ProblemTypes.Truss_3D => new[] { typeof(ElementBarLinear) },
+
+            // Default case: return empty
+            _ => []
+        };
+
+        /// <summary>
+        /// Which node DOF should be used for given problem type
+        /// </summary>
+        public int AvailableNodeDOFs => ProblemType switch
+        {
+            // Case for 1 DOFs
+            ProblemTypes.Bar_1D or ProblemTypes.Beam_1D => 1,
+
+            // Case for 3 DOFs
+            ProblemTypes.Truss_3D => 3,
+
+            // Default case (return 0)
+            _ => 0
+        };
+
         // ---------------------- Public Methods ----------------------------
         public StressProblem(ProblemTypes problemType = ProblemTypes.Bar_1D)
         {

@@ -14,34 +14,6 @@ namespace FEA_Program.Controllers
         public ElementManager Elements { get; private set; }
         public MaterialManager Materials { get; private set; }
 
-
-        /// <summary>
-        /// which elements are available depending on problem type
-        /// </summary>
-        public Type[]? AvailableElements => Problem.ProblemType switch
-        {
-            ProblemTypes.Bar_1D => new[] { typeof(ElementBarLinear) },
-            ProblemTypes.Truss_3D => new[] { typeof(ElementBarLinear) },
-
-            // Default case: return null
-            _ => null
-        };
-
-        /// <summary>
-        /// Which node DOF should be used for given problem type
-        /// </summary>
-        public int AvailableNodeDOFs => Problem.ProblemType switch
-        {
-            // Case for 1 DOFs
-            ProblemTypes.Bar_1D or ProblemTypes.Beam_1D => 1,
-
-            // Case for 3 DOFs
-            ProblemTypes.Truss_3D => 3,
-
-            // Default case (return 0)
-            _ => 0
-        };
-
         /// <summary>
         /// Whether the screen should be 3D based on the problem type
         /// </summary>
@@ -67,10 +39,10 @@ namespace FEA_Program.Controllers
                 // ------------- Add Node Command-------------
                 var addNodeArgs = new List<Type>();
 
-                for (int i = 0; i < AvailableNodeDOFs; i++)
+                for (int i = 0; i < Problem.AvailableNodeDOFs; i++)
                     addNodeArgs.Add(typeof(double)); // node position
 
-                for (int i = 0; i < AvailableNodeDOFs; i++)
+                for (int i = 0; i < Problem.AvailableNodeDOFs; i++)
                     addNodeArgs.Add(typeof(bool)); // node fixity
 
                 // ------------- Add Material Command-------------
