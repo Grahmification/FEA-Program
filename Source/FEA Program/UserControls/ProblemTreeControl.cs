@@ -1,4 +1,3 @@
-﻿using FEA_Program.Controllers;
 using FEA_Program.Drawable;
 using FEA_Program.Graphics;
 using FEA_Program.Models;
@@ -8,11 +7,10 @@ namespace FEA_Program.UserControls
 {
     internal partial class ProblemTreeControl : UserControl
     {
-        private List<TreeNode> _nodeItems = [];
-        private List<TreeNode> _elementItems = [];
-        private List<TreeNode> _forceItems = [];
-        private List<TreeNode> _materialItems = [];
-
+        private readonly TreeNode _nodeRootItem;
+        private readonly TreeNode _elementRootItem;
+        private readonly TreeNode _forceRootItem;
+        private readonly TreeNode _materialRootItem;
 
         public event EventHandler<int>? NodeDeleteRequest;
         public event EventHandler<int>? ElementDeleteRequest;
@@ -21,31 +19,27 @@ namespace FEA_Program.UserControls
         public ProblemTreeControl()
         {
             InitializeComponent();
-        }
 
-        public void DrawTree(ProblemManager P)
-        {
             var tree = treeView_main;
             tree.Nodes.Clear();
-            _forceItems.Clear();
-            _elementItems.Clear();
-            _materialItems.Clear();
-            _nodeItems.Clear();
 
-            // ---------------------- Add base level ------------------------
+            _nodeRootItem = new TreeNode("Nodes");
+            _elementRootItem = new TreeNode("Elements");
+            _forceRootItem = new TreeNode("Forces");
+            _materialRootItem = new TreeNode("Material");
 
-            string[] baseLevel = ["Nodes", "Elements", "Forces", "Materials"];
-
-            for (int i = 0; i < baseLevel.Length; i++)
-            {
-                tree.Nodes.Add(new TreeNode(baseLevel[i]));
-            }
-
+            tree.Nodes.Add(_nodeRootItem);
+            tree.Nodes.Add(_elementRootItem);
+            tree.Nodes.Add(_forceRootItem);
+            tree.Nodes.Add(_materialRootItem);
+        }
+        public void DisplayNodes(List<NodeDrawable> nodes)
+        {
             // ------------------ Add nodes --------------------
+            var baseNode = _nodeRootItem;
+            baseNode.Nodes.Clear();
 
-            var baseNode = tree.Nodes[0];
-
-            foreach (NodeDrawable node in P.Nodes.Nodelist)
+            foreach (NodeDrawable node in nodes)
             {
                 var newNode = new TreeNode($"Node {node.Node.ID}")
                 {
@@ -55,33 +49,13 @@ namespace FEA_Program.UserControls
                 newNode.Nodes.Add(new TreeNode($"Pos: {string.Join(",", node.Coordinates_mm)}"));
                 newNode.Nodes.Add(new TreeNode($"Fixity: {string.Join(",", node.Node.Fixity)}"));
                 baseNode.Nodes.Add(newNode);
-                _nodeItems.Add(newNode);
-            }
-
-            // ------------------ Add Elements --------------------
-
-            baseNode = tree.Nodes[1];
-
-            foreach (IElementDrawable element in P.Elements.Elemlist)
-            {
-                var newNode = new TreeNode($"Element {element.ID}")
-                {
-                    Tag = element.ID
-                };
-
-                newNode.Nodes.Add(new TreeNode($"Type: {element.Name}"));
-                //newNode.Nodes.Add(new TreeNode("Area: " & (Units.Convert(Units.AllUnits.m_squared, element.Ar, Units.AllUnits.mm_squared)) & Units.UnitStrings(Units.AllUnits.mm_squared)(0)))
-                newNode.Nodes.Add(new TreeNode($"Material: {element.Material.Name}"));
-                newNode.Nodes.Add(new TreeNode($"Length: {element.Length()}"));
-                baseNode.Nodes.Add(newNode);
-                _elementItems.Add(newNode);
             }
 
             // ------------------ Add forces --------------------
+            baseNode = _forceRootItem;
+            baseNode.Nodes.Clear();
 
-            baseNode = tree.Nodes[2];
-
-            foreach (Node node in P.Nodes.Nodelist.Select(n => n.Node))
+            foreach (Node node in nodes.Select(n => n.Node))
             {
                 if (node.ForceMagnitude > 0)
                 {
@@ -93,15 +67,40 @@ namespace FEA_Program.UserControls
                     newNode.Nodes.Add(new TreeNode($"Magnitude [N]: {node.ForceMagnitude}"));
                     newNode.Nodes.Add(new TreeNode($"Components [N]: {string.Join(",", node.Force)}"));
                     baseNode.Nodes.Add(newNode);
-                    _forceItems.Add(newNode);
                 }
             }
 
+            baseNode.Expand();
+        }
+        public void DisplayElements(List<IElementDrawable> elements)
+        {
+            // ------------------ Add Elements --------------------
+            var baseNode = _elementRootItem;
+            baseNode.Nodes.Clear();
+
+            foreach (IElementDrawable element in elements)
+            {
+                var newNode = new TreeNode($"Element {element.ID}")
+                {
+                    Tag = element.ID
+                };
+
+                newNode.Nodes.Add(new TreeNode($"Type: {element.Name}"));
+                //newNode.Nodes.Add(new TreeNode("Area: " & (Units.Convert(Units.AllUnits.m_squared, element.Ar, Units.AllUnits.mm_squared)) & Units.UnitStrings(Units.AllUnits.mm_squared)(0)))
+                newNode.Nodes.Add(new TreeNode($"Material: {element.Material.Name}"));
+                newNode.Nodes.Add(new TreeNode($"Length: {element.Length()}"));
+                baseNode.Nodes.Add(newNode);
+            }
+
+            baseNode.Expand();
+        }
+        public void DisplayMaterials(List<Material> materials)
+        {
             // ------------------ Add Materials --------------------
+            var baseNode = _materialRootItem;
+            baseNode.Nodes.Clear();
 
-            baseNode = tree.Nodes[3];
-
-            foreach (Material mat in P.Materials.MaterialList)
+            foreach (Material mat in materials)
             {
                 var newNode = new TreeNode(mat.Name)
                 {
@@ -114,13 +113,14 @@ namespace FEA_Program.UserControls
                 newNode.Nodes.Add(new TreeNode($"Sut (MPa) {mat.Sut_MPa}: "));
                 newNode.Nodes.Add(new TreeNode($"Type : {Enum.GetName(typeof(MaterialType), mat.Subtype)}"));
                 baseNode.Nodes.Add(newNode);
-                _materialItems.Add(newNode);
             }
 
-            // Expand base level nodes
-            foreach (TreeNode node in tree.Nodes)
-                node.Expand();
+            baseNode.Expand();
         }
+
+
+
+
 
         private void TreeView_Main_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
@@ -175,7 +175,7 @@ namespace FEA_Program.UserControls
             tree.SelectedNode = e.Node;
 
             // A node was selected
-            if (_nodeItems.Contains(e.Node) || _elementItems.Contains(e.Node))
+            if (_nodeRootItem.Nodes.Contains(e.Node) || _elementRootItem.Nodes.Contains(e.Node))
             {
                 // Store the node in the ContextMenuStrip's Tag property
                 contextMenuStrip_Edit.Tag = e.Node;
@@ -191,12 +191,12 @@ namespace FEA_Program.UserControls
             if (menu != null && menu.Tag is TreeNode clickedNode)
             {
                 // A node was selected
-                if (_nodeItems.Contains(clickedNode))
+                if (_nodeRootItem.Nodes.Contains(clickedNode))
                 {
                     NodeDeleteRequest?.Invoke(this, (int)clickedNode.Tag);
                 }
                 // An element was selected
-                else if (_elementItems.Contains(clickedNode))
+                else if (_elementRootItem.Nodes.Contains(clickedNode))
                 {
                     ElementDeleteRequest?.Invoke(this, (int)clickedNode.Tag);
                 }

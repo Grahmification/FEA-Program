@@ -118,7 +118,9 @@ namespace FEA_Program
         // -------------------- Main Treeview --------------------------
         public void ReDrawLists()
         {
-            TreeView_Main.DrawTree(P);
+            TreeView_Main.DisplayNodes(P.Nodes.Nodelist);
+            TreeView_Main.DisplayElements(P.Elements.Elemlist);
+            TreeView_Main.DisplayMaterials(P.Materials.MaterialList);
         }
 
         private void OnNodeDeleteRequest(object? sender, int e)
