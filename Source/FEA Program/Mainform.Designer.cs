@@ -1,4 +1,6 @@
-﻿namespace FEA_Program
+﻿using FEA_Program.UserControls;
+
+namespace FEA_Program
 {
     partial class Mainform
     {
@@ -29,10 +31,6 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            TreeNode treeNode1 = new TreeNode("Nodes");
-            TreeNode treeNode2 = new TreeNode("Elements");
-            TreeNode treeNode3 = new TreeNode("Forces");
-            TreeNode treeNode4 = new TreeNode("Materials");
             ToolStrip_Upper = new ToolStrip();
             ToolStripDropDownButton_File = new ToolStripDropDownButton();
             toolStripMenuItem_Load = new ToolStripMenuItem();
@@ -50,11 +48,11 @@
             SplitContainer_Main = new SplitContainer();
             TabControl_Main = new TabControl();
             TabPage1 = new TabPage();
-            TreeView_Main = new TreeView();
+            TreeView_Main = new ProblemTreeControl();
             TabPage2 = new TabPage();
-            resultsTreeControl_main = new UserControls.ResultsTreeControl();
+            resultsTreeControl_main = new ResultsTreeControl();
             tabPage_display = new TabPage();
-            resultDisplaySettingsControl_main = new UserControls.ResultDisplaySettingsControl();
+            resultDisplaySettingsControl_main = new ResultDisplaySettingsControl();
             glControl_main = new OpenTK.GLControl.GLControl();
             ContextMenuStrip_TreeView = new ContextMenuStrip(components);
             ToolStripMenuItem1 = new ToolStripMenuItem();
@@ -227,23 +225,13 @@
             // TreeView_Main
             // 
             TreeView_Main.BackColor = Color.LightGray;
+            TreeView_Main.BorderStyle = BorderStyle.FixedSingle;
             TreeView_Main.Dock = DockStyle.Fill;
-            TreeView_Main.FullRowSelect = true;
             TreeView_Main.Location = new Point(0, 0);
             TreeView_Main.Margin = new Padding(4, 3, 4, 3);
             TreeView_Main.Name = "TreeView_Main";
-            treeNode1.Name = "Nodes";
-            treeNode1.Text = "Nodes";
-            treeNode2.Name = "Elements";
-            treeNode2.Text = "Elements";
-            treeNode3.Name = "Forces";
-            treeNode3.Text = "Forces";
-            treeNode4.Name = "Materials";
-            treeNode4.Text = "Materials";
-            TreeView_Main.Nodes.AddRange(new TreeNode[] { treeNode1, treeNode2, treeNode3, treeNode4 });
             TreeView_Main.Size = new Size(174, 379);
             TreeView_Main.TabIndex = 1;
-            TreeView_Main.NodeMouseClick += TreeView_Main_NodeMouseClick;
             // 
             // TabPage2
             // 
@@ -356,7 +344,7 @@
         internal ToolStripStatusLabel ToolStripStatusLabel_Rot;
         internal ToolStripStatusLabel ToolStripStatusLabel_Zoom;
         internal ToolStripDropDownButton ToolStripDropDownButton_File;
-        internal TreeView TreeView_Main;
+        internal UserControls.ProblemTreeControl TreeView_Main;
         internal TabControl TabControl_Main;
         internal TabPage TabPage1;
         internal TabPage TabPage2;
