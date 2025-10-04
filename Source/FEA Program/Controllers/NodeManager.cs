@@ -49,7 +49,7 @@ namespace FEA_Program.Controllers
             }
 
             for (int i = 0; i < IDs.Count; i++)
-                _Nodes[IDs[i]].Force = forces[i];
+                _Nodes[IDs[i]].Node.Force = forces[i];
 
             NodesChanged?.Invoke(this, IDs);
         }
@@ -81,13 +81,13 @@ namespace FEA_Program.Controllers
         /// Import a dataset, usually when loading from a file
         /// </summary>
         /// <param name="nodes"></param>
-        public void ImportNodes(List<NodeDrawable> nodes)
+        public void ImportNodes(List<Node> nodes)
         {
             _Nodes.Clear();
 
-            foreach (NodeDrawable node in nodes)
+            foreach (Node node in nodes)
             {
-                _Nodes[node.ID] = node;
+                _Nodes[node.ID] = new NodeDrawable(node);
                 Problem.AddNode(node);
             }
 
@@ -113,7 +113,7 @@ namespace FEA_Program.Controllers
                     // Create a new node, but don't add it yet until after the form confirms
                     int dimension = Problem.AvailableNodeDOFs;
                     int Id = IDClass.CreateUniqueId(Problem.Nodes.Cast<IHasID>().ToList());
-                    var newNode = new NodeDrawable(new double[dimension], new int[dimension], Id, dimension);
+                    var newNode = new NodeDrawable(new(new double[dimension], new int[dimension], Id, dimension));
 
                     var editView = view.ShowNodeEditView(newNode, false);
                     editView.NodeEditConfirmed += OnNodeEditsConfirmed;
@@ -133,9 +133,9 @@ namespace FEA_Program.Controllers
                 // If we're not editing
                 if (!view.Editing)
                 {
-                    var newNode = e;
+                    var newNode = e.Node;
                     Problem.AddNode(newNode); // This must be done first because it validates the node parameters
-                    _Nodes.Add(newNode.ID, newNode);
+                    _Nodes.Add(newNode.ID, e);
 
                     NodeListChanged?.Invoke(this, _Nodes); // this will redraw so leave it until all have been updated
                 }

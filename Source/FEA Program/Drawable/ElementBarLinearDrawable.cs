@@ -19,15 +19,15 @@ namespace FEA_Program.Drawable
         /// </summary>
         public Color[] Colors { get; private set; } = [];
 
-        public ElementBarLinearDrawable(double area, int ID, List<NodeDrawable> nodes, Material material, int nodeDOFs = 1) : base(area, ID, nodes.Cast<INode>().ToList(), material, nodeDOFs)
+        public ElementBarLinearDrawable(double area, int ID, List<NodeDrawable> nodes, Material material, int nodeDOFs = 1) : base(area, ID, nodes.Select(n => (INode)n.Node).ToList(), material, nodeDOFs)
         {
             // Check that sorting of the nodes is correct
             _nodes = [.. nodes];
-            var baseNodes = nodes.Cast<INode>().ToList();
+            var baseNodes = nodes.Select(n => (INode)n.Node).ToList();
             SortNodeOrder(ref baseNodes);
 
             // Reverse the nodes
-            if (baseNodes[0].ID != _nodes[0].ID)
+            if (baseNodes[0].ID != _nodes[0].Node.ID)
             {
                 _nodes[0] = nodes[1];
                 _nodes[1] = nodes[0];

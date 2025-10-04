@@ -96,7 +96,7 @@ namespace FEA_Program.Controllers
             var output = new ProblemData();
 
             // ------------------- Nodes --------------------
-            foreach (var node in Nodes.Nodelist)
+            foreach (var node in Problem.Nodes)
             {
                 output.Nodes.Add(new NodeProblemData
                 {
@@ -163,11 +163,11 @@ namespace FEA_Program.Controllers
             Materials.ImportMaterials(materials);
 
             // ----------- Import Nodes ---------------
-            Dictionary<int, NodeDrawable> nodes = [];
+            Dictionary<int, Node> nodes = [];
 
             foreach (var item in data.Nodes)
             {
-                nodes.Add(item.ID, new NodeDrawable(item.Coords, item.Fixity, item.ID, item.Dimension)
+                nodes.Add(item.ID, new Node(item.Coords, item.Fixity, item.ID, item.Dimension)
                 {
                     Force = item.Force
                 });
@@ -181,7 +181,7 @@ namespace FEA_Program.Controllers
             {
                 var elementMaterial = Materials.GetMaterial(item.MaterialID);
                 List<NodeDrawable> elementNodes = item.NodeIDs
-                    .Select(nodeId => nodes[nodeId])
+                    .Select(nodeId => Nodes.GetNode(nodeId)) // Must get drawable objects from the manager
                     .ToList();
 
                 IElementDrawable? element = null;

@@ -9,7 +9,7 @@ namespace FEA_Program.UserControls
     {
         private int _DOFs = -1;
         private string[] _DOFNames = ["X", "Y", "Z"];
-        private List<Node> _Nodes;
+        private List<NodeDrawable> _Nodes;
 
         private const int _YIncrement = 40;
         private const int _YStart = 46;
@@ -28,7 +28,7 @@ namespace FEA_Program.UserControls
         public delegate void NodeSelectionUpdatedEventHandler(object sender, List<int> SelectedNodeIDs);
 
 
-        public AddNodeForceControl(int NodeDOFs, List<Node> Nodes)
+        public AddNodeForceControl(int NodeDOFs, List<NodeDrawable> Nodes)
         {
             InitializeComponent();
 
@@ -73,7 +73,7 @@ namespace FEA_Program.UserControls
 
             foreach (NodeDrawable Node in _Nodes)
             {
-                string text = $"{Node.ID} - ({string.Join(",", Node.Coordinates_mm)})";
+                string text = $"{Node.Node.ID} - ({string.Join(",", Node.Coordinates_mm)})";
                 CheckedListBox_ApplyNodes.Items.Add(text);
             }
 

@@ -5,7 +5,7 @@ namespace FEA_Program.Drawable
 {
     // Note: Draw is not yet setup for 6D nodes - need to be able to display rotation displacement
 
-    internal class NodeDrawable(double[] coords, int[] fixity, int id, int dimension) : Node(coords, fixity, id, dimension)
+    internal class NodeDrawable(Node node)
     {
         private Color _DefaultColor = Color.Blue;
         private Color _DefaultForceColor = Color.Purple;
@@ -13,10 +13,12 @@ namespace FEA_Program.Drawable
         private Color _DefaultFixityColor = Color.Red;
         private Color _SelectedColor = Color.Yellow;
 
+        public Node Node { get; private set; } = node;
+
         /// <summary>
         /// Get the node coordinates in user units
         /// </summary>
-        public double[] Coordinates_mm => Coordinates.Select(coord => coord * 1000.0d).ToArray();
+        public double[] Coordinates_mm => Node.Coordinates.Select(coord => coord * 1000.0d).ToArray();
 
         /// <summary>
         /// Center coordinates to draw the node at
@@ -27,6 +29,8 @@ namespace FEA_Program.Drawable
         /// How much to scale the result displacement by. 0 = show at original position, 1 = show at displaced position
         /// </summary>
         public double DisplacementScalingFactor { get; set; } = 0;
+
+
  
         public bool Selected { get; set; } = false;
         public void Draw()
@@ -46,10 +50,10 @@ namespace FEA_Program.Drawable
         }
         public double[] GetScaledDisplacement_mm(double scaleFactor)
         {
-            var output = new double[Dimension];
+            var output = new double[Node.Dimension];
 
-            for (int i = 0; i < Coordinates.Length; i++)
-                output[i] = (Coordinates[i] + Displacement[i] * scaleFactor) * 1000.0; // convert to mm
+            for (int i = 0; i < Node.Coordinates.Length; i++)
+                output[i] = (Node.Coordinates[i] + Node.Displacement[i] * scaleFactor) * 1000.0; // convert to mm
 
             return output;
         }
@@ -65,7 +69,7 @@ namespace FEA_Program.Drawable
                 coords[i] = nodeCoords[i];
             }
 
-            if (node.Dimension == 1 | node.Dimension == 2)
+            if (node.Node.Dimension == 1 | node.Node.Dimension == 2)
             {
                 GL.Color3(color);
                 GL.Begin(PrimitiveType.Quads);
@@ -85,7 +89,7 @@ namespace FEA_Program.Drawable
         public static void DrawNodeForce(NodeDrawable node, Color color, bool reaction = false)
         {
             var nodeCoords = node.DrawCoordinates;
-            var nodeForce = reaction ? node.ReactionForce : node.Force;
+            var nodeForce = reaction ? node.Node.ReactionForce : node.Node.Force;
             double[] coords = [0, 0, 0];
             double[] force = [0, 0, 0];
 
@@ -98,14 +102,14 @@ namespace FEA_Program.Drawable
 
             double forcelength = 10.0d;
 
-            if (node.Dimension == 1)
+            if (node.Node.Dimension == 1)
             {
                 coords[1] = 0;
                 coords[2] = 0;
                 force[1] = 0;
                 force[2] = 0;
             }
-            else if (node.Dimension == 1)
+            else if (node.Node.Dimension == 1)
             {
                 coords[2] = 0;
                 force[2] = 0;
@@ -118,7 +122,7 @@ namespace FEA_Program.Drawable
             double squareoffset = 1.5d;
 
             var nodeCoords = node.DrawCoordinates;
-            var nodeFixity = node.Fixity;
+            var nodeFixity = node.Node.Fixity;
             double[] coords = [0, 0, 0];
             int[] fixity = [0, 0, 0];
 
@@ -141,7 +145,7 @@ namespace FEA_Program.Drawable
                 GL.End();
             }
 
-            if (node.Dimension > 1) // or else will error when searching for invalid value
+            if (node.Node.Dimension > 1) // or else will error when searching for invalid value
             {
                 if (fixity[1] == 1) // Y Axis
                 {
@@ -154,7 +158,7 @@ namespace FEA_Program.Drawable
                 }
             }
 
-            if (node.Dimension > 2) // or else will error when searching for invalid value
+            if (node.Node.Dimension > 2) // or else will error when searching for invalid value
             {
                 if (fixity[2] == 1) // Z Axis
                 {
@@ -172,6 +176,6 @@ namespace FEA_Program.Drawable
         /// Gets an empty node for reference use
         /// </summary>
         /// <returns></returns>
-        public static new NodeDrawable DummyNode(int dimension = 1) => new(new double[dimension], new int[dimension], Constants.InvalidID, dimension);
+        public static new NodeDrawable DummyNode(int dimension = 1) => new(Node.DummyNode(dimension));
     }
 }

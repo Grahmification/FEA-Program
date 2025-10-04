@@ -47,13 +47,13 @@ namespace FEA_Program.UserControls
 
             foreach (NodeDrawable node in P.Nodes.Nodelist)
             {
-                var newNode = new TreeNode($"Node {node.ID}")
+                var newNode = new TreeNode($"Node {node.Node.ID}")
                 {
-                    Tag = node.ID,
+                    Tag = node.Node.ID,
                 };
 
                 newNode.Nodes.Add(new TreeNode($"Pos: {string.Join(",", node.Coordinates_mm)}"));
-                newNode.Nodes.Add(new TreeNode($"Fixity: {string.Join(",", node.Fixity)}"));
+                newNode.Nodes.Add(new TreeNode($"Fixity: {string.Join(",", node.Node.Fixity)}"));
                 baseNode.Nodes.Add(newNode);
                 _nodeItems.Add(newNode);
             }
@@ -81,7 +81,7 @@ namespace FEA_Program.UserControls
 
             baseNode = tree.Nodes[2];
 
-            foreach (Node node in P.Nodes.Nodelist)
+            foreach (Node node in P.Nodes.Nodelist.Select(n => n.Node))
             {
                 if (node.ForceMagnitude > 0)
                 {

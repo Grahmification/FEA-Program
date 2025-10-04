@@ -28,7 +28,7 @@ namespace FEA_Program.UserControls
 
             var baseNode = tree.Nodes[0];
 
-            foreach (Node node in P.Nodes.Nodelist)
+            foreach (Node node in P.Nodes.Nodelist.Select(n => n.Node))
             {
                 var newNode = new TreeNode($"Node {node.ID}")
                 {

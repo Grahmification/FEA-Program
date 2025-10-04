@@ -25,7 +25,7 @@ namespace FEA_Program.UserControls
             Editing = editing;
             
             InitializeComponent();
-            InitializeTextBoxes(node.Dimension);
+            InitializeTextBoxes(node.Node.Dimension);
             ValidateEntry();
         }
 
@@ -56,7 +56,7 @@ namespace FEA_Program.UserControls
                 // ---------------- add textbox ---------------------
                 var txt = new NumericalInputTextBox(100, new Point(_FirstTextBoxPos[0], _FirstTextBoxPos[1] + _YIncrement * i), Units.DataUnitType.Length, Units.AllUnits.mm)
                 {
-                    Value = _node.Coordinates[i],
+                    Value = _node.Node.Coordinates[i],
                     Tag = i,
                 };
                 txt.TextChanged += OnTextFieldChanged;
@@ -66,7 +66,7 @@ namespace FEA_Program.UserControls
                 // -------------- add checkbox -------------------
                 var CK = new CheckBox
                 {
-                    Checked = _node.Fixity[i] != 0,
+                    Checked = _node.Node.Fixity[i] != 0,
                     Anchor = AnchorStyles.Top | AnchorStyles.Right,
                     Location = new Point(_FirstCheckBoxPos[0], _FirstCheckBoxPos[1] + _YIncrement * i),
                     Tag = i
@@ -88,17 +88,17 @@ namespace FEA_Program.UserControls
 
                 if (ReferenceEquals(sendbtn, Button_Accept))
                 {
-                    var coords = new double[_node.Dimension];
-                    var fixity = new int[_node.Dimension];
+                    var coords = new double[_node.Node.Dimension];
+                    var fixity = new int[_node.Node.Dimension];
 
-                    for (int i = 0; i < _node.Dimension; i++)
+                    for (int i = 0; i < _node.Node.Dimension; i++)
                     {
                         coords[i] = _TextBoxes[i].Value;
                         fixity[i] = _CheckBoxes[i].Checked ? 1 : 0;
                     }
 
-                    _node.Coordinates = coords;
-                    _node.Fixity = fixity;
+                    _node.Node.Coordinates = coords;
+                    _node.Node.Fixity = fixity;
 
                     NodeEditConfirmed?.Invoke(this, _node);
                 }

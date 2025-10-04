@@ -10,7 +10,7 @@ namespace FEA_Program.UserControls
     {
         private Type[] _AvailableElemTypes;
         private List<int> _MatIDs = new List<int>();
-        private List<Node> _Nodes;
+        private List<NodeDrawable> _Nodes;
         private List<Dictionary<string, Units.DataUnitType>> _ElementArgs;
 
         private int _YIncrement = 50;
@@ -31,7 +31,7 @@ namespace FEA_Program.UserControls
 
         public delegate void NodeSelectionUpdatedEventHandler(object sender, List<int> SelectedNodeIDs);
 
-        public AddElementControl(Type[] AvailableElemTypes, List<Dictionary<string, Units.DataUnitType>> ElementArgs, List<Material> Mats, List<Node> Nodes)
+        public AddElementControl(Type[] AvailableElemTypes, List<Dictionary<string, Units.DataUnitType>> ElementArgs, List<Material> Mats, List<NodeDrawable> Nodes)
         {
             int startingY = 120;
             _FirstLabelPos = new[] { 8, startingY + _YIncrement };
@@ -217,7 +217,7 @@ namespace FEA_Program.UserControls
 
                 foreach (NodeDrawable Node in _Nodes)
                 {
-                    string text = (string)Node.ID.ToString() + " - (" + string.Join(",", Node.Coordinates_mm) + ")";
+                    string text = (string)Node.Node.ID.ToString() + " - (" + string.Join(",", Node.Coordinates_mm) + ")";
 
                     nodeCollection.Add(text);
 

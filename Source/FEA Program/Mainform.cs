@@ -234,7 +234,7 @@ namespace FEA_Program
                 foreach (Type ElemType in P.Problem.AvailableElements)
                     ElementArgsList.Add(ElementManager.ElementArgs(ElemType));
 
-                var UC = new AddElementControl(P.Problem.AvailableElements, ElementArgsList, P.Materials.MaterialList, P.Nodes.Nodelist.Cast<Node>().ToList());
+                var UC = new AddElementControl(P.Problem.AvailableElements, ElementArgsList, P.Materials.MaterialList, P.Nodes.Nodelist);
                 UC.ElementAddFormSuccess += ElemAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
                 DisplaySideBarMenuControl(UC);
@@ -265,7 +265,7 @@ namespace FEA_Program
         {
             try
             {
-                var UC = new AddNodeForceControl(P.Problem.AvailableNodeDOFs, P.Nodes.Nodelist.Cast<Node>().ToList());
+                var UC = new AddNodeForceControl(P.Problem.AvailableNodeDOFs, P.Nodes.Nodelist);
                 UC.NodeForceAddFormSuccess += NodeForceAddFormSuccess;
                 UC.NodeSelectionUpdated += FeatureAddFormNodeSelectionChanged;
                 DisplaySideBarMenuControl(UC);
