@@ -1,4 +1,4 @@
-﻿using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
 {
@@ -24,10 +24,10 @@ namespace FEA_Program.Models
         /// <summary>
         /// which elements are available depending on problem type
         /// </summary>
-        public Type[] AvailableElements => ProblemType switch
+        public ElementTypes[] AvailableElements => ProblemType switch
         {
-            ProblemTypes.Bar_1D => new[] { typeof(ElementBarLinear) },
-            ProblemTypes.Truss_3D => new[] { typeof(ElementBarLinear) },
+            ProblemTypes.Bar_1D => [ElementTypes.BarLinear],
+            ProblemTypes.Truss_3D => [ElementTypes.BarLinear],
 
             // Default case: return empty
             _ => []

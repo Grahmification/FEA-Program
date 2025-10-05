@@ -226,7 +226,7 @@ namespace FEA_Program
             {
                 var ElementArgsList = new List<Dictionary<string, Units.DataUnitType>>();
 
-                foreach (Type ElemType in P.Problem.AvailableElements)
+                foreach (ElementTypes ElemType in P.Problem.AvailableElements)
                     ElementArgsList.Add(ElementManager.ElementArgs(ElemType));
 
                 var UC = new AddElementControl(P.Problem.AvailableElements, ElementArgsList, P.Materials.MaterialList, P.Nodes.Nodelist);
@@ -239,7 +239,7 @@ namespace FEA_Program
                 FormattedMessageBox.DisplayError(ex);
             }
         }
-        private void ElemAddFormSuccess(AddElementControl sender, Type Type, List<int> NodeIDs, double[] ElementArgs, int Mat)
+        private void ElemAddFormSuccess(AddElementControl sender, ElementTypes Type, List<int> NodeIDs, double[] ElementArgs, int Mat)
         {
 
             sender.ElementAddFormSuccess -= ElemAddFormSuccess;

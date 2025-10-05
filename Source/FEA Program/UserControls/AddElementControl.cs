@@ -8,7 +8,7 @@ namespace FEA_Program.UserControls
 {
     internal partial class AddElementControl : UserControl
     {
-        private Type[] _AvailableElemTypes;
+        private ElementTypes[] _AvailableElemTypes;
         private List<int> _MatIDs = new List<int>();
         private List<NodeDrawable> _Nodes;
         private List<Dictionary<string, Units.DataUnitType>> _ElementArgs;
@@ -26,12 +26,12 @@ namespace FEA_Program.UserControls
 
         public event ElementAddFormSuccessEventHandler ElementAddFormSuccess;
 
-        public delegate void ElementAddFormSuccessEventHandler(AddElementControl sender, Type Type, List<int> NodeIDs, double[] ElementArgs, int Mat);
+        public delegate void ElementAddFormSuccessEventHandler(AddElementControl sender, ElementTypes Type, List<int> NodeIDs, double[] ElementArgs, int Mat);
         public event NodeSelectionUpdatedEventHandler NodeSelectionUpdated;
 
         public delegate void NodeSelectionUpdatedEventHandler(object sender, List<int> SelectedNodeIDs);
 
-        public AddElementControl(Type[] AvailableElemTypes, List<Dictionary<string, Units.DataUnitType>> ElementArgs, List<Material> Mats, List<NodeDrawable> Nodes)
+        public AddElementControl(ElementTypes[] AvailableElemTypes, List<Dictionary<string, Units.DataUnitType>> ElementArgs, List<Material> Mats, List<NodeDrawable> Nodes)
         {
             int startingY = 120;
             _FirstLabelPos = new[] { 8, startingY + _YIncrement };
@@ -48,7 +48,7 @@ namespace FEA_Program.UserControls
 
             {
                 var withBlock = _ComboBox_ElemType;
-                foreach (Type i in AvailableElemTypes)
+                foreach (ElementTypes i in AvailableElemTypes)
                     withBlock.Items.Add(ElementManager.Name(i));
 
                 if (withBlock.Items.Count > 0)

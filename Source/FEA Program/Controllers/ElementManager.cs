@@ -18,14 +18,14 @@ namespace FEA_Program.Controllers
 
         // ---------------------- Public Methods ----------------------------
 
-        public void Add(int nodeDOFs, Type elementType, List<NodeDrawable> nodes, double[] elementArgs, Material material)
+        public void Add(int nodeDOFs, ElementTypes elementType, List<NodeDrawable> nodes, double[] elementArgs, Material material)
         {
             IElementDrawable? newElement = null;
             int newElemID = IDClass.CreateUniqueId(Problem.Elements.Cast<IHasID>().ToList());
 
             // ------------------ Determine type of element ----------------------
 
-            if (ReferenceEquals(elementType, typeof(ElementBarLinear))) // linear bar element
+            if (elementType == ElementTypes.BarLinear) // linear bar element
             {
                 newElement = new ElementBarLinearDrawable(elementArgs[0], newElemID, nodes, material, nodeDOFs);
             }
@@ -89,26 +89,26 @@ namespace FEA_Program.Controllers
 
         // ---------------------- Static Methods ----------------------------
 
-        public static int NumOfNodes(Type elementType)
+        public static int NumOfNodes(ElementTypes elementType)
         {
             return elementType switch
             {
-                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinear(1, 0, [Node.DummyNode(), Node.DummyNode()], Material.DummyMaterial()).NumOfNodes,
+                ElementTypes.BarLinear => new ElementBarLinear(1, 0, [Node.DummyNode(), Node.DummyNode()], Material.DummyMaterial()).NumOfNodes,
                 _ => 0,
             };
         }
-        public static string Name(Type elementType)
+        public static string Name(ElementTypes elementType)
         {
             return elementType switch
             {
-                Type t when t == typeof(ElementBarLinear) || t == typeof(ElementBarLinearDrawable) => new ElementBarLinearDrawable(1, 0, [NodeDrawable.DummyNode(), NodeDrawable.DummyNode()], Material.DummyMaterial()).Name,
+                ElementTypes.BarLinear => new ElementBarLinearDrawable(1, 0, [NodeDrawable.DummyNode(), NodeDrawable.DummyNode()], Material.DummyMaterial()).Name,
                 _ => "",
             };
         }
-        public static Dictionary<string, Units.DataUnitType> ElementArgs(Type elementType) => elementType switch
+        public static Dictionary<string, Units.DataUnitType> ElementArgs(ElementTypes elementType) => elementType switch
         {
             // Case for ElementBarLinear
-            Type t when t == typeof(ElementBarLinear) => new Dictionary<string, Units.DataUnitType>
+            ElementTypes.BarLinear => new Dictionary<string, Units.DataUnitType>
             {
                 { "Area", Units.DataUnitType.Area }
             },
