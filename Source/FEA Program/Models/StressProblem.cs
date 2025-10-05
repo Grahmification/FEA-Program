@@ -1,4 +1,4 @@
-using MathNet.Numerics.LinearAlgebra.Double;
+﻿using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
 {
@@ -58,6 +58,9 @@ namespace FEA_Program.Models
             if (_Nodes.ContainsKey(node.ID))
                 throw new ArgumentException($"Could not add node {node.ID} to problem. Problem already contains that ID.");
 
+            if (node.Dimension != AvailableNodeDOFs)
+                throw new ArgumentException($"Could not add node {node.ID} to problem. Node has {node.Dimension} DOFs, and problem only supports {AvailableNodeDOFs} DOFs.");
+
             // dont want to create node where one already is
             if (NodeExistsAtLocation(node.Coordinates, Nodes))
                 throw new Exception("Tried to add a node at location where one already exists. Nodes cannot be in identical locations.");
@@ -79,8 +82,11 @@ namespace FEA_Program.Models
             if (_Elements.ContainsKey(element.ID))
                 throw new ArgumentException($"Could not add element {element.ID} to problem. Problem already contains that ID.");
 
+            if (!AvailableElements.Contains(element.ElementType))
+                throw new ArgumentException($"Could not add element {element.ID} to problem. Problem does not support element type {Enum.GetName(element.ElementType)}.");
+
             // Make sure we aren't adding a duplicate element
-            if(ContainsElementWithSameNodeIDs(Elements, element))
+            if (ContainsElementWithSameNodeIDs(Elements, element))
                 throw new ArgumentException($"Could not add element {element.ID} to problem. An element already exists that is linked to the same nodes.");
 
             _Elements[element.ID] = element;
