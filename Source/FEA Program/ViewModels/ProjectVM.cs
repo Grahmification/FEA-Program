@@ -1,4 +1,4 @@
-using FEA_Program.Models;
+﻿using FEA_Program.Models;
 using FEA_Program.SaveData;
 using FEA_Program.UI;
 using FEA_Program.ViewModels.Base;
@@ -15,6 +15,7 @@ namespace FEA_Program.ViewModels
 
         // ---------------------- Sub VMs ----------------------
         public BaseVM Base { get; private set; } = new();
+        public MaterialsVM Materials { get; private set; } = new();
 
 
 
@@ -35,6 +36,8 @@ namespace FEA_Program.ViewModels
         {
             LoadFileCommand = new AsyncRelayCommand(LoadFile);
             SaveFileCommand = new AsyncRelayCommand(SaveFile);
+
+            Materials.AddDefaultMaterials();
         }
         public async Task LoadFile()
         {
@@ -113,7 +116,7 @@ namespace FEA_Program.ViewModels
                 });
             }
 
-            //Materials.ImportMaterials(materials);
+            Materials.ImportMaterials(materials);
 
             // ----------- Import Nodes ---------------
             Dictionary<int, Node> nodes = [];
@@ -161,6 +164,21 @@ namespace FEA_Program.ViewModels
                     ElementArgs = element.ElementArgs,
                     BodyForce = [.. element.BodyForce],
                     TractionForce = [.. element.TractionForce],
+                });
+            }
+
+            // ------------------- Materials --------------------
+            foreach (var item in Materials.Items.Select(m => m.Model))
+            {
+                output.Materials.Add(new MaterialSaveData
+                {
+                    ID = item.ID,
+                    Name = item.Name,
+                    Subtype = item.Subtype,
+                    E = item.E,
+                    V = item.V,
+                    Sy = item.Sy,
+                    Sut = item.Sut,
                 });
             }
 
