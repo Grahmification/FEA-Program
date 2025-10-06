@@ -1,0 +1,173 @@
+using FEA_Program.Models;
+using FEA_Program.SaveData;
+using FEA_Program.UI;
+using FEA_Program.ViewModels.Base;
+using System.IO;
+using System.Text.Json;
+using System.Windows.Input;
+
+namespace FEA_Program.ViewModels
+{
+    internal class ProjectVM: ObservableObject
+    {
+        // ---------------------- Models ----------------------
+        public StressProblem Problem { get; private set; } = new();
+
+        // ---------------------- Sub VMs ----------------------
+        public BaseVM Base { get; private set; } = new();
+
+
+
+        // ---------------------- Commands ----------------------
+        /// <summary>
+        /// RelayCommand for <see cref="LoadFile"/>
+        /// </summary>
+        public ICommand LoadFileCommand { get; private set; }
+
+        /// <summary>
+        /// RelayCommand for <see cref="SaveFile"/>
+        /// </summary>
+        public ICommand SaveFileCommand { get; private set; }
+
+
+        // ---------------------- Public Methods ----------------------
+        public ProjectVM()
+        {
+            LoadFileCommand = new AsyncRelayCommand(LoadFile);
+            SaveFileCommand = new AsyncRelayCommand(SaveFile);
+        }
+        public async Task LoadFile()
+        {
+            try
+            {
+                var filePath = IODialogs.DisplayOpenFileDialog([IOFileTypes.JSON]);
+
+                if (filePath != null && filePath != "")
+                {
+                    var saveData = await SaveData.JsonSerializer.DeserializeFromJsonFile<ProblemData>(filePath);
+
+                    if (saveData != null)
+                    {
+                        // This this before loading data so changing it doesn't reset the problem
+                        //ToolStripComboBox_ProblemMode.SelectedIndex = (int)saveData.ProblemType;
+
+                        LoadData(saveData);
+                    }
+                }
+            }
+            catch (InvalidOperationException ex) // Unsure if this will ever happen
+            {
+                Base.DisplayError(ex.Message);
+            }
+            catch (FileFormatException ex) // Will fire if there is no data in the file
+            {
+                Base.DisplayError(ex.Message);
+            }
+            catch (JsonException)
+            {
+                Base.DisplayError("Could not load the file. It contains invalid data.");
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
+        }
+        public async Task SaveFile()
+        {
+            try
+            {
+                var filePath = IODialogs.DisplaySaveFileDialog([IOFileTypes.JSON], "FEA Problem 1");
+
+                if (filePath != null && filePath != "")
+                {
+                    var saveData = GetSaveData();
+
+                    await SaveData.JsonSerializer.SerializeToJsonFile(saveData, filePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
+        }
+
+
+        // ---------------------- Private Helpers ----------------------
+        private void ResetProblem(ProblemTypes problemType)
+        {
+            Problem = new StressProblem(problemType);
+        }
+        private void LoadData(ProblemData data)
+        {
+            ResetProblem(data.ProblemType);
+
+            // ----------- Import Materials ---------------
+            List<Material> materials = [];
+            foreach (var item in data.Materials)
+            {
+                materials.Add(new Material(item.Name, item.E, item.ID, item.Subtype)
+                {
+                    V = item.V,
+                    Sy = item.Sy,
+                    Sut = item.Sut
+                });
+            }
+
+            //Materials.ImportMaterials(materials);
+
+            // ----------- Import Nodes ---------------
+            Dictionary<int, Node> nodes = [];
+
+            foreach (var item in data.Nodes)
+            {
+                nodes.Add(item.ID, new Node(item.Coords, item.Fixity, item.ID, item.Dimension)
+                {
+                    Force = item.Force
+                });
+            }
+
+            foreach (var node in nodes.Values)
+                Problem.AddNode(node);
+
+            //Nodes.ImportNodes([.. nodes.Values]);
+        }
+        private ProblemData GetSaveData()
+        {
+            var output = new ProblemData();
+
+            // ------------------- Nodes --------------------
+            foreach (var node in Problem.Nodes)
+            {
+                output.Nodes.Add(new NodeProblemData
+                {
+                    Dimension = node.Dimension,
+                    ID = node.ID,
+                    Coords = node.Coordinates,
+                    Fixity = node.Fixity,
+                    Force = node.Force
+                });
+            }
+
+            // ------------------- Elements --------------------
+            foreach (var element in Problem.Elements)
+            {
+                output.Elements.Add(new ElementProblemData
+                {
+                    ID = element.ID,
+                    MaterialID = element.Material.ID,
+                    NodeIDs = element.Nodes.Select(n => n.ID).ToArray(),
+                    NodeDOFs = element.NodeDOFs,
+                    ElementType = element.ElementType,
+                    ElementArgs = element.ElementArgs,
+                    BodyForce = [.. element.BodyForce],
+                    TractionForce = [.. element.TractionForce],
+                });
+            }
+
+            // ------------------- Other --------------------
+            output.ProblemType = Problem.ProblemType;
+
+            return output;
+        }
+    }
+}

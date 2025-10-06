@@ -53,8 +53,8 @@
                 <Menu VerticalAlignment="Center">
                     <MenuItem Header="_File" Height="20">
                         <MenuItem Header="_New"/>
-                        <MenuItem Header="_Open"/>
-                        <MenuItem Header="_Save"/>
+                        <MenuItem Header="_Open" Command="{Binding Project.LoadFileCommand}"/>
+                        <MenuItem Header="_Save" Command="{Binding Project.SaveFileCommand}"/>
                         <Separator/>
                         <MenuItem Header="_Exit"/>
                     </MenuItem>

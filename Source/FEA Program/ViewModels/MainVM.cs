@@ -15,6 +15,7 @@ namespace FEA_Program.ViewModels
 
         // Sub VMs
         public BaseVM Base { get; private set; } = new();
+        public ProjectVM Project { get; private set; } = new();
 
 
         public MainVM()
