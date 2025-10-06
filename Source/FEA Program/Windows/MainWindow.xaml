@@ -6,7 +6,126 @@
         xmlns:local="clr-namespace:FEA_Program.Windows"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
 
-    </Grid>
+    <Window.Resources>
+        <!-- Simple ToolBar style that removes grip and overflow -->
+        <Style x:Key="ToolBarNoGripNoOverflow" TargetType="ToolBar">
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToolBar">
+                        <!-- Border for visuals; ToolBarPanel does the horizontal layout -->
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="2">
+                            <ToolBarPanel IsItemsHost="True" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Status bar text style -->
+        <Style TargetType="TextBlock" x:Key="StatusText">
+            <Setter Property="Foreground" Value="#555"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Upper ToolBar -->
+        <Grid DockPanel.Dock="Top" Height="25" VerticalAlignment="Top" Background="#EDEDED">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="_File" Height="20">
+                        <MenuItem Header="_New"/>
+                        <MenuItem Header="_Open"/>
+                        <MenuItem Header="_Save"/>
+                        <Separator/>
+                        <MenuItem Header="_Exit"/>
+                    </MenuItem>
+                </Menu>
+
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
+
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="Add Node" Height="20"/>
+                </Menu>
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="Add Material" Height="20"/>
+                </Menu>
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="Add Element" Height="20"/>
+                </Menu>
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="Add Force" Height="20"/>
+                </Menu>
+
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
+
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="Solve" Height="20"/>
+                </Menu>
+            </StackPanel>
+
+            <ComboBox Grid.Column="2" 
+              Width="150" 
+              Margin="5,0,5,0" 
+              VerticalAlignment="Center">
+                <ComboBoxItem IsSelected="True">Option A</ComboBoxItem>
+                <ComboBoxItem>Option B</ComboBoxItem>
+                <ComboBoxItem>Option C</ComboBoxItem>
+            </ComboBox>
+        </Grid>
+        
+        <!-- Lower Status Bar -->
+        <StatusBar DockPanel.Dock="Bottom" Background="#F2F2F2" Height="24">
+            <StatusBarItem>
+                <TextBlock Text="Ready" Style="{StaticResource StatusText}"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="Line 1, Col 1" Style="{StaticResource StatusText}"/>
+            </StatusBarItem>
+        </StatusBar>
+
+        <!-- Main Content Area -->
+        <Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width ="275"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Sidebar -->
+                <TabControl Grid.Column="0" Margin="0">
+                    <TabItem Header="Problem">
+
+                    </TabItem>
+                    <TabItem Header="Results">
+
+                    </TabItem>
+                    <TabItem Header="Display">
+
+                    </TabItem>
+                </TabControl>
+                
+                <GridSplitter Grid.Column="0" Width="5"/>
+
+                <!-- 3D Viewer -->
+                <TextBlock Grid.Column="1" Text="Main content area"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       Foreground="#999"/>
+            </Grid>
+        </Grid>
+    </DockPanel>
 </Window>
