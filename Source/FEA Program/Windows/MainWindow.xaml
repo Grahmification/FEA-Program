@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         xmlns:local="clr-namespace:FEA_Program.Windows"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
@@ -120,11 +121,30 @@
                 <GridSplitter Grid.Column="0" Width="5"/>
 
                 <!-- 3D Viewer -->
-                <TextBlock Grid.Column="1" Text="Main content area"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       FontSize="16"
-                       Foreground="#999"/>
+                <h:HelixViewport3D Grid.Column="1" x:Name="MainViewPort"
+                   ShowViewCube="False"
+                   ShowCoordinateSystem="True"
+                   Orthographic="True"
+                   IsRotationEnabled="False"
+                   IsPanEnabled="True"
+                   IsZoomEnabled="True"
+                   ZoomExtentsWhenLoaded="True">
+
+                    <h:HelixViewport3D.Camera>
+                        <OrthographicCamera 
+                            Position="0, 0, 20" 
+                            LookDirection="0, 0, -20" 
+                            UpDirection="0, 1, 0" 
+                            Width="20" />
+                    </h:HelixViewport3D.Camera>
+
+                    <h:SunLight/>
+
+                    <h:LinesVisual3D Points="0,0,0, 10,0,0, 10,10,0, 0,10,0, 0,0,0" 
+                     Color="Red" 
+                     Thickness="2"/>
+
+                </h:HelixViewport3D>
             </Grid>
         </Grid>
     </DockPanel>
