@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="FEA_Program.Views.ProblemTreeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FEA_Program.Views"
+             xmlns:vm="clr-namespace:FEA_Program.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="275">
+    <UserControl.DataContext>
+        <vm:ProjectVM/>
+    </UserControl.DataContext>
+
+    <Grid>
+        <TreeView>
+            <!-- Materials Sub Tree -->
+            <TreeViewItem x:Name="MaterialsTree" IsExpanded="True" ItemsSource="{Binding Materials.Items}">
+                <TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Materials" />
+                    </StackPanel>
+                </TreeViewItem.Header>
+
+                <TreeViewItem.Resources>
+                    <DataTemplate DataType="{x:Type vm:MaterialVM}">
+                        <TreeViewItem>
+                            <TreeViewItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Model.Name}" />
+
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu Focusable="False">
+                                            <MenuItem Header="Edit" Command="{Binding EditCommand}" Focusable="False"/>
+                                            <MenuItem Header="Delete" Command="{Binding DeleteCommand}" Focusable="False"/>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+                                </StackPanel>
+                            </TreeViewItem.Header>
+                            <StackPanel>
+                                <TextBlock>
+                                <Run Text="E:     " FontWeight="Bold"/>
+                                <Run Text="{Binding E_GPa, StringFormat={}{0:F1} GPa, Mode=OneWay}"/>
+                                </TextBlock>
+
+                                <TextBlock>
+                                <Run Text="V:     " FontWeight="Bold"/>
+                                <Run Text="{Binding Model.V, StringFormat={}{0:F1} GPa, Mode=OneWay}"/>
+                                </TextBlock>
+
+                                <TextBlock>
+                                <Run Text="Sy:   " FontWeight="Bold"/>
+                                <Run Text="{Binding Sy_MPa, StringFormat={}{0:F1} MPa, Mode=OneWay}"/>
+                                </TextBlock>
+
+                                <TextBlock>
+                                <Run Text="Sy:   " FontWeight="Bold"/>
+                                <Run Text="{Binding Sy_MPa, StringFormat={}{0:F1} MPa, Mode=OneWay}"/>
+                                </TextBlock>
+
+                                <TextBlock>
+                                <Run Text="SuT: " FontWeight="Bold"/>
+                                <Run Text="{Binding Sut_MPa, StringFormat={}{0:F1} MPa, Mode=OneWay}"/>
+                                </TextBlock>
+
+                                <TextBlock>
+                                <Run Text="Type: " FontWeight="Bold"/>
+                                <Run Text="{Binding Model.Subtype, Mode=OneWay}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </TreeViewItem>
+                    </DataTemplate>
+                </TreeViewItem.Resources>
+            </TreeViewItem>
+        </TreeView>
+    </Grid>
+</UserControl>

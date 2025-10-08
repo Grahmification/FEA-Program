@@ -35,6 +35,8 @@ namespace FEA_Program.ViewModels
 
             _Materials.Add(ID, vm);
             Items.Add(_Materials[ID]);
+            vm.DeleteRequest += OnDeleteRequest;
+            vm.EditRequest += OnEditRequest;
         }
         public void AddDefaultMaterials()
         {
@@ -55,8 +57,27 @@ namespace FEA_Program.ViewModels
                 var vm = new MaterialVM(material);
                 _Materials[material.ID] = vm;
                 Items.Add(vm);
+                vm.DeleteRequest += OnDeleteRequest;
+                vm.EditRequest += OnEditRequest;
             }
         }
 
+        // ---------------------- Event Methods ----------------------
+        private void OnEditRequest(object? sender, EventArgs e)
+        {
+            // Todo
+            Base.DisplayMessage("Editing not implemented yet.");
+        }
+        private void OnDeleteRequest(object? sender, EventArgs e)
+        {
+            if(sender is MaterialVM vm)
+            {
+                _Materials.Remove(vm.Model.ID);
+                Items.Remove(vm);
+
+                vm.DeleteRequest -= OnDeleteRequest;
+                vm.EditRequest -= OnEditRequest;
+            }
+        }
     }
 }

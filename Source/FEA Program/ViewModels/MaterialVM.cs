@@ -1,12 +1,18 @@
-using FEA_Program.Models;
+﻿using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
+using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
     internal class MaterialVM: ObservableObject
     {
-        public Material Model { get; private set; } = Material.DummyMaterial();
+        // ---------------------- Events ----------------------
 
+        public event EventHandler? EditRequest;
+        public event EventHandler? DeleteRequest;
+
+        // ---------------------- Properties ----------------------
+        public Material Model { get; private set; } = Material.DummyMaterial();
 
         /// <summary>
         /// Youngs modulus in GPa
@@ -23,9 +29,16 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public double Sut_MPa => Model.Sut / Math.Pow(1000.0, 2);
 
+        // ---------------------- Commands ----------------------
+        public ICommand EditCommand { get; }
+        public ICommand DeleteCommand { get; }
+
+
         public MaterialVM(Material model)
         {
             Model = model;
+            EditCommand = new RelayCommand(() => EditRequest?.Invoke(this, EventArgs.Empty));
+            DeleteCommand = new RelayCommand(() => DeleteRequest?.Invoke(this, EventArgs.Empty));
         }
     }
 }
