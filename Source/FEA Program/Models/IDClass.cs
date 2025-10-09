@@ -1,4 +1,6 @@
-﻿namespace FEA_Program.Models
+﻿using FEA_Program.ViewModels.Base;
+
+namespace FEA_Program.Models
 {
     /// <summary>
     /// Generic definition for a class that has an ID
@@ -14,7 +16,7 @@
     /// <summary>
     /// Base definition for a class that has an ID
     /// </summary>
-    internal abstract class IDClass(int ID = Constants.InvalidID) : IHasID, IComparable<IHasID>
+    internal abstract class IDClass(int ID = Constants.InvalidID) : ObservableObject, IHasID, IComparable<IHasID>
     {
         /// <summary>
         /// The idenfier for the class
