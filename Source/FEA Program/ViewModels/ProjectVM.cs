@@ -16,6 +16,7 @@ namespace FEA_Program.ViewModels
         // ---------------------- Sub VMs ----------------------
         public BaseVM Base { get; private set; } = new();
         public MaterialsVM Materials { get; private set; } = new();
+        public NodesVM Nodes { get; private set; } = new();
 
 
 
@@ -132,7 +133,7 @@ namespace FEA_Program.ViewModels
             foreach (var node in nodes.Values)
                 Problem.AddNode(node);
 
-            //Nodes.ImportNodes([.. nodes.Values]);
+            Nodes.ImportNodes([.. nodes.Values]);
         }
         private ProblemData GetSaveData()
         {
