@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         xmlns:vm="clr-namespace:FEA_Program.ViewModels"
+        xmlns:conv="clr-namespace:FEA_Program.Converters"
         xmlns:v="clr-namespace:FEA_Program.Views"
         xmlns:local="clr-namespace:FEA_Program.Windows"
         mc:Ignorable="d"
@@ -15,6 +16,8 @@
     </Window.DataContext>
 
     <Window.Resources>
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        
         <!-- Simple ToolBar style that removes grip and overflow -->
         <Style x:Key="ToolBarNoGripNoOverflow" TargetType="ToolBar">
             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
@@ -112,17 +115,27 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Sidebar -->
-                <TabControl Grid.Column="0" Margin="0">
-                    <TabItem Header="Problem">
-                        <v:ProblemTreeControl DataContext="{Binding Project}"/>
-                    </TabItem>
-                    <TabItem Header="Results">
+                <Grid>
+                    <!-- Base sidebar view -->
+                    <TabControl Grid.Column="0" Margin="0">
+                        <TabItem Header="Problem">
+                            <v:ProblemTreeControl DataContext="{Binding Project}"/>
+                        </TabItem>
+                        <TabItem Header="Results">
 
-                    </TabItem>
-                    <TabItem Header="Display">
+                        </TabItem>
+                        <TabItem Header="Display">
 
-                    </TabItem>
-                </TabControl>
+                        </TabItem>
+                    </TabControl>
+
+                    <!-- Edit material view -->
+                    <v:EditMaterialControl DataContext="{Binding Project.Materials.Editor}" 
+                                           Visibility="{Binding DataContext.Project.Materials.Editor.Material,
+                                                RelativeSource={RelativeSource AncestorType=Window},
+                                                Converter={StaticResource NullToVisibilityConverter}}"/>
+                </Grid>
+
                 
                 <GridSplitter Grid.Column="0" Width="5"/>
 

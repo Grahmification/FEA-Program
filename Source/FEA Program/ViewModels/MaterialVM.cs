@@ -17,22 +17,23 @@ namespace FEA_Program.ViewModels
         /// <summary>
         /// Youngs modulus in GPa
         /// </summary>
-        public double E_GPa => Model.E / Math.Pow(1000.0, 3);
+        public double E_GPa { get => Model.E / Math.Pow(1000.0, 3); set => Model.E = value * Math.Pow(1000.0, 3); }
 
         /// <summary>
         /// Yield strength in MPa
         /// </summary>
-        public double Sy_MPa => Model.Sy / Math.Pow(1000.0, 2);
+        public double Sy_MPa { get => Model.Sy / Math.Pow(1000.0, 2); set => Model.Sy = value * Math.Pow(1000.0, 2); }
 
         /// <summary>
         /// Ultimate strength in Pa
         /// </summary>
-        public double Sut_MPa => Model.Sut / Math.Pow(1000.0, 2);
+        public double Sut_MPa { get => Model.Sut / Math.Pow(1000.0, 2); set => Model.Sut = value * Math.Pow(1000.0, 2); }
 
         // ---------------------- Commands ----------------------
-        public ICommand EditCommand { get; }
-        public ICommand DeleteCommand { get; }
+        public ICommand? EditCommand { get; }
+        public ICommand? DeleteCommand { get; }
 
+        public MaterialVM() { }
 
         public MaterialVM(Material model)
         {

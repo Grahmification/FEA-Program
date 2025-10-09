@@ -2,9 +2,9 @@
 
 namespace FEA_Program.Models
 {
-    internal class Material(string name, double e, int id = Constants.InvalidID, MaterialType subtype = MaterialType.Other) : IDClass(id)
+    internal class Material(string name, double e, int id = Constants.InvalidID, MaterialType subtype = MaterialType.Other) : IDClass(id), ICloneable
     {
-        public string Name { get; private set; } = name;
+        public string Name { get; set; } = name;
         public MaterialType Subtype { get; set; } = subtype;
 
         /// <summary>
@@ -60,7 +60,35 @@ namespace FEA_Program.Models
             }
         }
 
-        public static Material DummyMaterial() => new("Dummy matieral", 0);
+        public static Material DummyMaterial() => new("Dummy material", 0);
+
+        /// <summary>
+        /// Clone the class
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            return new Material(Name, E, ID, Subtype)
+            {
+                V = this.V,
+                Sy = this.Sy,
+                Sut = this.Sut
+            };
+        }
+
+        /// <summary>
+        /// Import parameters from another matieral, while retaining ID.
+        /// </summary>
+        /// <param name="other"></param>
+        public void ImportParameters(Material other)
+        {
+            Name = other.Name;
+            Subtype = other.Subtype;
+            E = other.E;
+            V = other.V;
+            Sy = other.Sy;
+            Sut = other.Sut;
+        }
     }
 
     public enum MaterialType

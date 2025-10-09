@@ -1,4 +1,4 @@
-using FEA_Program.Models;
+﻿using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
 using System.Collections.ObjectModel;
 
@@ -13,11 +13,13 @@ namespace FEA_Program.ViewModels
 
         // ---------------------- Sub VMs ----------------------
         public BaseVM Base { get; private set; } = new();
+        public MaterialEditVM Editor { get; private set; } = new();
 
         // ---------------------- Public Methods ----------------------
         public MaterialsVM()
         {
-
+            Editor.AcceptEdits += OnAcceptEdits;
+            Editor.CancelEdits += OnCancelEdits;
         }
 
         public void Add(string Name, double E_GPa, double V, double Sy_MPa, double Sut_MPa, MaterialType subtype)
@@ -35,6 +37,13 @@ namespace FEA_Program.ViewModels
 
             _Materials.Add(ID, vm);
             Items.Add(_Materials[ID]);
+            vm.DeleteRequest += OnDeleteRequest;
+            vm.EditRequest += OnEditRequest;
+        }
+        public void Delete(MaterialVM vm)
+        {
+            _Materials.Remove(vm.Model.ID);
+            Items.Remove(vm);
             vm.DeleteRequest += OnDeleteRequest;
             vm.EditRequest += OnEditRequest;
         }
@@ -65,8 +74,10 @@ namespace FEA_Program.ViewModels
         // ---------------------- Event Methods ----------------------
         private void OnEditRequest(object? sender, EventArgs e)
         {
-            // Todo
-            Base.DisplayMessage("Editing not implemented yet.");
+            if (sender is MaterialVM vm)
+            {
+                Editor.DisplayEditor(vm, true);
+            }
         }
         private void OnDeleteRequest(object? sender, EventArgs e)
         {
@@ -77,6 +88,25 @@ namespace FEA_Program.ViewModels
 
                 vm.DeleteRequest -= OnDeleteRequest;
                 vm.EditRequest -= OnEditRequest;
+            }
+        }
+
+        private void OnAcceptEdits(object? sender, MaterialVM e)
+        {
+            if (sender is MaterialEditVM vm)
+            {
+                // Todo - validate the material
+            }
+        }
+        private void OnCancelEdits(object? sender, MaterialVM e)
+        {
+            if (sender is MaterialEditVM vm)
+            {
+                // If we were adding a material but it was cancelled, delete it
+                if (!vm.Editing)
+                {
+                    Delete(e);
+                }
             }
         }
     }
