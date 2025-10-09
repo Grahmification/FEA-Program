@@ -1,6 +1,8 @@
 ﻿using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
 using System.Collections.ObjectModel;
+using System.Data;
+using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
@@ -15,11 +17,15 @@ namespace FEA_Program.ViewModels
         public BaseVM Base { get; private set; } = new();
         public MaterialEditVM Editor { get; private set; } = new();
 
+        // ---------------------- Commands ----------------------
+
+        public ICommand? AddCommand { get; }
+
         // ---------------------- Public Methods ----------------------
         public MaterialsVM()
         {
+            AddCommand = new RelayCommand(AddMaterialWithEditor);
             Editor.AcceptEdits += OnAcceptEdits;
-            Editor.CancelEdits += OnCancelEdits;
         }
 
         public void Add(string Name, double E_GPa, double V, double Sy_MPa, double Sut_MPa, MaterialType subtype)
@@ -33,19 +39,7 @@ namespace FEA_Program.ViewModels
                 Sut = Sut_MPa * Math.Pow(1000, 2),
             };
 
-            var vm = new MaterialVM(material);
-
-            _Materials.Add(ID, vm);
-            Items.Add(_Materials[ID]);
-            vm.DeleteRequest += OnDeleteRequest;
-            vm.EditRequest += OnEditRequest;
-        }
-        public void Delete(MaterialVM vm)
-        {
-            _Materials.Remove(vm.Model.ID);
-            Items.Remove(vm);
-            vm.DeleteRequest += OnDeleteRequest;
-            vm.EditRequest += OnEditRequest;
+            AddVM(new MaterialVM(material));
         }
         public void AddDefaultMaterials()
         {
@@ -63,11 +57,7 @@ namespace FEA_Program.ViewModels
             Items.Clear();
             foreach (var material in materials)
             {
-                var vm = new MaterialVM(material);
-                _Materials[material.ID] = vm;
-                Items.Add(vm);
-                vm.DeleteRequest += OnDeleteRequest;
-                vm.EditRequest += OnEditRequest;
+                AddVM(new MaterialVM(material));
             }
         }
 
@@ -96,18 +86,37 @@ namespace FEA_Program.ViewModels
             if (sender is MaterialEditVM vm)
             {
                 // Todo - validate the material
-            }
-        }
-        private void OnCancelEdits(object? sender, MaterialVM e)
-        {
-            if (sender is MaterialEditVM vm)
-            {
-                // If we were adding a material but it was cancelled, delete it
+
+                // This is a new material
                 if (!vm.Editing)
                 {
-                    Delete(e);
+                    AddVM(e);
                 }
             }
+        }
+
+        // ---------------------- Private Helpers ----------------------
+        private void AddVM(MaterialVM vm)
+        {
+            _Materials[vm.Model.ID] = vm;
+            Items.Add(vm);
+            vm.DeleteRequest += OnDeleteRequest;
+            vm.EditRequest += OnEditRequest;
+        }
+        private void DeleteVM(MaterialVM vm)
+        {
+            _Materials.Remove(vm.Model.ID);
+            Items.Remove(vm);
+            vm.DeleteRequest -= OnDeleteRequest;
+            vm.EditRequest -= OnEditRequest;
+        }
+        private void AddMaterialWithEditor()
+        {
+            int ID = IDClass.CreateUniqueId(_Materials.Values.Select(m => m.Model).Cast<IHasID>().ToList());
+            var material = new Material($"Material {Items.Count + 1}", 70 * 1e9, ID, MaterialType.Other);
+
+            var vm = new MaterialVM(material);
+            Editor.DisplayEditor(vm, false);
         }
     }
 }

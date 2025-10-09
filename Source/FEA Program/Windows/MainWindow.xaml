@@ -70,7 +70,7 @@
                     <MenuItem Header="Add Node" Height="20"/>
                 </Menu>
                 <Menu VerticalAlignment="Center">
-                    <MenuItem Header="Add Material" Height="20"/>
+                    <MenuItem Header="Add Material" Height="20" Command="{Binding Project.Materials.AddCommand}"/>
                 </Menu>
                 <Menu VerticalAlignment="Center">
                     <MenuItem Header="Add Element" Height="20"/>
