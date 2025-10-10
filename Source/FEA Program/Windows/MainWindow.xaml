@@ -140,30 +140,7 @@
                 <GridSplitter Grid.Column="0" Width="5"/>
 
                 <!-- 3D Viewer -->
-                <h:HelixViewport3D Grid.Column="1" x:Name="MainViewPort"
-                   ShowViewCube="False"
-                   ShowCoordinateSystem="True"
-                   Orthographic="True"
-                   IsRotationEnabled="False"
-                   IsPanEnabled="True"
-                   IsZoomEnabled="True"
-                   ZoomExtentsWhenLoaded="True">
-
-                    <h:HelixViewport3D.Camera>
-                        <OrthographicCamera 
-                            Position="0, 0, 20" 
-                            LookDirection="0, 0, -20" 
-                            UpDirection="0, 1, 0" 
-                            Width="20" />
-                    </h:HelixViewport3D.Camera>
-
-                    <h:SunLight/>
-
-                    <h:LinesVisual3D Points="0,0,0, 10,0,0, 10,10,0, 0,10,0, 0,0,0" 
-                     Color="Red" 
-                     Thickness="2"/>
-
-                </h:HelixViewport3D>
+                <v:ViewPortControl Grid.Column="1" DataContext="{Binding ViewPort}"/>
             </Grid>
         </Grid>
     </DockPanel>
