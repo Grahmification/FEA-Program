@@ -30,10 +30,12 @@ namespace FEA_Program.Views
             set => SetValue(PositionProperty, value);
         }
 
+        public double Size { get; set; } = 1;
+
         public NodeVisual3Dx()
         {
             var meshBuilder = new MeshBuilder(true);
-            meshBuilder.AddBox(new Vector3(0, 0, 0), 2, 2, 2);
+            meshBuilder.AddBox(new Vector3(0, 0, 0), Size, Size, Size);
 
             // Create a box
             var box = new MeshGeometryModel3D

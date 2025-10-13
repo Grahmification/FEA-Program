@@ -1,5 +1,6 @@
 ﻿using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
+using SharpDX;
 using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
@@ -18,6 +19,11 @@ namespace FEA_Program.ViewModels
         /// Get the node coordinates in user units
         /// </summary>
         public double[] Coordinates_mm => Model.Coordinates.Select(coord => coord * 1000.0).ToArray();
+
+        public Vector3 DrawPosition => new(
+            (float)(Coordinates_mm.Length > 0 ? Coordinates_mm[0] : 0.0),
+            (float)(Coordinates_mm.Length > 1 ? Coordinates_mm[1] : 0.0),
+            (float)(Coordinates_mm.Length > 2 ? Coordinates_mm[2] : 0.0));
 
         // ---------------------- Commands ----------------------
         public ICommand? EditCommand { get; }

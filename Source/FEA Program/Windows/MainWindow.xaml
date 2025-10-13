@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:h="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
+        xmlns:h="clr-namespace:HelixToolkit.Wpf.SharpDX;assembly=HelixToolkit.Wpf.SharpDX"
         xmlns:vm="clr-namespace:FEA_Program.ViewModels"
         xmlns:conv="clr-namespace:FEA_Program.Converters"
         xmlns:v="clr-namespace:FEA_Program.Views"
@@ -140,7 +140,17 @@
                 <GridSplitter Grid.Column="0" Width="5"/>
 
                 <!-- 3D Viewer -->
-                <v:ViewPortControl Grid.Column="1" DataContext="{Binding ViewPort}"/>
+                <v:ViewPortControl Grid.Column="1" DataContext="{Binding ViewPort}">
+                    <v:ViewPortControl.DrawItems>
+                        <h:ItemsModel3D ItemsSource="{Binding DataContext.Project.Nodes.Items, RelativeSource={RelativeSource AncestorType=Window}}">
+                            <h:ItemsModel3D.ItemTemplate>
+                                <DataTemplate>
+                                    <v:NodeVisual3Dx Position="{Binding DrawPosition}"/>
+                                </DataTemplate>
+                            </h:ItemsModel3D.ItemTemplate>
+                        </h:ItemsModel3D>
+                    </v:ViewPortControl.DrawItems>
+                </v:ViewPortControl>
             </Grid>
         </Grid>
     </DockPanel>
