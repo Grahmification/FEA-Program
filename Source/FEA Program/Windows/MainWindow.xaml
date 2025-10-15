@@ -147,6 +147,7 @@
                                 <DataTemplate>
                                     <v:NodeVisual3Dx Position="{Binding DrawPosition}">
                                         <v:FixityVisual3D ShowX="{Binding FixedX}" ShowY="{Binding FixedY}" ShowZ="{Binding FixedZ}"/>
+                                        <v:ArrowVisual3D Direction="{Binding Force}" Length="{Binding Model.ForceMagnitude}"/>
                                     </v:NodeVisual3Dx>
                                 </DataTemplate>
                             </h:ItemsModel3D.ItemTemplate>

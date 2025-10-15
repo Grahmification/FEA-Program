@@ -29,6 +29,13 @@ namespace FEA_Program.ViewModels
         public bool FixedY => Model.Fixity.Length > 1 && Model.Fixity[1] == 1;
         public bool FixedZ => Model.Fixity.Length > 2 && Model.Fixity[2] == 1;
 
+        public Vector3 Force => new(
+            (float)(Model.Force.Length > 0 ? Model.Force[0] : 0.0),
+            (float)(Model.Force.Length > 1 ? Model.Force[1] : 0.0),
+            (float)(Model.Force.Length > 2 ? Model.Force[2] : 0.0));
+
+        public bool HasForce => Model.ForceMagnitude > 0;
+
 
         // ---------------------- Commands ----------------------
         public ICommand? EditCommand { get; }
