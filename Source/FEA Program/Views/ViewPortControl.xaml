@@ -40,18 +40,6 @@
                 <h:AxisPlaneGridModel3D GridColor="White"/>
                 <h:TransformManipulator3D/>
                 <h:ViewBoxModel3D/>
-
-                <h:ItemsModel3D x:Name="itemsModel1" ItemsSource="{Binding ItemsSource}">
-                    <h:ItemsModel3D.ItemTemplate>
-                        <DataTemplate>
-                            <h:MeshGeometryModel3D Geometry="{Binding Geometry}"
-                                                Material="{Binding Material}"
-                                                Transform="{Binding Transform}" />
-                        </DataTemplate>
-                    </h:ItemsModel3D.ItemTemplate>
-                </h:ItemsModel3D>
-
-                <h:GroupModel3D x:Name="SceneRoot" ItemsSource="{Binding SceneObjects}" />
             </h:GroupModel3D>
         </h:Viewport3DX>
     </Grid>

@@ -1,12 +1,8 @@
 using FEA_Program.ViewModels.Base;
 using HelixToolkit.Wpf.SharpDX;
 using SharpDX;
-using System.Windows.Media;
-using Transform3D = System.Windows.Media.Media3D.Transform3D;
-using Color = System.Windows.Media.Color;
 using Media3D = System.Windows.Media.Media3D;
 using Vector3D = System.Windows.Media.Media3D.Vector3D;
-using System.Collections.ObjectModel;
 using System.IO;
 
 namespace FEA_Program.ViewModels
@@ -63,66 +59,5 @@ namespace FEA_Program.ViewModels
             NearPlaneDistance = 0.5,
             FarPlaneDistance = 150
         };
-
-        // ----------------------- Testing Code -----------------------------
-
-        public ObservableCollection<MeshDataModel> ItemsSource { private set; get; } = [];
-        public ObservableCollection<Element3D> SceneObjects { get; } = [];
-
-        private void AddItemsModel()
-        {
-            var blue = new PhongMaterial { DiffuseColor = new Color4(0, 0, 1, 1) };
-
-            // Create a sphere
-            var meshBuilder = new MeshBuilder(true);
-            meshBuilder.AddSphere(new Vector3(2, 0, 0), 0.5);
-            var sphere = meshBuilder.ToMeshGeometry3D();
-
-            var model = new MeshDataModel
-            {
-                Geometry = sphere,
-                Material = PhongMaterials.Green,
-                Transform = new Media3D.TranslateTransform3D(0, -ItemsSource.Count * 2, 0)
-            };
-
-            ItemsSource.Add(model);
-        }
-        private void AddGroupItems()
-        {
-            // Materials
-            var red = new PhongMaterial { DiffuseColor = new Color4(1, 0, 0, 1) };
-            var blue = new PhongMaterial { DiffuseColor = new Color4(0, 0, 1, 1) };
-
-            var meshBuilder = new MeshBuilder(true);
-            meshBuilder.AddBox(new Vector3(0, 0, 0), 1, 1, 1);
-
-            // Create a box
-            var box = new MeshGeometryModel3D
-            {
-                Geometry = meshBuilder.ToMeshGeometry3D(),
-                Material = red
-            };
-
-            meshBuilder = new MeshBuilder(true);
-            meshBuilder.AddSphere(new Vector3(2, 0, 0), 0.5);
-
-            // Create a sphere
-            var sphere = new MeshGeometryModel3D
-            {
-                Geometry = meshBuilder.ToMeshGeometry3D(),
-                Material = blue
-            };
-
-            // Add to the collection — the GroupModel3D in XAML will render them as a group
-            SceneObjects.Add(box);
-            SceneObjects.Add(sphere);
-        }
-       
-        public class MeshDataModel
-        {
-            public required Geometry3D Geometry { set; get; }
-            public required Material Material { set; get; }
-            public required Transform3D Transform { set; get; }
-        }
     }
 }
