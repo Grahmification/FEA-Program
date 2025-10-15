@@ -14,17 +14,23 @@
         <vm:ViewPortVM/>
     </UserControl.DataContext>
 
+    <UserControl.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
 
     <Grid>
         <h:Viewport3DX EffectsManager="{Binding EffectsManager}"
-                        Camera="{Binding Camera}"
-                        IsViewCubeEdgeClicksEnabled="True">
+                       Camera="{Binding Camera}"
+                       IsViewCubeEdgeClicksEnabled="True"
+                       ShowViewCube="{Binding Is3Dimensional}"
+                       AllowLeftRightRotation="{Binding Is3Dimensional}"
+                       AllowUpDownRotation="{Binding Is3Dimensional}">
             <h:AmbientLight3D Color="DimGray"  />
             <h:DirectionalLight3D Direction="{Binding Camera.LookDirection}" Color="White" />
             <h:ScreenQuadModel3D Texture="{Binding BackgroundTexture}" />
 
-            <local:GridVisual3D Color="Gray"/>
-            <h:CoordinateSystemModel3D CoordinateSystemLabelZ=""/>
+            <local:GridVisual3D Color="Gray" Visibility="{Binding Is3Dimensional, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <h:CoordinateSystemModel3D CoordinateSystemLabelZ="{Binding CoordZText}"/>
 
             <!-- ✨ Allow external views to inject multiple extra 3D elements -->
             <h:GroupModel3D ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DrawItems}" />

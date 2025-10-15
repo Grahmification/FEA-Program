@@ -13,9 +13,21 @@ namespace FEA_Program.ViewModels
 {
     internal class ViewPortVM: ObservableObject
     {
+        private bool _is3Dimensional = true;
+        
         public EffectsManager? EffectsManager { get; }
-        public Camera Camera { get; }
+        public Camera Camera { get; private set; }
         public Stream? BackgroundTexture { get; }
+
+        public bool Is3Dimensional 
+        { get => _is3Dimensional;
+            set 
+            {
+                _is3Dimensional = value;
+                Camera = value ? DefaultPerspectiveCamera() : DefaultOrthographicCamera();
+            }
+        }
+        public string CoordZText => Is3Dimensional ? "Z" : "";
 
         // ----------------------- Public Methods -----------------------------
         public ViewPortVM()
@@ -45,8 +57,8 @@ namespace FEA_Program.ViewModels
         };
         public static PerspectiveCamera DefaultPerspectiveCamera() => new()
         {
-            Position = new Media3D.Point3D(0, 0, 5),
-            LookDirection = new Vector3D(0, 0, -5),
+            Position = new Media3D.Point3D(0, 5, 18),
+            LookDirection = new Vector3D(0, -5, -18),
             UpDirection = new Vector3D(0, 1, 0),
             NearPlaneDistance = 0.5,
             FarPlaneDistance = 150
