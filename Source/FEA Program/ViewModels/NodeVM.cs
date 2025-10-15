@@ -25,6 +25,11 @@ namespace FEA_Program.ViewModels
             (float)(Coordinates_mm.Length > 1 ? Coordinates_mm[1] : 0.0),
             (float)(Coordinates_mm.Length > 2 ? Coordinates_mm[2] : 0.0));
 
+        public bool FixedX => Model.Fixity[0] == 1;
+        public bool FixedY => Model.Fixity.Length > 1 && Model.Fixity[1] == 1;
+        public bool FixedZ => Model.Fixity.Length > 2 && Model.Fixity[2] == 1;
+
+
         // ---------------------- Commands ----------------------
         public ICommand? EditCommand { get; }
         public ICommand? DeleteCommand { get; }
