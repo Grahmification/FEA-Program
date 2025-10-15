@@ -1,22 +1,19 @@
 ﻿using HelixToolkit.Wpf.SharpDX;
 using SharpDX;
 using System.Windows;
+using TranslateTransform3D = System.Windows.Media.Media3D.TranslateTransform3D;
 
 namespace FEA_Program.Views
 {
-    internal class NodeVisual3Dx : GroupModel3D
+    internal class NodeVisual3D : GroupModel3D
     {
         public static readonly DependencyProperty ColorProperty = DependencyProperty.Register(
-            nameof(Color),
-            typeof(Color4),
-            typeof(NodeVisual3Dx),
-            new PropertyMetadata(new Color4(1, 1, 1, 1), OnColorChanged));
+            nameof(Color), typeof(Color4), typeof(NodeVisual3D),
+            new PropertyMetadata(new Color4(0, 1, 0, 1), OnColorChanged));
 
         public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
-                nameof(Position),
-                typeof(Vector3),
-                typeof(NodeVisual3Dx),
-                new PropertyMetadata(new Vector3(), OnGeometryChanged));
+                nameof(Position), typeof(Vector3), typeof(NodeVisual3D),
+                new PropertyMetadata(new Vector3(), OnPositionChanged));
 
         public Color4 Color
         {
@@ -32,7 +29,7 @@ namespace FEA_Program.Views
 
         public double Size { get; set; } = 1;
 
-        public NodeVisual3Dx()
+        public NodeVisual3D()
         {
             var meshBuilder = new MeshBuilder(true);
             meshBuilder.AddBox(new Vector3(0, 0, 0), Size, Size, Size);
@@ -41,7 +38,12 @@ namespace FEA_Program.Views
             var box = new MeshGeometryModel3D
             {
                 Geometry = meshBuilder.ToMeshGeometry3D(),
-                Material = PhongMaterials.PolishedGold
+                Material = new PhongMaterial
+                {
+                    DiffuseColor = Color,
+                    AmbientColor = new Color4(0.3f),
+                    SpecularColor = new Color4(0.5f),
+                }
             };
 
             Children.Add(box);
@@ -49,13 +51,13 @@ namespace FEA_Program.Views
 
         private static void OnColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is NodeVisual3Dx group)
+            if (d is NodeVisual3D group)
                 group.UpdateChildrenColor();
         }
-        private static void OnGeometryChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnPositionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is NodeVisual3Dx group)
-                group.UpdateGeometry();
+            if (d is NodeVisual3D group)
+                group.UpdateTransform();
         }
 
         private void UpdateChildrenColor()
@@ -67,9 +69,9 @@ namespace FEA_Program.Views
             foreach (var mesh in Children.OfType<MeshGeometryModel3D>())
                 mesh.Material = mat;
         }
-        private void UpdateGeometry()
+        private void UpdateTransform()
         {
-            Transform = new System.Windows.Media.Media3D.TranslateTransform3D(Position.X, Position.Y, Position.Z);
+            Transform = new TranslateTransform3D(Position.X, Position.Y, Position.Z);
         }
     }
 }
