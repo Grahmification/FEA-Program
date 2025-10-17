@@ -99,7 +99,16 @@ namespace FEA_Program.Models
         public double[] ReactionForce { get; private set; } // reaction force in [N], reaction moments in [Nm]
         public double[] FinalPos => _Coordinates.Zip(Displacement, (coord, disp) => coord + disp).ToArray();
 
+        public Node(int id, int dimension) : base(id)
+        {
+            Dimension = dimension;
 
+            _Coordinates = new double[dimension];
+            _Fixity = new int[dimension];
+            _Force = new double[dimension];
+            Displacement = new double[dimension];
+            ReactionForce = new double[dimension];
+        }
         public Node(double[] coords, int[] fixity, int id, int dimension) : base(id)
         {
             Dimension = dimension;
@@ -192,6 +201,6 @@ namespace FEA_Program.Models
         /// Gets an empty node for reference use
         /// </summary>
         /// <returns></returns>
-        public static Node DummyNode(int dimension = 1) => new(new double[dimension], new int[dimension], Constants.InvalidID, dimension);
+        public static Node DummyNode(int dimension = 1) => new(Constants.InvalidID, dimension);
     }
 }

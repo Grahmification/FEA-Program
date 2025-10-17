@@ -95,9 +95,7 @@ namespace FEA_Program.ViewModels
         private void AddNodeWithEditor()
         {
             int ID = IDClass.CreateUniqueId(Items.Select(m => m.Model).Cast<IHasID>().ToList());
-            double[] coords = new double[_problemDOFs];
-            int[] fixity = new int[_problemDOFs];
-            var node = new Node(coords, fixity, ID, _problemDOFs);
+            var node = new Node(ID, _problemDOFs);
 
             var vm = new NodeVM(node);
             Editor.DisplayEditor(vm, false);
