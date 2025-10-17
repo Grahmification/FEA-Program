@@ -115,6 +115,45 @@
                     </DataTemplate>
                 </TreeViewItem.Resources>
             </TreeViewItem>
+
+            <!-- Forces Sub Tree -->
+            <TreeViewItem x:Name="ForcesTree" IsExpanded="True" ItemsSource="{Binding Nodes.NonZeroForceItems}">
+                <TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Forces" />
+                    </StackPanel>
+                </TreeViewItem.Header>
+
+                <TreeViewItem.Resources>
+                    <DataTemplate DataType="{x:Type vm:NodeVM}">
+                        <TreeViewItem>
+                            <TreeViewItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Model.ID, StringFormat={}Force (Node {0}), Mode=OneWay}" />
+
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu Focusable="False">
+                                            <MenuItem Header="Edit" Command="{Binding EditForceCommand}" Focusable="False"/>
+                                            <MenuItem Header="Delete" Command="{Binding DeleteForceCommand}" Focusable="False"/>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+                                </StackPanel>
+                            </TreeViewItem.Header>
+                            <StackPanel>
+                                <TextBlock>
+                                <Run Text="Magnitude [N]: " FontWeight="Bold"/>
+                                <Run Text="{Binding Model.ForceMagnitude, StringFormat=N2, Mode=OneWay}"/>
+                                </TextBlock>
+                                <TextBlock>
+                                <Run Text="Components [N]: " FontWeight="Bold"/>
+                                <Run Text="{Binding Model.Force, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </TreeViewItem>
+                    </DataTemplate>
+                </TreeViewItem.Resources>
+            </TreeViewItem>
+
         </TreeView>
     </Grid>
 </UserControl>

@@ -1,12 +1,16 @@
 ﻿using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
     internal class NodesVM: ObservableObject
     {
+        private readonly CollectionViewSource _nonZeroForceCollection;
+
         /// <summary>
         /// Number of DOFs used for creating new nodes
         /// </summary>
@@ -16,6 +20,7 @@ namespace FEA_Program.ViewModels
         //private readonly Dictionary<int, MaterialVM> _Materials = []; // reference by ID
  
         public ObservableCollection<NodeVM> Items { get; private set; } = [];
+        public ICollectionView NonZeroForceItems { get; }
 
         // ---------------------- Sub VMs ----------------------
         public BaseVM Base { get; private set; } = new();
@@ -31,6 +36,18 @@ namespace FEA_Program.ViewModels
             _problemDOFs = problemDOFs;
             AddCommand = new RelayCommand(AddNodeWithEditor);
             Editor.AcceptEdits += OnAcceptEdits;
+
+            // Filter items without a force
+            _nonZeroForceCollection = new CollectionViewSource { Source = Items };
+            _nonZeroForceCollection.Filter += (_, e) =>
+            {
+                if (e.Item is NodeVM node)
+                    e.Accepted = node.Model.ForceMagnitude != 0;
+                else
+                    e.Accepted = false;
+            };
+
+            NonZeroForceItems = _nonZeroForceCollection.View;
         }
 
         /// <summary>
@@ -85,7 +102,15 @@ namespace FEA_Program.ViewModels
             Items.Add(vm);
             vm.DeleteRequest += OnDeleteRequest;
             vm.EditRequest += OnEditRequest;
+
+            // Update force list when a force value changes
+            vm.Model.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(NodeVM.Force))
+                    _nonZeroForceCollection.View.Refresh();
+            };
         }
+
         private void DeleteVM(NodeVM vm)
         {
             Items.Remove(vm);

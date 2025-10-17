@@ -12,6 +12,7 @@ namespace FEA_Program.ViewModels
 
         public event EventHandler? EditRequest;
         public event EventHandler? DeleteRequest;
+        public event EventHandler? EditForceRequest;
 
         // ---------------------- Properties ----------------------
         public Node Model { get; private set; } = Node.DummyNode();
@@ -41,6 +42,8 @@ namespace FEA_Program.ViewModels
         // ---------------------- Commands ----------------------
         public ICommand? EditCommand { get; }
         public ICommand? DeleteCommand { get; }
+        public ICommand? EditForceCommand { get; }
+        public ICommand? DeleteForceCommand { get; }
 
         public NodeVM() { }
 
@@ -50,6 +53,8 @@ namespace FEA_Program.ViewModels
             Model.PropertyChanged += OnModelPropertyChanged;
             EditCommand = new RelayCommand(() => EditRequest?.Invoke(this, EventArgs.Empty));
             DeleteCommand = new RelayCommand(() => DeleteRequest?.Invoke(this, EventArgs.Empty));
+            EditForceCommand = new RelayCommand(() => EditForceRequest?.Invoke(this, EventArgs.Empty));
+            DeleteForceCommand = new RelayCommand(DeleteForce);
         }
 
         private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -74,6 +79,13 @@ namespace FEA_Program.ViewModels
                 }
 
             }
+        }
+
+        // ---------------------- Private Helpers ----------------------
+        private void DeleteForce()
+        {
+            // Set all force components to zero
+            Model.Force = new double[Model.Dimension];
         }
     }
 }
