@@ -67,7 +67,7 @@
                 <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
 
                 <Menu VerticalAlignment="Center">
-                    <MenuItem Header="Add Node" Height="20"/>
+                    <MenuItem Header="Add Node" Height="20" Command="{Binding Project.Nodes.AddCommand}"/>
                 </Menu>
                 <Menu VerticalAlignment="Center">
                     <MenuItem Header="Add Material" Height="20" Command="{Binding Project.Materials.AddCommand}"/>
@@ -134,6 +134,12 @@
                                            Visibility="{Binding DataContext.Project.Materials.Editor.Material,
                                                 RelativeSource={RelativeSource AncestorType=Window},
                                                 Converter={StaticResource NullToVisibilityConverter}}"/>
+
+                    <!-- Edit node view -->
+                    <v:EditNodeControl DataContext="{Binding Project.Nodes.Editor}" 
+                                       Visibility="{Binding DataContext.Project.Nodes.Editor.EditItem,
+                                                  RelativeSource={RelativeSource AncestorType=Window},
+                                                  Converter={StaticResource NullToVisibilityConverter}}"/>
                 </Grid>
 
                 

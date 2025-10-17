@@ -35,6 +35,8 @@ namespace FEA_Program.ViewModels
         // ---------------------- Public Methods ----------------------
         public ProjectVM()
         {
+            Nodes = new NodesVM(Problem.AvailableNodeDOFs);
+            
             LoadFileCommand = new AsyncRelayCommand(LoadFile);
             SaveFileCommand = new AsyncRelayCommand(SaveFile);
 
@@ -100,6 +102,7 @@ namespace FEA_Program.ViewModels
         private void ResetProblem(ProblemTypes problemType)
         {
             Problem = new StressProblem(problemType);
+            Nodes = new NodesVM(Problem.AvailableNodeDOFs);
         }
         private void LoadData(ProblemData data)
         {

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using MathNet.Numerics.LinearAlgebra.Double;
 
 
@@ -7,7 +7,7 @@ namespace FEA_Program.Models
     /// <summary>
     /// A node in an FEA problem with arbitrary degrees of freedom
     /// </summary>
-    internal class Node : IDClass, INode
+    internal class Node : IDClass, INode, ICloneable
     {
         /// <summary>
         /// Provides a list of available dimsensions for error checking
@@ -126,6 +126,48 @@ namespace FEA_Program.Models
             Displacement = displacement;
             ReactionForce = reactionForce;
             SolutionValid = true;
+        }
+
+        /// <summary>
+        /// Clone the class
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            var output = new Node((double[])Coordinates.Clone(), (int[])Fixity.Clone(), ID, Dimension)
+            {
+                Force = (double[])Force.Clone(),
+            };
+
+            output.Solve((double[])Displacement.Clone(), (double[])ReactionForce.Clone());
+
+            if(!SolutionValid)
+            {
+                // This will invalidate the solution
+                output.Coordinates = (double[])Coordinates.Clone();
+            }
+
+            return output;
+        }
+
+        /// <summary>
+        /// Import parameters from another node, while retaining ID.
+        /// </summary>
+        /// <param name="other"></param>
+        public void ImportParameters(Node other)
+        {
+            // Set these underlying so SolutionInvalidate event doesn't get called
+            _Coordinates = (double[])other.Coordinates.Clone();
+            _Fixity = (int[])other.Fixity.Clone();
+            _Force = (double[])other.Force.Clone();
+            OnPropertyChanged(nameof(Coordinates));
+            OnPropertyChanged(nameof(Fixity));
+            OnPropertyChanged(nameof(Force));
+
+            Dimension = other.Dimension;
+            SolutionValid = other.SolutionValid;
+            Displacement = (double[])other.Displacement.Clone();
+            ReactionForce = (double[])other.ReactionForce.Clone();
         }
 
 

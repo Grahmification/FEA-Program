@@ -1,0 +1,123 @@
+﻿<UserControl x:Class="FEA_Program.Views.EditNodeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:FEA_Program.ViewModels"
+             xmlns:conv="clr-namespace:FEA_Program.Converters"
+             xmlns:mod="clr-namespace:FEA_Program.Models"
+             xmlns:local="clr-namespace:FEA_Program.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="275">
+
+    <UserControl.DataContext>
+        <vm:NodeEditVM/>
+    </UserControl.DataContext>
+
+    <Border Background="#F4F4F4" Padding="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Header row -->
+                <RowDefinition Height="Auto"/>
+                <!-- Column Header row -->
+                <RowDefinition Height="Auto"/>
+                <!-- Value Rows -->
+                <RowDefinition Height="Auto"/>
+                <!-- Remaining fields -->
+                <RowDefinition Height="*"/>
+                <!-- Spacer -->
+            </Grid.RowDefinitions>
+
+            <!-- ===== Header: Title + Buttons ===== -->
+            <DockPanel Grid.Row="0" Margin="0 0 0 20">
+                <TextBlock Text="Add Node"
+                       FontWeight="Bold"
+                       FontSize="20"
+                       VerticalAlignment="Center"
+                       DockPanel.Dock="Left">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Text" Value="Add Node"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Editing}" Value="True">
+                                    <Setter Property="Text" Value="Edit Node"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        DockPanel.Dock="Right"
+                        Margin="10 0 0 0">
+                    <Button Content="Y" Width="30" Height="30" Margin="0 0 5 0" Command="{Binding AcceptCommand}"/>
+                    <Button Content="N" Width="30" Height="30" Command="{Binding CancelCommand}"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- ===== Row 1: Column Headers ===== -->
+            <Grid Grid.Row="1" Margin="0 0 0 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="" Width="20"/>
+                <Label Grid.Column="1" Content="Position (mm)" HorizontalAlignment="Center"/>
+                <Label Grid.Column="2" Content="Fix" Width="40" HorizontalAlignment="Center"/>
+
+            </Grid>
+
+            <!-- ===== Row 2: Value Fields ===== -->
+            <ItemsControl Grid.Row="2" ItemsSource="{Binding EditItem.Coordinates}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0 5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                        Text="{Binding Label}"
+                                        Width="20"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,8,0"/>
+                            <TextBox Grid.Column="1" 
+                                        Text="{Binding Value}"
+                                        Height="20"
+                                        VerticalContentAlignment="Center"
+                                        Margin="0 0 5 0"/>
+                            <CheckBox Grid.Column="2"
+                                        Width="40"
+                                        IsChecked="{Binding Fixed}" 
+                                        Margin="5 0 -5 0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Content=""/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- ===== Row 3: Value Fields ===== -->
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content=""/>
+                <StackPanel Grid.Column="1">
+                    <Button Width="50" Content="Fix All" Command="{Binding FixAllCommand}" Margin="3"/>
+                    <Button Width="50" Content="Unfix All" Command="{Binding UnfixAllCommand}" Margin="3"/>
+                </StackPanel>
+            </Grid>
+
+        </Grid>
+    </Border>
+</UserControl>
