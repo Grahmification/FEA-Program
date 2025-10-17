@@ -1,7 +1,6 @@
 ﻿using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
 using SharpDX;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 
@@ -16,8 +15,6 @@ namespace FEA_Program.ViewModels
 
         // ---------------------- Properties ----------------------
         public Node Model { get; private set; } = Node.DummyNode();
-
-        public ObservableCollection<CoordinateVM> Coordinates { get; } = [];
 
         /// <summary>
         /// Get the node coordinates in user units
@@ -53,27 +50,6 @@ namespace FEA_Program.ViewModels
             Model.PropertyChanged += OnModelPropertyChanged;
             EditCommand = new RelayCommand(() => EditRequest?.Invoke(this, EventArgs.Empty));
             DeleteCommand = new RelayCommand(() => DeleteRequest?.Invoke(this, EventArgs.Empty));
-
-            for(int i = 0; i < model.Coordinates.Length; i++)
-            {
-                var coordVM = new CoordinateVM(i, model.Coordinates[i], model.Fixity[i] == 1);
-                coordVM.ValueChanged += OnCoordinateValueChanged;
-                Coordinates.Add(coordVM);
-            }
-        }
-
-        /// <summary>
-        /// Fires when one of the coordinates is updated
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnCoordinateValueChanged(object? sender, int e)
-        {
-            if (sender is CoordinateVM vm)
-            {
-                Model.Coordinates[e] = vm.Value;
-                Model.Fixity[e] = vm.Fixed ? 1 : 0;
-            }
         }
 
         private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -84,7 +60,6 @@ namespace FEA_Program.ViewModels
                 {
                     OnPropertyChanged(nameof(Coordinates_mm));
                     OnPropertyChanged(nameof(DrawPosition));
-                    SyncCoordinateVMs();
                 }
                 else if(e.PropertyName == nameof(Node.Force))
                 {
@@ -96,18 +71,8 @@ namespace FEA_Program.ViewModels
                     OnPropertyChanged(nameof(FixedX));
                     OnPropertyChanged(nameof(FixedY));
                     OnPropertyChanged(nameof(FixedZ));
-                    SyncCoordinateVMs();
                 }
 
-            }
-        }
-
-        private void SyncCoordinateVMs()
-        {
-            for (int i = 0; i < Model.Dimension; i++)
-            {
-                Coordinates[i].Value = Model.Coordinates[i];
-                Coordinates[i].Fixed = Model.Fixity[i] == 1;
             }
         }
     }

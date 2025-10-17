@@ -1,5 +1,6 @@
 ﻿using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
@@ -19,6 +20,12 @@ namespace FEA_Program.ViewModels
         /// Node being edited
         /// </summary>
         public NodeVM? EditItem { get; private set; } = null;
+
+        /// <summary>
+        /// Coordinates of the node being edited
+        /// </summary>
+        public ObservableCollection<CoordinateVM> EditCoordinates { get; } = [];
+
 
         /// <summary>
         /// True if editing an existing item
@@ -47,14 +54,41 @@ namespace FEA_Program.ViewModels
             _inputItem = item;
 
             // Make this so we're editing a copy. The original is preserved in case we cancel
-            EditItem = null;
             EditItem = new NodeVM((Node)item.Model.Clone());
             Editing = editing;
+
+            EditCoordinates.Clear();
+
+            for (int i = 0; i < EditItem.Model.Dimension; i++)
+            {
+                var userCoord = EditItem.Model.Coordinates[i] * 1000;  // Convert to mm
+                var coordVM = new CoordinateVM(i, userCoord, EditItem.Model.Fixity[i] == 1);
+                coordVM.ValueChanged += OnCoordinateValueChanged;
+                EditCoordinates.Add(coordVM);
+            }
         }
         public void HideEditor()
         {
             EditItem = null; // This hides the editor
+            EditCoordinates.Clear();
         }
+
+        // ---------------------- Event Handers ----------------------
+
+        /// <summary>
+        /// Fires when one of the coordinates is updated
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnCoordinateValueChanged(object? sender, int e)
+        {
+            if (sender is CoordinateVM vm && EditItem is not null)
+            {
+                EditItem.Model.Coordinates[e] = vm.Value / 1000.0;  // Convert from mm
+                EditItem.Model.Fixity[e] = vm.Fixed ? 1 : 0;
+            }
+        }
+
 
         // ---------------------- Private Helpers ----------------------
         private void AcceptEdit()
@@ -78,7 +112,7 @@ namespace FEA_Program.ViewModels
         }
         private void SetFixity(bool fix)
         {
-            foreach(var vm in EditItem?.Coordinates ?? [])
+            foreach(var vm in EditCoordinates)
             {
                 vm.Fixed = fix;
             }

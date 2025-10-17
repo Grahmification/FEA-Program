@@ -71,7 +71,7 @@
             </Grid>
 
             <!-- ===== Row 2: Value Fields ===== -->
-            <ItemsControl Grid.Row="2" ItemsSource="{Binding EditItem.Coordinates}">
+            <ItemsControl Grid.Row="2" ItemsSource="{Binding EditCoordinates}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="0 5">
