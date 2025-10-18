@@ -1,7 +1,8 @@
-﻿using FEA_Program.Models;
+using FEA_Program.Models;
 using FEA_Program.SaveData;
 using FEA_Program.UI;
 using FEA_Program.ViewModels.Base;
+using MathNet.Numerics.LinearAlgebra.Double;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Input;
@@ -17,8 +18,7 @@ namespace FEA_Program.ViewModels
         public BaseVM Base { get; private set; } = new();
         public MaterialsVM Materials { get; private set; } = new();
         public NodesVM Nodes { get; private set; } = new();
-
-
+        public ElementsVM Elements { get; private set; } = new();
 
         // ---------------------- Commands ----------------------
         /// <summary>
@@ -35,12 +35,11 @@ namespace FEA_Program.ViewModels
         // ---------------------- Public Methods ----------------------
         public ProjectVM()
         {
-            Nodes = new NodesVM(Problem.AvailableNodeDOFs);
-            
             LoadFileCommand = new AsyncRelayCommand(LoadFile);
             SaveFileCommand = new AsyncRelayCommand(SaveFile);
 
             Materials.AddDefaultMaterials();
+            ResetProblem(ProblemTypes.Truss_3D);
         }
         public async Task LoadFile()
         {
@@ -103,16 +102,17 @@ namespace FEA_Program.ViewModels
         {
             Problem = new StressProblem(problemType);
             Nodes = new NodesVM(Problem.AvailableNodeDOFs);
+            Elements.LinkCollections(Nodes.Items, Materials.Items);
         }
         private void LoadData(ProblemData data)
         {
             ResetProblem(data.ProblemType);
 
             // ----------- Import Materials ---------------
-            List<Material> materials = [];
+            Dictionary<int, Material> materials = [];
             foreach (var item in data.Materials)
             {
-                materials.Add(new Material(item.Name, item.E, item.ID, item.Subtype)
+                materials.Add(item.ID, new Material(item.Name, item.E, item.ID, item.Subtype)
                 {
                     V = item.V,
                     Sy = item.Sy,
@@ -120,7 +120,7 @@ namespace FEA_Program.ViewModels
                 });
             }
 
-            Materials.ImportMaterials(materials);
+            Materials.ImportMaterials([.. materials.Values]);
 
             // ----------- Import Nodes ---------------
             Dictionary<int, Node> nodes = [];
@@ -137,6 +137,38 @@ namespace FEA_Program.ViewModels
                 Problem.AddNode(node);
 
             Nodes.ImportNodes([.. nodes.Values]);
+
+            // ----------- Import Elements ---------------
+            List<IElement> elements = [];
+
+            foreach (var item in data.Elements)
+            {
+                // Get nodes and material corresponding to element
+                var elementMaterial = materials[item.MaterialID];
+                List<INode> elementNodes = item.NodeIDs.Select(nodeId => nodes[nodeId]).Cast<INode>().ToList();
+
+                IElement? element = null;
+
+                switch (item.ElementType)
+                {
+                    case ElementTypes.BarLinear:
+                        element = new ElementBarLinear(1, item.ID, elementNodes, elementMaterial, item.NodeDOFs)
+                        {
+                            ElementArgs = item.ElementArgs
+                        };
+                        element.SetBodyForce(new DenseVector(item.BodyForce));
+                        element.SetTractionForce(new DenseVector(item.TractionForce));
+                        break;
+                }
+
+                if (element is not null)
+                    elements.Add(element);
+            }
+
+            foreach (var element in elements)
+                Problem.AddElement(element);
+
+            Elements.ImportElements(elements);
         }
         private ProblemData GetSaveData()
         {
