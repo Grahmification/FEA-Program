@@ -79,7 +79,7 @@ namespace FEA_Program.ViewModels
             // Case for ElementBarLinear
             ElementTypes.BarLinear => new()
             {
-                new ElementArgVM(0, "Area", Units.DataUnitType.Area)
+                new ElementArgVM(0, "Area", Units.DataUnitType.Area, validatorMethod: (x) => x > 0)
             },
             // Default case: return an empty list
             _ => []

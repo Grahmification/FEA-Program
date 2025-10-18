@@ -89,9 +89,9 @@ namespace FEA_Program.ViewModels
 
 
         // Validation properties
-        public bool CanCreateElement => NodeSelectionValid & SelectedMaterial != null;
+        public bool CanCreateElement => NodeSelectionValid & SelectedMaterial != null & ArgumentsValid;
         public bool NodeSelectionValid { get; private set; } = false;
-
+        public bool ArgumentsValid => ElementArguments.Count == 0 || ElementArguments.All(arg => arg.ValueValid);
 
         // ---------------------- Sub VMs ----------------------
         public BaseVM Base { get; private set; } = new();

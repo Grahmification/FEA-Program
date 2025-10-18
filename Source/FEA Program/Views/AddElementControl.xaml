@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="FEA_Program.Views.AddElementControl"
+<UserControl x:Class="FEA_Program.Views.AddElementControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -120,8 +120,22 @@
                                 </TextBlock>
 
                                 <TextBox Margin="10, 0, 0, 0" VerticalContentAlignment="Center" Height="20"
-                                    Text="{Binding Value}"/>
+                                    Text="{Binding Value, UpdateSourceTrigger=Explicit}" KeyDown="TextBox_KeyDown">
+                                    <TextBox.Style>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="BorderBrush" Value="Gray"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
 
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ValueValid}" Value="False">
+                                                    <Setter Property="BorderBrush" Value="Red"/>
+                                                    <Setter Property="BorderThickness" Value="1"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                                
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
