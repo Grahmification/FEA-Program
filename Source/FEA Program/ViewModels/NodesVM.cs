@@ -25,15 +25,17 @@ namespace FEA_Program.ViewModels
         // ---------------------- Sub VMs ----------------------
         public BaseVM Base { get; private set; } = new();
         public NodeEditVM Editor { get; private set; } = new();
+        public ForceEditVM ForceEditor { get; private set; } = new();
 
         // ---------------------- Commands ----------------------
-
         public ICommand? AddCommand { get; }
+        public ICommand? AddForceCommand { get; }
 
         // ---------------------- Public Methods ----------------------
         public NodesVM(int problemDOFs = -1)
         {
             _problemDOFs = problemDOFs;
+            AddForceCommand = new RelayCommand(() => ForceEditor.DisplayEditorAdd([.. Items], _problemDOFs));
             AddCommand = new RelayCommand(AddNodeWithEditor);
             Editor.AcceptEdits += OnAcceptEdits;
 
@@ -64,6 +66,13 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Event Methods ----------------------
+        private void OnEditForceRequest(object? sender, EventArgs e)
+        {
+            if (sender is NodeVM vm)
+            {
+                ForceEditor.DisplayEditor(vm);
+            }
+        }
         private void OnEditRequest(object? sender, EventArgs e)
         {
             if (sender is NodeVM vm)
@@ -75,10 +84,7 @@ namespace FEA_Program.ViewModels
         {
             if(sender is NodeVM vm)
             {
-                Items.Remove(vm);
-
-                vm.DeleteRequest -= OnDeleteRequest;
-                vm.EditRequest -= OnEditRequest;
+                DeleteVM(vm);
             }
         }
 
@@ -102,6 +108,7 @@ namespace FEA_Program.ViewModels
             Items.Add(vm);
             vm.DeleteRequest += OnDeleteRequest;
             vm.EditRequest += OnEditRequest;
+            vm.EditForceRequest += OnEditForceRequest;
 
             // Update force list when a force value changes
             vm.Model.PropertyChanged += (_, e) =>
@@ -110,12 +117,12 @@ namespace FEA_Program.ViewModels
                     _nonZeroForceCollection.View.Refresh();
             };
         }
-
         private void DeleteVM(NodeVM vm)
         {
             Items.Remove(vm);
             vm.DeleteRequest -= OnDeleteRequest;
             vm.EditRequest -= OnEditRequest;
+            vm.EditForceRequest -= OnEditForceRequest;
         }
         private void AddNodeWithEditor()
         {

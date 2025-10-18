@@ -76,7 +76,7 @@
                     <MenuItem Header="Add Element" Height="20"/>
                 </Menu>
                 <Menu VerticalAlignment="Center">
-                    <MenuItem Header="Add Force" Height="20"/>
+                    <MenuItem Header="Add Force" Height="20" Command="{Binding Project.Nodes.AddForceCommand}"/>
                 </Menu>
 
                 <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
@@ -138,6 +138,12 @@
                     <!-- Edit node view -->
                     <v:EditNodeControl DataContext="{Binding Project.Nodes.Editor}" 
                                        Visibility="{Binding DataContext.Project.Nodes.Editor.EditItem,
+                                                  RelativeSource={RelativeSource AncestorType=Window},
+                                                  Converter={StaticResource NullToVisibilityConverter}}"/>
+
+                    <!-- Edit force view -->
+                    <v:EditForceControl DataContext="{Binding Project.Nodes.ForceEditor}" 
+                                       Visibility="{Binding DataContext.Project.Nodes.ForceEditor.ShowEditor,
                                                   RelativeSource={RelativeSource AncestorType=Window},
                                                   Converter={StaticResource NullToVisibilityConverter}}"/>
                 </Grid>
