@@ -73,7 +73,7 @@
                     <MenuItem Header="Add Material" Height="20" Command="{Binding Project.Materials.AddCommand}"/>
                 </Menu>
                 <Menu VerticalAlignment="Center">
-                    <MenuItem Header="Add Element" Height="20"/>
+                    <MenuItem Header="Add Element" Height="20" Command="{Binding Project.Elements.AddCommand}"/>
                 </Menu>
                 <Menu VerticalAlignment="Center">
                     <MenuItem Header="Add Force" Height="20" Command="{Binding Project.Nodes.AddForceCommand}"/>
@@ -144,6 +144,12 @@
                     <!-- Edit force view -->
                     <v:EditForceControl DataContext="{Binding Project.Nodes.ForceEditor}" 
                                        Visibility="{Binding DataContext.Project.Nodes.ForceEditor.ShowEditor,
+                                                  RelativeSource={RelativeSource AncestorType=Window},
+                                                  Converter={StaticResource NullToVisibilityConverter}}"/>
+
+                    <!-- Add element view -->
+                    <v:AddElementControl DataContext="{Binding Project.Elements.AddEditor}" 
+                                         Visibility="{Binding DataContext.Project.Elements.AddEditor.ShowEditor,
                                                   RelativeSource={RelativeSource AncestorType=Window},
                                                   Converter={StaticResource NullToVisibilityConverter}}"/>
                 </Grid>

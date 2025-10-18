@@ -38,6 +38,11 @@ namespace FEA_Program.ViewModels
 
         public bool HasForce => Model.ForceMagnitude > 0;
 
+        /// <summary>
+        /// Display the node ID and the coordinates nicely in a text field
+        /// </summary>
+        public string IDCoordsDisplayText => $"{Model.ID} - ({string.Join(", ", Coordinates_mm.Select(c => c.ToString("F1")).ToArray() ?? [])})";
+
 
         // ---------------------- Commands ----------------------
         public ICommand? EditCommand { get; }

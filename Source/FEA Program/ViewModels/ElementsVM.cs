@@ -15,7 +15,8 @@ namespace FEA_Program.ViewModels
 
         // ---------------------- Sub VMs ----------------------
         public BaseVM Base { get; private set; } = new();
-        //public ElementEditVM Editor { get; private set; } = new();
+        
+        public ElementAddVM AddEditor { get; private set; } = new();
 
         // ---------------------- Commands ----------------------
 
@@ -24,8 +25,8 @@ namespace FEA_Program.ViewModels
         // ---------------------- Public Methods ----------------------
         public ElementsVM()
         {
-            //AddCommand = new RelayCommand(AddElementWithEditor);
-            //Editor.AcceptEdits += OnAcceptEdits;
+            AddCommand = new RelayCommand(AddElementWithEditor);
+            AddEditor.AcceptEdits += OnAcceptEdits;
         }
         public void LinkCollections(ObservableCollection<NodeVM> nodes, ObservableCollection<MaterialVM> materials)
         {
@@ -100,6 +101,16 @@ namespace FEA_Program.ViewModels
             }
         }
 
+        private void OnAcceptEdits(object? sender, ElementVM e)
+        {
+            // This is a new material
+            if (sender is ElementAddVM vm)
+            {
+                // Todo - validate the material
+                AddVM(e);
+            }
+        }
+
         // ---------------------- Private Helpers ----------------------
         private void AddVM(ElementVM vm)
         {
@@ -112,6 +123,13 @@ namespace FEA_Program.ViewModels
             Items.Remove(vm);
             vm.DeleteRequest -= OnDeleteRequest;
             vm.EditRequest -= OnEditRequest;
+        }
+
+        private void AddElementWithEditor()
+        {
+            // Allocate an unused ID
+            int ID = IDClass.CreateUniqueId(Items.Select(m => m.Model).Cast<IHasID>().ToList());
+            AddEditor.DisplayEditor(ID, _materials, _nodes);
         }
 
     }

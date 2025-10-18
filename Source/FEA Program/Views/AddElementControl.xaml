@@ -1,0 +1,136 @@
+﻿<UserControl x:Class="FEA_Program.Views.AddElementControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:FEA_Program.ViewModels"
+             xmlns:conv="clr-namespace:FEA_Program.Converters"
+             xmlns:mod="clr-namespace:FEA_Program.Models"
+             xmlns:local="clr-namespace:FEA_Program.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="275">
+
+    <UserControl.DataContext>
+        <vm:ElementAddVM/>
+    </UserControl.DataContext>
+
+    <Border Background="#F4F4F4" Padding="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <!-- Header row -->
+                <RowDefinition Height="Auto"/>
+                <!-- Type row -->
+                <RowDefinition Height="Auto"/>
+                <!-- Material row -->
+                <RowDefinition Height="Auto"/>
+                <!-- Node Selections row -->
+                <RowDefinition Height="Auto"/>
+                <!-- Element Options -->
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- ===== Header: Title + Buttons ===== -->
+            <DockPanel Grid.Row="0" Margin="0 0 0 20">
+                <TextBlock Text="Add Element"
+                       FontWeight="Bold"
+                       FontSize="20"
+                       VerticalAlignment="Center"
+                       DockPanel.Dock="Left">
+                </TextBlock>
+
+                <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        DockPanel.Dock="Right"
+                        Margin="10 0 0 0">
+                    <Button Content="Y" Width="30" Height="30" Margin="0 0 5 0" Command="{Binding AcceptCommand}"/>
+                    <Button Content="N" Width="30" Height="30" Command="{Binding CancelCommand}"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- ===== Row 1: Type ===== -->
+            <StackPanel Grid.Row="1" Margin="0 0 0 10" Orientation="Vertical">
+                <Label Content="Element Type:"/>
+                <ComboBox Margin="10, 0, 0, 0" HorizontalAlignment="Stretch" 
+                          SelectedItem="{Binding SelectedElementType}" 
+                          ItemsSource="{Binding AvailableElementTypes}"/>
+            </StackPanel>
+
+            <!-- ===== Row 2: Material ===== -->
+            <StackPanel Grid.Row="2" Margin="0 0 0 10" Orientation="Vertical">
+                <Label Content="Material:"/>
+                <ComboBox Margin="10, 0, 0, 0" HorizontalAlignment="Stretch" 
+                          SelectedItem="{Binding SelectedMaterial}" 
+                          ItemsSource="{Binding Materials}"
+                          DisplayMemberPath="Model.Name"/>
+            </StackPanel>
+
+            <!-- ===== Row 3: Node Selections ===== -->
+            <StackPanel Grid.Row="3" Margin="0 0 0 10">
+                <Separator Margin="0,15"/>
+                
+                <TextBlock Text="Node Selection" Margin="0,0,0,10"/>
+
+                <ItemsControl ItemsSource="{Binding NodeSelectors}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" Margin="0,5">
+                                <TextBlock Text="{Binding NodeNumber, StringFormat={}Node {0}:}" Margin="5,0,0,5"/>
+
+                                <ComboBox Margin="10, 0, 0, 0" HorizontalAlignment="Stretch" 
+                                    ItemsSource="{Binding AvailableNodes}"
+                                    SelectedItem="{Binding SelectedNode, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                                    DisplayMemberPath="IDCoordsDisplayText">
+                                </ComboBox>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="ERROR: Invalid node selection. All nodes must be unique."
+                   Foreground="Red" 
+                   FontWeight="Bold"
+                   Margin="10,10,10,0" 
+                   TextWrapping="Wrap">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding NodeSelectionValid}" Value="False">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- ===== Row 4: Element Options ===== -->
+            <StackPanel Grid.Row="4" Margin="0 0 0 10">
+                <Separator Margin="0,15"/>
+                
+                <TextBlock Text="Element Options" Margin="0,0,0,10"/>
+
+                <ItemsControl ItemsSource="{Binding ElementArguments}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" Margin="0,5">
+                                <TextBlock Margin="5,0,0,5">
+                                    <Run Text="{Binding Name, Mode=OneWay}"/>
+                                    <Run Text="{Binding UnitName, StringFormat={}[{0}]:, Mode=OneWay}" />
+                                </TextBlock>
+
+                                <TextBox Margin="10, 0, 0, 0" VerticalContentAlignment="Center" Height="20"
+                                    Text="{Binding Value}"/>
+
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+            </StackPanel>
+
+
+
+        </Grid>
+    </Border>
+</UserControl>

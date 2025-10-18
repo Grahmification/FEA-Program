@@ -84,5 +84,19 @@ namespace FEA_Program.ViewModels
             // Default case: return an empty list
             _ => []
         };
+
+        /// <summary>
+        /// Get the number of nodes for a given element type
+        /// </summary>
+        /// <param name="elementType"></param>
+        /// <returns></returns>
+        public static int NumOfNodes(ElementTypes elementType)
+        {
+            return elementType switch
+            {
+                ElementTypes.BarLinear => new ElementBarLinear(1, 0, [Node.DummyNode(), Node.DummyNode()], Models.Material.DummyMaterial()).NumOfNodes,
+                _ => 0,
+            };
+        }
     }
 }

@@ -133,7 +133,7 @@
 
                                     <StackPanel.ContextMenu>
                                         <ContextMenu Focusable="False">
-                                            <MenuItem Header="Edit" Command="{Binding EditCommand}" Focusable="False"/>
+                                            <MenuItem Header="Edit" Command="{Binding EditCommand}" IsEnabled="False" Focusable="False"/>
                                             <MenuItem Header="Delete" Command="{Binding DeleteCommand}" Focusable="False"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>

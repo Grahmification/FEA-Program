@@ -138,6 +138,7 @@ namespace FEA_Program.ViewModels
             Nodes.Items.CollectionChanged += OnNodesCollectionChanged;
 
             Elements.LinkCollections(Nodes.Items, Materials.Items);
+            Elements.AddEditor.AvailableElementTypes = new(Problem.AvailableElements);
         }
         private void LoadData(ProblemData data)
         {
