@@ -159,6 +159,12 @@
         {
             switch (Unit)
             {
+                // ---------------- Unitless ------------------
+                case (int)AllUnits.Unitless:
+                    {
+                        return 1.0;
+                    }
+
                 // ---------------- Length ------------------
                 case (int)AllUnits.m:
                     {
@@ -250,6 +256,12 @@
         {
             switch (Unit)
             {
+                // ---------------- Unitless ------------------
+                case AllUnits.Unitless:
+                    {
+                        return ["-"];
+                    }
+
                 // -------------------- Length -------------------
                 case AllUnits.m:
                     {
@@ -342,6 +354,11 @@
         {
             switch (UnitType)
             {
+                case DataUnitType.Unitless:
+                    {
+                        return AllUnits.Unitless;
+                    }
+
                 case DataUnitType.Length:
                     {
                         return AllUnits.m;
@@ -392,6 +409,11 @@
                         return new[] { 12, 17 };
                     }
 
+                case DataUnitType.Unitless:
+                    {
+                        return [18, 18];
+                    }
+
                 default:
                     {
                         return null;
@@ -437,7 +459,8 @@
             Length = 0, // m
             Area = 1, // m^2
             Force = 2, // N
-            Pressure = 3 // Pa
+            Pressure = 3, // Pa
+            Unitless = 4 // [-]
         }
         public enum AllUnits
         {
@@ -462,8 +485,9 @@
             GPa,
             Pa,
             Psi,
-            Bar
-
+            Bar,
+            // ------------- Unitless ---------------
+            Unitless,
         }
     }
 }
