@@ -152,6 +152,20 @@
                                 <Run Text="Nodes: " FontWeight="Bold"/>
                                 <Run Text="{Binding NodeIds, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
                                 </TextBlock>
+
+                                <!-- Variable Element Arguments -->
+                                <ItemsControl ItemsSource="{Binding Arguments, Mode=OneWay}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock>
+                                                <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold"/>
+                                                <Run Text=":" FontWeight="Bold"/>
+                                                <Run Text="{Binding Value, Mode=OneWay}"/>
+                                                <Run Text="{Binding UnitName, Mode=OneWay}" />
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </TreeViewItem>
                     </DataTemplate>

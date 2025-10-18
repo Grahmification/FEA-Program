@@ -16,6 +16,7 @@ namespace FEA_Program.ViewModels
         public NodeVM[] Nodes { get; private set; } = [];
         public IElement? Model { get; private set; } = null;
         public int[] NodeIds => Nodes.Select(n => n.Model.ID).ToArray();
+        public ElementArgVM[] Arguments { get; private set; } = [];
 
         // ---------------------- Commands ----------------------
         public ICommand? EditCommand { get; }
@@ -30,6 +31,58 @@ namespace FEA_Program.ViewModels
             Material = material;
             EditCommand = new RelayCommand(() => EditRequest?.Invoke(this, EventArgs.Empty));
             DeleteCommand = new RelayCommand(() => DeleteRequest?.Invoke(this, EventArgs.Empty));
+
+            // Setup Arguments
+            Arguments = [.. ElementArgs(model.ElementType)];
+
+            foreach(var arg in Arguments)
+            {
+                arg.ValueChanged += OnArgumentValueUpdated;
+            }
+
+            // Arguments should only be changed from these VMs, so synchronization only needs to be called at startup
+            SynchronizeArguments();
         }
+
+        // ---------------------- Event Handlers ----------------------
+        private void OnArgumentValueUpdated(object? sender, EventArgs e)
+        {
+            if (sender is ElementArgVM vm && Model is not null)
+            {
+                Model.ElementArgs[vm.Index] = vm.Value;
+            }
+        }
+
+        // ---------------------- Private Helpers ----------------------
+
+        /// <summary>
+        /// Synchronizes Argument values with the model
+        /// </summary>
+        private void SynchronizeArguments()
+        {
+            foreach (var arg in Arguments)
+            {
+                if (Model is not null)
+                    arg.Value = Model.ElementArgs[arg.Index];
+            }
+        }
+
+        // ---------------------- Static Methods ----------------------
+
+        /// <summary>
+        /// Get element arguments associated with various element types
+        /// </summary>
+        /// <param name="elementType"></param>
+        /// <returns></returns>
+        public static List<ElementArgVM> ElementArgs(ElementTypes elementType) => elementType switch
+        {
+            // Case for ElementBarLinear
+            ElementTypes.BarLinear => new()
+            {
+                new ElementArgVM(0, "Area", Units.DataUnitType.Area)
+            },
+            // Default case: return an empty list
+            _ => []
+        };
     }
 }
