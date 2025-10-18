@@ -154,6 +154,7 @@
                 <!-- 3D Viewer -->
                 <v:ViewPortControl Grid.Column="1" DataContext="{Binding ViewPort}">
                     <v:ViewPortControl.DrawItems>
+                        <!-- Nodes -->
                         <h:ItemsModel3D ItemsSource="{Binding DataContext.Project.Nodes.Items, RelativeSource={RelativeSource AncestorType=Window}}">
                             <h:ItemsModel3D.ItemTemplate>
                                 <DataTemplate>
@@ -164,6 +165,19 @@
                                 </DataTemplate>
                             </h:ItemsModel3D.ItemTemplate>
                         </h:ItemsModel3D>
+
+                        <!-- Elements -->
+                        <h:ItemsModel3D ItemsSource="{Binding DataContext.Project.Elements.Items, RelativeSource={RelativeSource AncestorType=Window}}">
+                            <h:ItemsModel3D.ItemTemplate>
+                                <DataTemplate>
+                                    <v:TubeVisual3D 
+                                        StartPoint="{Binding Nodes[0].DrawPosition}" 
+                                        EndPoint="{Binding Nodes[1].DrawPosition}"/>
+                                </DataTemplate>
+                            </h:ItemsModel3D.ItemTemplate>
+                        </h:ItemsModel3D>
+
+
                     </v:ViewPortControl.DrawItems>
                 </v:ViewPortControl>
             </Grid>
