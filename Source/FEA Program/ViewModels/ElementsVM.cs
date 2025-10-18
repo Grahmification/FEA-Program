@@ -1,4 +1,4 @@
-﻿using FEA_Program.Models;
+using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
@@ -59,6 +59,27 @@ namespace FEA_Program.ViewModels
                 AddVM(new ElementVM(item, [.. nodes], material));
             }
         }
+
+        /// <summary>
+        /// Delete the indicated elements, or all if the list is null
+        /// </summary>
+        /// <param name="elementIDs">Element IDs to delete</param>
+        public void Delete(List<int>? elementIDs = null)
+        {
+            // Delete all elements by default
+            var selectedElements = Items.ToList();
+
+            if (elementIDs != null)
+            {
+                selectedElements = Items
+                .Where(element => elementIDs.Contains(element.Model?.ID ?? -1))
+                .ToList();
+            }
+
+            foreach (var item in selectedElements)
+                DeleteVM(item);
+        }
+
 
         // ---------------------- Event Methods ----------------------
         private void OnEditRequest(object? sender, EventArgs e)

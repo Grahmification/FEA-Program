@@ -3,6 +3,7 @@ using FEA_Program.SaveData;
 using FEA_Program.UI;
 using FEA_Program.ViewModels.Base;
 using MathNet.Numerics.LinearAlgebra.Double;
+using System.Collections.Specialized;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Input;
@@ -96,12 +97,46 @@ namespace FEA_Program.ViewModels
             }
         }
 
+        // ---------------------- Event Methods ----------------------
+
+        /// <summary>
+        /// This is the method called whenever a node is added, removed, moved, or replaced.
+        /// </summary>
+        /// <param name="sender">The ObservableCollection itself.</param>
+        /// <param name="e">Event arguments detailing the change.</param>
+        private void OnNodesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            // Items were removed
+            if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems is not null)
+            {
+                // e.OldItems contains the list of items that were removed.
+                var removedIds = e.OldItems
+                    .Cast<NodeVM>()
+                    .Select(node => node.Model.ID);
+
+                // Get the list of hanging element IDs
+                List<int> elementIds = removedIds
+                    .SelectMany(NodeID => Problem.RemoveNode(NodeID))
+                    .ToList();
+
+                // Delete hanging elements
+                Elements.Delete(elementIds);
+            }
+            // The list was reset
+            else if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                // Delete all elements
+                Elements.Delete();
+            }
+        }
 
         // ---------------------- Private Helpers ----------------------
         private void ResetProblem(ProblemTypes problemType)
         {
             Problem = new StressProblem(problemType);
             Nodes = new NodesVM(Problem.AvailableNodeDOFs);
+            Nodes.Items.CollectionChanged += OnNodesCollectionChanged;
+
             Elements.LinkCollections(Nodes.Items, Materials.Items);
         }
         private void LoadData(ProblemData data)
