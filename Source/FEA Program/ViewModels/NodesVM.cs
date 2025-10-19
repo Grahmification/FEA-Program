@@ -16,9 +16,14 @@ namespace FEA_Program.ViewModels
         /// </summary>
         private int _problemDOFs = -1;
 
+        // ---------------------- Events ----------------------
+
+        public event EventHandler<NodeVM>? ItemAdding;
+        public event EventHandler<NodeVM>? ItemRemoving;
+
         // ---------------------- Models ----------------------
         //private readonly Dictionary<int, MaterialVM> _Materials = []; // reference by ID
- 
+
         public ObservableCollection<NodeVM> Items { get; private set; } = [];
         public ICollectionView NonZeroForceItems { get; }
 
@@ -105,6 +110,9 @@ namespace FEA_Program.ViewModels
         // ---------------------- Private Helpers ----------------------
         private void AddVM(NodeVM vm)
         {
+            // Call first so others can validate the prior
+            ItemAdding?.Invoke(this, vm);
+            
             Items.Add(vm);
             vm.DeleteRequest += OnDeleteRequest;
             vm.EditRequest += OnEditRequest;
@@ -119,6 +127,9 @@ namespace FEA_Program.ViewModels
         }
         private void DeleteVM(NodeVM vm)
         {
+            // Call first so others can validate the prior
+            ItemRemoving?.Invoke(this, vm);
+
             Items.Remove(vm);
             vm.DeleteRequest -= OnDeleteRequest;
             vm.EditRequest -= OnEditRequest;

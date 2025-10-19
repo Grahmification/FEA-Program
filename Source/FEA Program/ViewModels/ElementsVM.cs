@@ -9,7 +9,12 @@ namespace FEA_Program.ViewModels
     {
         private ObservableCollection<NodeVM> _nodes = [];
         private ObservableCollection<MaterialVM> _materials = [];
-        
+
+        // ---------------------- Events ----------------------
+
+        public event EventHandler<ElementVM>? ItemAdding;
+        public event EventHandler<ElementVM>? ItemRemoving;
+
         // ---------------------- Models ----------------------
         public ObservableCollection<ElementVM> Items { get; private set; } = [];
 
@@ -114,12 +119,18 @@ namespace FEA_Program.ViewModels
         // ---------------------- Private Helpers ----------------------
         private void AddVM(ElementVM vm)
         {
+            // Call first so others can validate the prior
+            ItemAdding?.Invoke(this, vm);
+            
             Items.Add(vm);
             vm.DeleteRequest += OnDeleteRequest;
             vm.EditRequest += OnEditRequest;
         }
         private void DeleteVM(ElementVM vm)
         {
+            // Call first so others can validate the prior
+            ItemRemoving?.Invoke(this, vm);
+
             Items.Remove(vm);
             vm.DeleteRequest -= OnDeleteRequest;
             vm.EditRequest -= OnEditRequest;

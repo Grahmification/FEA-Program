@@ -39,6 +39,9 @@ namespace FEA_Program.ViewModels
             LoadFileCommand = new AsyncRelayCommand(LoadFile);
             SaveFileCommand = new AsyncRelayCommand(SaveFile);
 
+            Elements.ItemAdding += OnElementAdding;
+            Elements.ItemRemoving += OnElementRemoving;
+
             Materials.AddDefaultMaterials();
             ResetProblem(ProblemTypes.Truss_3D);
         }
@@ -98,36 +101,27 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Event Methods ----------------------
-
-        /// <summary>
-        /// This is the method called whenever a node is added, removed, moved, or replaced.
-        /// </summary>
-        /// <param name="sender">The ObservableCollection itself.</param>
-        /// <param name="e">Event arguments detailing the change.</param>
-        private void OnNodesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void OnNodeAdding(object? sender, NodeVM e)
         {
-            // Items were removed
-            if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems is not null)
-            {
-                // e.OldItems contains the list of items that were removed.
-                var removedIds = e.OldItems
-                    .Cast<NodeVM>()
-                    .Select(node => node.Model.ID);
+            Problem.AddNode(e.Model);
+        }
+        private void OnNodeRemoving(object? sender, NodeVM e)
+        {
+            // Get the list of hanging element IDs
+            List<int> elementIds = [.. Problem.RemoveNode(e.Model.ID)];
 
-                // Get the list of hanging element IDs
-                List<int> elementIds = removedIds
-                    .SelectMany(NodeID => Problem.RemoveNode(NodeID))
-                    .ToList();
-
-                // Delete hanging elements
-                Elements.Delete(elementIds);
-            }
-            // The list was reset
-            else if (e.Action == NotifyCollectionChangedAction.Reset)
-            {
-                // Delete all elements
-                Elements.Delete();
-            }
+            // Also delete hanging elements
+            Elements.Delete(elementIds);
+        }
+        private void OnElementAdding(object? sender, ElementVM e)
+        {
+            if(e.Model != null)
+                Problem.AddElement(e.Model);
+        }
+        private void OnElementRemoving(object? sender, ElementVM e)
+        {
+            if (e.Model != null)
+                Problem.RemoveElement(e.Model.ID);
         }
 
         // ---------------------- Private Helpers ----------------------
@@ -135,7 +129,8 @@ namespace FEA_Program.ViewModels
         {
             Problem = new StressProblem(problemType);
             Nodes = new NodesVM(Problem.AvailableNodeDOFs);
-            Nodes.Items.CollectionChanged += OnNodesCollectionChanged;
+            Nodes.ItemAdding += OnNodeAdding;
+            Nodes.ItemRemoving += OnNodeRemoving;
 
             Elements.LinkCollections(Nodes.Items, Materials.Items);
             Elements.AddEditor.AvailableElementTypes = new(Problem.AvailableElements);
@@ -169,9 +164,6 @@ namespace FEA_Program.ViewModels
                 });
             }
 
-            foreach (var node in nodes.Values)
-                Problem.AddNode(node);
-
             Nodes.ImportNodes([.. nodes.Values]);
 
             // ----------- Import Elements ---------------
@@ -200,9 +192,6 @@ namespace FEA_Program.ViewModels
                 if (element is not null)
                     elements.Add(element);
             }
-
-            foreach (var element in elements)
-                Problem.AddElement(element);
 
             Elements.ImportElements(elements);
         }
