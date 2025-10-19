@@ -121,7 +121,7 @@ namespace FEA_Program.ViewModels
             // Update force list when a force value changes
             vm.Model.PropertyChanged += (_, e) =>
             {
-                if (e.PropertyName == nameof(NodeVM.Force))
+                if (e.PropertyName == nameof(Node.Force))
                     _nonZeroForceCollection.View.Refresh();
             };
         }

@@ -3,7 +3,6 @@ using FEA_Program.SaveData;
 using FEA_Program.UI;
 using FEA_Program.ViewModels.Base;
 using MathNet.Numerics.LinearAlgebra.Double;
-using System.Collections.Specialized;
 using System.IO;
 using System.Text.Json;
 using System.Windows.Input;
@@ -20,6 +19,7 @@ namespace FEA_Program.ViewModels
         public MaterialsVM Materials { get; private set; } = new();
         public NodesVM Nodes { get; private set; } = new();
         public ElementsVM Elements { get; private set; } = new();
+        public DrawVM Draw { get; private set; } = new();
 
         // ---------------------- Commands ----------------------
         /// <summary>
@@ -104,11 +104,13 @@ namespace FEA_Program.ViewModels
         private void OnNodeAdding(object? sender, NodeVM e)
         {
             Problem.AddNode(e.Model);
+            Draw.AddNode(e);
         }
         private void OnNodeRemoving(object? sender, NodeVM e)
         {
             // Get the list of hanging element IDs
             List<int> elementIds = [.. Problem.RemoveNode(e.Model.ID)];
+            Draw.RemoveNode(e.Model.ID);
 
             // Also delete hanging elements
             Elements.Delete(elementIds);
@@ -116,18 +118,25 @@ namespace FEA_Program.ViewModels
         private void OnElementAdding(object? sender, ElementVM e)
         {
             if(e.Model != null)
+            {
                 Problem.AddElement(e.Model);
+                Draw.AddElement(e);
+            }
         }
         private void OnElementRemoving(object? sender, ElementVM e)
         {
             if (e.Model != null)
+            {
                 Problem.RemoveElement(e.Model.ID);
+                Draw.RemoveElement(e.Model.ID);
+            }
         }
 
         // ---------------------- Private Helpers ----------------------
         private void ResetProblem(ProblemTypes problemType)
         {
             Problem = new StressProblem(problemType);
+            Draw = new DrawVM();
             Nodes = new NodesVM(Problem.AvailableNodeDOFs);
             Nodes.ItemAdding += OnNodeAdding;
             Nodes.ItemRemoving += OnNodeRemoving;
