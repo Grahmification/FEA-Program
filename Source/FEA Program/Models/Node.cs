@@ -63,7 +63,7 @@ namespace FEA_Program.Models
                 // Dimension == 1
                 DenseVector output = new([_Force[0], 0, 0]);
 
-                if (Dimension == 2)
+                if (Dimension >= 2)
                 {
                     output[1] = _Force[1];
                 }
