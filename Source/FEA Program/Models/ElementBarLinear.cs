@@ -1,4 +1,4 @@
-﻿using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double;
 using System.Reflection;
 
 namespace FEA_Program.Models
@@ -19,6 +19,11 @@ namespace FEA_Program.Models
         /// Element traction force in N/m [X, Y, Z]^T
         /// </summary>
         public DenseVector TractionForce { get; private set; }
+
+        /// <summary>
+        /// Get the max stress in the element
+        /// </summary>
+        public double MaxStress => StressMatrix().Values[0]; // This element has constant stress
 
         /// <summary>
         /// Get arguments that may vary between different element types

@@ -20,6 +20,9 @@ namespace FEA_Program.ViewModels
         /// Get the node coordinates in user units
         /// </summary>
         public double[] Coordinates_mm => Model.Coordinates.Select(coord => coord * 1000.0).ToArray();
+        public double[] Displacement_mm => Model.Displacement.Select(coord => coord * 1000.0).ToArray();
+        public double[] FinalPos_mm => Model.FinalPos.Select(coord => coord * 1000.0).ToArray();
+
         public bool Selected { get; set; } = false;
 
         public bool FixedX => Model.Fixity[0] == 1;
@@ -59,6 +62,7 @@ namespace FEA_Program.ViewModels
                 if (e.PropertyName == nameof(Node.Coordinates))
                 {
                     OnPropertyChanged(nameof(Coordinates_mm));
+                    OnPropertyChanged(nameof(FinalPos_mm));
                 }
                 else if(e.PropertyName == nameof(Node.Force))
                 {
@@ -70,7 +74,11 @@ namespace FEA_Program.ViewModels
                     OnPropertyChanged(nameof(FixedY));
                     OnPropertyChanged(nameof(FixedZ));
                 }
-
+                else if (e.PropertyName == nameof(Node.Displacement))
+                {
+                    OnPropertyChanged(nameof(Displacement_mm));
+                    OnPropertyChanged(nameof(FinalPos_mm));
+                }
             }
         }
 

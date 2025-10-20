@@ -122,7 +122,7 @@
                             <v:ProblemTreeControl DataContext="{Binding Project}"/>
                         </TabItem>
                         <TabItem Header="Results">
-
+                            <v:ResultsTreeControl DataContext="{Binding Project}"/>
                         </TabItem>
                         <TabItem Header="Display">
 

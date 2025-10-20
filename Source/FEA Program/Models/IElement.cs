@@ -21,7 +21,7 @@ namespace FEA_Program.Models
         /// Element traction force in N/m [X, Y, Z]^T
         /// </summary>
         public DenseVector TractionForce { get; }
-
+        public double MaxStress { get; }
 
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
+using System.ComponentModel;
 using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
@@ -33,6 +34,10 @@ namespace FEA_Program.ViewModels
             EditCommand = new RelayCommand(() => EditRequest?.Invoke(this, EventArgs.Empty));
             DeleteCommand = new RelayCommand(() => DeleteRequest?.Invoke(this, EventArgs.Empty));
 
+            // Use node changes to determine when element properties have been updated
+            foreach (var node in Nodes)
+                node.Model.PropertyChanged += OnNodeModelPropertyChanged;
+
             // Setup Arguments
             Arguments = [.. ElementArgs(model.ElementType)];
 
@@ -51,6 +56,18 @@ namespace FEA_Program.ViewModels
             if (sender is ElementArgVM vm && Model is not null)
             {
                 Model.ElementArgs[vm.Index] = vm.Value;
+            }
+        }
+
+        // TODO: This isn't a great implementation. Clean it up.
+        private void OnNodeModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (sender is Node)
+            {
+                if (e.PropertyName == nameof(Node.SolutionValid))
+                {
+                    OnPropertyChanged(nameof(Model.MaxStress));
+                }
             }
         }
 

@@ -1,0 +1,83 @@
+﻿<UserControl x:Class="FEA_Program.Views.ResultsTreeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FEA_Program.Views"
+             xmlns:vm="clr-namespace:FEA_Program.ViewModels"
+             xmlns:conv="clr-namespace:FEA_Program.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="275">
+
+    <UserControl.DataContext>
+        <vm:ProjectVM/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <conv:NumberArrayToStringConverter x:Key="NumberArrayToStringConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <TreeView>
+
+            <!-- Nodes Sub Tree -->
+            <TreeViewItem x:Name="NodesTree" IsExpanded="True" ItemsSource="{Binding Nodes.Items}">
+                <TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Nodes" />
+                    </StackPanel>
+                </TreeViewItem.Header>
+
+                <TreeViewItem.Resources>
+                    <DataTemplate DataType="{x:Type vm:NodeVM}">
+                        <TreeViewItem>
+                            <TreeViewItem.Header>
+                                <TextBlock Text="{Binding Model.ID, StringFormat={}Node {0}, Mode=OneWay}" />
+                            </TreeViewItem.Header>
+                            <StackPanel>
+                                <TextBlock>
+                                    <Run Text="Displacement: " FontWeight="Bold"/>
+                                    <Run Text="{Binding Displacement_mm, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
+                                </TextBlock>
+                                <TextBlock>
+                                    <Run Text="Position: " FontWeight="Bold"/>
+                                    <Run Text="{Binding FinalPos_mm, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
+                                </TextBlock>
+                                <TextBlock>
+                                    <Run Text="Reaction Force [N]: " FontWeight="Bold"/>
+                                    <Run Text="{Binding Model.ReactionForce, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </TreeViewItem>
+                    </DataTemplate>
+                </TreeViewItem.Resources>
+            </TreeViewItem>
+
+            <!-- Elements Sub Tree -->
+            <TreeViewItem x:Name="ElementsTree" IsExpanded="True" ItemsSource="{Binding Elements.Items}">
+                <TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Elements" />
+                    </StackPanel>
+                </TreeViewItem.Header>
+
+                <TreeViewItem.Resources>
+                    <DataTemplate DataType="{x:Type vm:ElementVM}">
+                        <TreeViewItem>
+                            <TreeViewItem.Header>
+                                <TextBlock Text="{Binding Model.ID, StringFormat={}Element {0}, Mode=OneWay}" />
+                            </TreeViewItem.Header>
+                            <StackPanel>
+                                <TextBlock>
+                                    <Run Text="Stress: " FontWeight="Bold"/>
+                                    <Run Text="{Binding Model.MaxStress, StringFormat={}{0:F1} Pa, Mode=OneWay}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </TreeViewItem>
+                    </DataTemplate>
+                </TreeViewItem.Resources>
+            </TreeViewItem>
+
+        </TreeView>
+    </Grid>
+</UserControl>
