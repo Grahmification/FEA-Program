@@ -82,7 +82,7 @@
                 <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
 
                 <Menu VerticalAlignment="Center">
-                    <MenuItem Header="Solve" Height="20"/>
+                    <MenuItem Header="Solve" Height="20" Command="{Binding Project.SolveCommand}"/>
                 </Menu>
             </StackPanel>
 

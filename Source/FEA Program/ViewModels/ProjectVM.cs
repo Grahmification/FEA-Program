@@ -32,12 +32,18 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public ICommand SaveFileCommand { get; private set; }
 
+        /// <summary>
+        /// RelayCommand for <see cref="Solve"/>
+        /// </summary>
+        public ICommand SolveCommand { get; private set; }
+
 
         // ---------------------- Public Methods ----------------------
         public ProjectVM()
         {
             LoadFileCommand = new AsyncRelayCommand(LoadFile);
             SaveFileCommand = new AsyncRelayCommand(SaveFile);
+            SolveCommand = new AsyncRelayCommand(Solve);
 
             Elements.ItemAdding += OnElementAdding;
             Elements.ItemRemoving += OnElementRemoving;
@@ -99,6 +105,27 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
+        public async Task Solve()
+        {
+            try
+            {
+                bool result = await Task.Run(() => Problem.Solve());
+
+                if (result)
+                {
+                    FormattedMessageBox.DisplayMessage("Solved Successfully!");
+                }
+                else
+                {
+                    FormattedMessageBox.DisplayMessage("Solution succeeded, but with invalid values. Check for unconstrained degrees of freedom.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
+        }
+
 
         // ---------------------- Event Methods ----------------------
         private void OnNodeAdding(object? sender, NodeVM e)
