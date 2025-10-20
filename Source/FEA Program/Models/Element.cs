@@ -1,4 +1,4 @@
-﻿using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
 {
@@ -33,7 +33,19 @@ namespace FEA_Program.Models
             SortNodeOrder(ref nodes); // Sort them
             _nodes = [.. nodes];
 
+            // If the node solution is invalidated, we also want to invalidate the element
+            foreach(var node in nodes)
+                node.SolutionInvalidated += (_, _) => InvalidateSolution();
+
             _Material = material;
+        }
+
+        /// <summary>
+        /// Set the element SolutionValid to true
+        /// </summary>
+        public void Solve()
+        {
+            SolutionValid = true;
         }
 
         // ---------------- General matrix methods ----------------

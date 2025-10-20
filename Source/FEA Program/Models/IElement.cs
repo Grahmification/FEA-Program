@@ -1,9 +1,12 @@
 ﻿using MathNet.Numerics.LinearAlgebra.Double;
+using System.ComponentModel;
 
 namespace FEA_Program.Models
 {
-    internal interface IElement: IHasID
+    internal interface IElement: IHasID, INotifyPropertyChanged
     {
+        public event EventHandler<int>? SolutionInvalidated;
+        
         public Material Material { get; set; }
 
         public int NumOfNodes { get; }
@@ -21,6 +24,8 @@ namespace FEA_Program.Models
         /// Element traction force in N/m [X, Y, Z]^T
         /// </summary>
         public DenseVector TractionForce { get; }
+
+        public bool SolutionValid { get; }
         public double MaxStress { get; }
 
 
@@ -66,6 +71,11 @@ namespace FEA_Program.Models
         /// </summary>
         /// <returns></returns>
         public DenseVector TractionForceMatrix();
+
+        /// <summary>
+        /// Set the element SolutionValid to true
+        /// </summary>
+        public void Solve();
 
         // ---------------- Post solution methods ----------------
 

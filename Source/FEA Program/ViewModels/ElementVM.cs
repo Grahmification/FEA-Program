@@ -34,9 +34,7 @@ namespace FEA_Program.ViewModels
             EditCommand = new RelayCommand(() => EditRequest?.Invoke(this, EventArgs.Empty));
             DeleteCommand = new RelayCommand(() => DeleteRequest?.Invoke(this, EventArgs.Empty));
 
-            // Use node changes to determine when element properties have been updated
-            foreach (var node in Nodes)
-                node.Model.PropertyChanged += OnNodeModelPropertyChanged;
+            Model.PropertyChanged += OnModelPropertyChanged;
 
             // Setup Arguments
             Arguments = [.. ElementArgs(model.ElementType)];
@@ -59,12 +57,11 @@ namespace FEA_Program.ViewModels
             }
         }
 
-        // TODO: This isn't a great implementation. Clean it up.
-        private void OnNodeModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (sender is Node)
+            if (sender is IElement)
             {
-                if (e.PropertyName == nameof(Node.SolutionValid))
+                if (e.PropertyName == nameof(IElement.SolutionValid))
                 {
                     OnPropertyChanged(nameof(Model.MaxStress));
                 }

@@ -119,6 +119,9 @@ namespace FEA_Program.Models
             DenseVector[] output = Solver.Solve(K_assembled, F_assembled, Q_assembled);
             NodeExtensions.ApplySolution(Nodes, output[0], output[1]);
 
+            foreach (var element in Elements)
+                element.Solve(); // Set SolutionValid to true
+
             var displacements = output[0].Values;
 
             // False if there's a bad value
