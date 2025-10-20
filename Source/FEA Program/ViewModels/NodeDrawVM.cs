@@ -1,4 +1,4 @@
-using FEA_Program.ViewModels.Base;
+﻿using FEA_Program.ViewModels.Base;
 using SharpDX;
 using System.ComponentModel;
 
@@ -6,11 +6,17 @@ namespace FEA_Program.ViewModels
 {
     internal class NodeDrawVM: ObservableObject
     {
+        public static Color4 SelectedColor = new(1, 1, 0, 1);
+        public static Color4 DefaultNodeColor = new(0, 1, 0, 1);
+        public static Color4 DefaultFixityColor = new(0, 0, 1, 1);
+
         // ---------------------- Properties ----------------------
         public NodeVM Node { get; private set; } = new();
 
         public Vector3 DrawPosition => ArrayToVector(Node.Coordinates_mm);
         public Vector3 Force => ArrayToVector(Node.Model.Force);
+        public Color4 NodeColor => Node.Selected ? SelectedColor : DefaultNodeColor;
+        public Color4 FixityColor => Node.Selected ? SelectedColor : DefaultFixityColor;
 
         public NodeDrawVM() { }
 
@@ -31,6 +37,11 @@ namespace FEA_Program.ViewModels
                 else if (e.PropertyName == nameof(NodeVM.HasForce))
                 {
                     OnPropertyChanged(nameof(Force));
+                }
+                else if (e.PropertyName == (nameof(NodeVM.Selected)))
+                {
+                    OnPropertyChanged(nameof(NodeColor));
+                    OnPropertyChanged(nameof(FixityColor));
                 }
             }
         }

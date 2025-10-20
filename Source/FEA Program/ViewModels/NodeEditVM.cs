@@ -53,6 +53,10 @@ namespace FEA_Program.ViewModels
         {
             _inputItem = item;
 
+            // If we're editing, select the node being edited for clarity
+            if (editing)
+                _inputItem.Selected = true;
+
             // Make this so we're editing a copy. The original is preserved in case we cancel
             EditItem = new NodeVM((Node)item.Model.Clone());
             Editing = editing;
@@ -69,6 +73,10 @@ namespace FEA_Program.ViewModels
         }
         public void HideEditor()
         {
+            // Deselect the item when edits finish
+            if (_inputItem != null)
+                _inputItem.Selected = false;
+
             EditItem = null; // This hides the editor
             EditCoordinates.Clear();
         }

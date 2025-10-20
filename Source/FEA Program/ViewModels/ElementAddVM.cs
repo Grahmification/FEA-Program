@@ -127,6 +127,8 @@ namespace FEA_Program.ViewModels
         }
         public void HideEditor()
         {
+            // We're closing, deselect all nodes
+            DeselectAllNodes();
             ShowEditor = null;  // Do this instead of false because of how converter is setup
         }
 
@@ -158,6 +160,15 @@ namespace FEA_Program.ViewModels
         }
         private void OnNodeSelectionChanged(object? sender, EventArgs e)
         {
+            // Deselect all, then select the ones which matter
+            DeselectAllNodes();
+
+            foreach(var selector in NodeSelectors)
+                if (selector.SelectedNode != null)
+                {
+                    selector.SelectedNode.Selected = true;
+                }
+
             NodeSelectionValid = NodeSelectionVM.CheckForValidSelections(NodeSelectors);
         }
 
@@ -198,6 +209,11 @@ namespace FEA_Program.ViewModels
 
                 HideEditor(); // Do this after the event in case an error occurs
             }
+        }
+        private void DeselectAllNodes()
+        {
+            foreach (var node in _nodes)
+                node.Selected = false;
         }
     }
 }

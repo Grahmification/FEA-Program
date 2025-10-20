@@ -20,6 +20,7 @@ namespace FEA_Program.ViewModels
         /// Get the node coordinates in user units
         /// </summary>
         public double[] Coordinates_mm => Model.Coordinates.Select(coord => coord * 1000.0).ToArray();
+        public bool Selected { get; set; } = false;
 
         public bool FixedX => Model.Fixity[0] == 1;
         public bool FixedY => Model.Fixity.Length > 1 && Model.Fixity[1] == 1;

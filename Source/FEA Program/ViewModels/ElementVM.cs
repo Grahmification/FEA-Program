@@ -17,6 +17,7 @@ namespace FEA_Program.ViewModels
         public IElement? Model { get; private set; } = null;
         public int[] NodeIds => Nodes.Select(n => n.Model.ID).ToArray();
         public ElementArgVM[] Arguments { get; private set; } = [];
+        public bool Selected { get; set; } = false;
 
         // ---------------------- Commands ----------------------
         public ICommand? EditCommand { get; }

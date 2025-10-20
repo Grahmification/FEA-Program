@@ -164,8 +164,8 @@
                         <h:ItemsModel3D ItemsSource="{Binding DataContext.Project.Draw.Nodes, RelativeSource={RelativeSource AncestorType=Window}}">
                             <h:ItemsModel3D.ItemTemplate>
                                 <DataTemplate>
-                                    <v:NodeVisual3D Position="{Binding DrawPosition}">
-                                        <v:FixityVisual3D ShowX="{Binding Node.FixedX}" ShowY="{Binding Node.FixedY}" ShowZ="{Binding Node.FixedZ}"/>
+                                    <v:NodeVisual3D Position="{Binding DrawPosition}" Color="{Binding NodeColor}">
+                                        <v:FixityVisual3D ShowX="{Binding Node.FixedX}" ShowY="{Binding Node.FixedY}" ShowZ="{Binding Node.FixedZ}" Color="{Binding FixityColor}"/>
                                         <v:ArrowVisual3D Direction="{Binding Force}" Length="{Binding Node.Model.ForceMagnitude}"/>
                                     </v:NodeVisual3D>
                                 </DataTemplate>
@@ -178,7 +178,8 @@
                                 <DataTemplate>
                                     <v:TubeVisual3D 
                                         StartPoint="{Binding Nodes[0].DrawPosition}" 
-                                        EndPoint="{Binding Nodes[1].DrawPosition}"/>
+                                        EndPoint="{Binding Nodes[1].DrawPosition}"
+                                        FillColor="{Binding ElementColor}"/>
                                 </DataTemplate>
                             </h:ItemsModel3D.ItemTemplate>
                         </h:ItemsModel3D>

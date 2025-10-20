@@ -1,6 +1,7 @@
 ﻿using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
@@ -9,10 +10,24 @@ namespace FEA_Program.ViewModels
     /// Used for displaying a list of nodes with checkboxes
     /// </summary>
     /// <param name="node">The node to diplay</param>
-    internal class NodeSelectVM(NodeVM node) : ObservableObject
+    internal class NodeSelectVM: ObservableObject
     {
-        public NodeVM Node { get; private set; } = node;
+        public NodeVM Node { get; private set; }
         public bool IsSelected { get; set; } = false;
+
+        public NodeSelectVM(NodeVM node)
+        {
+            Node = node;
+            PropertyChanged += OnThisPropertyChanged;
+        }
+        private void OnThisPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IsSelected))
+            {
+                // Select the node if the box is checked
+                Node.Selected = IsSelected;
+            }
+        }
     }
 
     /// <summary>
@@ -91,7 +106,11 @@ namespace FEA_Program.ViewModels
         public void DisplayEditor(NodeVM editItem)
         {
             ResetItems();
+
+            // If we're editing, select the node
+            editItem.Selected = true;
             _inputItem = editItem;
+
             // Make this so we're editing a copy. The original is preserved in case we cancel
             EditItem = new NodeVM((Node)editItem.Model.Clone());
             Editing = true;
@@ -107,6 +126,7 @@ namespace FEA_Program.ViewModels
         }
         public void HideEditor()
         {
+            DeselectAllNodes();
             ShowEditor = null;  // Do this instead of false because of how converter is setup
         }
 
@@ -157,6 +177,14 @@ namespace FEA_Program.ViewModels
         private void CancelEdit()
         {
             HideEditor();
+        }
+        private void DeselectAllNodes()
+        {
+            if (_inputItem != null)
+                _inputItem.Selected = false;
+
+            foreach(var node in  Nodes)
+                node.Node.Selected = false;
         }
     }
 }
