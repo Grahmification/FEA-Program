@@ -2,15 +2,14 @@
 
 namespace FEA_Program.Models
 {
-    internal interface IElement
+    internal interface IElement: IHasID
     {
-        int ID { get; }
-        Material Material { get; set; }
+        public Material Material { get; set; }
 
-        int NumOfNodes { get; }
-        int NodeDOFs { get; }
-        int ElementDOFs { get; }
-        ElementTypes ElementType { get; }
+        public int NumOfNodes { get; }
+        public int NodeDOFs { get; }
+        public int ElementDOFs { get; }
+        public ElementTypes ElementType { get; }
         public IReadOnlyList<INode> Nodes { get; }
 
         /// <summary>
@@ -36,37 +35,37 @@ namespace FEA_Program.Models
         /// Sets the element body force
         /// </summary>
         /// <param name="forcePerVol">The body force matrix</param>
-        void SetBodyForce(DenseVector forcePerVolume);
+        public void SetBodyForce(DenseVector forcePerVolume);
 
         /// <summary>
         /// Sets the element traction force
         /// </summary>
         /// <param name="forcePerLength">The traction force matrix</param>
-        void SetTractionForce(DenseVector forcePerLength);
+        public void SetTractionForce(DenseVector forcePerLength);
 
         /// <summary>
         /// Gets the element length
         /// </summary>
         /// <returns></returns>
-        double Length();
+        public double Length();
 
         /// <summary>
         /// Gets the element stiffness matrix
         /// </summary>
         /// <returns></returns>
-        DenseMatrix K_Matrix();
+        public DenseMatrix K_Matrix();
 
         /// <summary>
         /// Gets the element body force matrix
         /// </summary>
         /// <returns></returns>
-        DenseVector BodyForceMatrix();
+        public DenseVector BodyForceMatrix();
 
         /// <summary>
         /// Gets the element traction force matrix
         /// </summary>
         /// <returns></returns>
-        DenseVector TractionForceMatrix();
+        public DenseVector TractionForceMatrix();
 
         // ---------------- Post solution methods ----------------
 
@@ -75,14 +74,14 @@ namespace FEA_Program.Models
         /// </summary>
         /// <param name="localCoords">Local coordinates inside the element to calculate the displacement</param>
         /// <returns></returns>
-        DenseVector Interpolated_Displacement(double[] localCoords);
+        public DenseVector Interpolated_Displacement(double[] localCoords);
 
         /// <summary>
         /// Gets the element stress matrix
         /// </summary>
         /// <param name="localCoords">Optional local coordinates inside the element</param>
         /// <returns></returns>
-        DenseVector StressMatrix(double[]? localCoords = null);
+        public DenseVector StressMatrix(double[]? localCoords = null);
 
     }
 
