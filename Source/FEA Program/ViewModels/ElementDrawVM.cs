@@ -14,7 +14,8 @@ namespace FEA_Program.ViewModels
         public NodeDrawVM[] Nodes { get; private set; } = [];
         public ElementVM Element { get; private set; } = new();
 
-        public Color ElementColor => Element.Selected ? SelectedColor : DefaultElementColor;
+        public Color ? ColorOverride { get; set; } = null;
+        public Color ElementColor => Element.Selected ? SelectedColor : (ColorOverride ?? DefaultElementColor);
 
         // ---------------------- Commands ----------------------
 
@@ -36,6 +37,57 @@ namespace FEA_Program.ViewModels
                     OnPropertyChanged(nameof(ElementColor));
                 }
             }
+        }
+
+
+        // ---------------------- Static Methods ----------------------
+
+        /// <summary>
+        /// Calculates stress ratios and applies a green (low stress) to red (high stress)
+        /// gradient color across a flat collection of elements.
+        /// </summary>
+        /// <param name="elements">The flat list of elements to process.</param>
+        public static void ApplyStressColors(IEnumerable<ElementDrawVM> elements)
+        {
+            if (elements == null || !elements.Any()) return;
+
+            double globalMaxStress = elements.Max(e => Math.Abs(e.Element.Model?.MaxStress ?? 0));
+
+            // Apply colors to all elements iteratively
+            foreach (var element in elements)
+            {
+                // Calculate stress fraction (0.0 to 1.0)
+                double stressRatio = Math.Abs((element.Element.Model?.MaxStress ?? 0)) / globalMaxStress;
+
+                // Safety check to ensure ratio doesn't exceed 1.0 due to floating point inaccuracies
+                stressRatio = Math.Min(1.0, Math.Max(0.0, stressRatio));
+
+                // Apply the gradient color (only is the solution is valid)
+                if (element.Element.Model?.SolutionValid ?? false)
+                {
+                    element.ColorOverride = GetGradientColor(stressRatio);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Converts a ratio (0.0 to 1.0) into a Color using a green-to-red gradient.
+        /// 0.0 is green, 1.0 is red.
+        /// </summary>
+        /// <param name="ratio">The fraction of maximum stress (0.0 to 1.0).</param>
+        /// <returns>A Windows.Media.Color instance.</returns>
+        private static Color GetGradientColor(double ratio)
+        {
+            // R component: increases from 0 (green) to 255 (red) as ratio increases.
+            byte red = (byte)Math.Round(255 * ratio);
+
+            // G component: decreases from 255 (green) to 0 (red) as ratio increases.
+            byte green = (byte)Math.Round(255 * (1.0 - ratio));
+
+            // B component: always 0 for a pure green-to-red gradient
+            byte blue = 0;
+
+            return Color.FromRgb(red, green, blue);
         }
     }
 }

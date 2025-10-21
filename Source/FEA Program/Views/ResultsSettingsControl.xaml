@@ -48,6 +48,16 @@
                 <Separator Margin="10,15"/>
             </StackPanel>
 
+            <StackPanel Grid.Row="1">
+                <Label Content="Element Settings" FontWeight="Bold"/>
+
+                <StackPanel Margin="10">
+                    <CheckBox Content="Color by Max Stress" IsChecked="{Binding Draw.DrawElementStressColors}"/>
+                </StackPanel>
+
+                <Separator Margin="10,15"/>
+            </StackPanel>
+
         </Grid>
     </Border>
 

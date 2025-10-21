@@ -23,6 +23,12 @@ namespace FEA_Program.ViewModels
         public double DisplacePercentage { get => _DisplacePercentage; set { _DisplacePercentage = value; UpdateNodeScaling(); } }
         public double DisplaceScaling { get => _DisplaceScaling; set { _DisplaceScaling = value; UpdateNodeScaling(); } }
 
+        // ---------------------- Element Properties ----------------------
+
+        private bool _DrawElementStressColors = false;
+        public bool DrawElementStressColors { get => _DrawElementStressColors; set { _DrawElementStressColors = value; UpdateElementColors(); } }
+
+
         // ---------------------- Public Methods ----------------------
         public DrawVM() { }
 
@@ -70,6 +76,25 @@ namespace FEA_Program.ViewModels
 
             foreach (NodeDrawVM N in Nodes)
                 N.DisplacementScalingFactor = nodeDrawScaling;
+        }
+
+        /// <summary>
+        /// Update element colors
+        /// </summary>
+        private void UpdateElementColors()
+        {
+            if (DrawElementStressColors)
+            {
+                ElementDrawVM.ApplyStressColors(Elements);
+            }
+            else
+            {
+                foreach(var e in Elements)
+                {
+                    // Set to default color
+                    e.ColorOverride = null;
+                }
+            }
         }
 
     }
