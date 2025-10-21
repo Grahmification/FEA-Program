@@ -125,7 +125,7 @@
                             <v:ResultsTreeControl DataContext="{Binding Project}"/>
                         </TabItem>
                         <TabItem Header="Display">
-
+                            <v:ResultsSettingsControl DataContext="{Binding Project}"/>
                         </TabItem>
                     </TabControl>
 

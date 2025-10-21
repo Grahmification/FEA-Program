@@ -13,6 +13,16 @@ namespace FEA_Program.ViewModels
         public ObservableCollection<ElementDrawVM> Elements { get; private set; } = [];
         public ObservableCollection<NodeDrawVM> Nodes { get; private set; } = [];
 
+        // ---------------------- Displacement Properties ----------------------
+
+        private bool _DrawDisplaced = false;
+        private double _DisplacePercentage = 0;
+        private double _DisplaceScaling = 10000;
+
+        public bool DrawDisplaced { get => _DrawDisplaced; set { _DrawDisplaced = value; UpdateNodeScaling(); } }
+        public double DisplacePercentage { get => _DisplacePercentage; set { _DisplacePercentage = value; UpdateNodeScaling(); } }
+        public double DisplaceScaling { get => _DisplaceScaling; set { _DisplaceScaling = value; UpdateNodeScaling(); } }
+
         // ---------------------- Public Methods ----------------------
         public DrawVM() { }
 
@@ -47,6 +57,19 @@ namespace FEA_Program.ViewModels
             var vm = _Elements[id];
             Elements.Remove(vm);
             _Elements.Remove(id);
+        }
+
+        // ---------------------- Private Helpers ----------------------
+
+        /// <summary>
+        /// Update internal value of displace scaling on all the nodes
+        /// </summary>
+        private void UpdateNodeScaling()
+        {
+            double nodeDrawScaling = DrawDisplaced ? DisplaceScaling * DisplacePercentage / 100.0 : 0;
+
+            foreach (NodeDrawVM N in Nodes)
+                N.DisplacementScalingFactor = nodeDrawScaling;
         }
 
     }

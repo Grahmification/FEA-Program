@@ -13,10 +13,15 @@ namespace FEA_Program.ViewModels
         // ---------------------- Properties ----------------------
         public NodeVM Node { get; private set; } = new();
 
-        public Vector3 DrawPosition => ArrayToVector(Node.Coordinates_mm);
+        public Vector3 DrawPosition => ArrayToVector(GetScaledDisplacement_mm());
         public Vector3 Force => ArrayToVector(Node.Model.Force);
         public Color4 NodeColor => Node.Selected ? SelectedColor : DefaultNodeColor;
         public Color4 FixityColor => Node.Selected ? SelectedColor : DefaultFixityColor;
+
+        /// <summary>
+        /// How much to scale the result displacement by. 0 = show at original position, 1 = show at displaced position
+        /// </summary>
+        public double DisplacementScalingFactor { get; set; } = 0;
 
         public NodeDrawVM() { }
 
@@ -24,6 +29,7 @@ namespace FEA_Program.ViewModels
         {
             Node = node;
             Node.PropertyChanged += OnNodePropertyChanged;
+            PropertyChanged += OnThisPropertyChanged;
         }
 
         private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -45,6 +51,31 @@ namespace FEA_Program.ViewModels
                 }
             }
         }
+        private void OnThisPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (sender is NodeDrawVM)
+            {
+                if (e.PropertyName == nameof(DisplacementScalingFactor))
+                {
+                    OnPropertyChanged(nameof(DrawPosition));
+                }
+            }
+        }
+        private double[] GetScaledDisplacement_mm()
+        {
+            var scaleFactor = DisplacementScalingFactor;
+
+            if (scaleFactor < 0)
+                scaleFactor = 0;
+            
+            var output = new double[Node.Model.Dimension];
+
+            for (int i = 0; i < Node.Model.Coordinates.Length; i++)
+                output[i] = (Node.Model.Coordinates[i] + Node.Model.Displacement[i] * scaleFactor) * 1000.0; // convert to mm
+
+            return output;
+        }
+
 
         /// <summary>
         /// Convert an XYZ array to vector, with non-supplied values being zero
