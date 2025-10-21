@@ -99,10 +99,7 @@ namespace FEA_Program.ViewModels
         {
             if(sender is ElementVM vm)
             {
-                Items.Remove(vm);
-
-                vm.DeleteRequest -= OnDeleteRequest;
-                vm.EditRequest -= OnEditRequest;
+                DeleteVM(vm);
             }
         }
 
