@@ -1,4 +1,5 @@
-﻿using FEA_Program.UI;
+﻿using FEA_Program.Models;
+using FEA_Program.UI;
 using FEA_Program.ViewModels.Base;
 
 namespace FEA_Program.ViewModels
@@ -25,10 +26,21 @@ namespace FEA_Program.ViewModels
             {
                 Base.Debugging = _debugging;
                 Base.ProgramVersion = ProgramExtensions.GetAssemblyVersion();
+
+                Project.ProblemReset += OnProblemReset;
             }
             catch (Exception ex)
             {
                 Base.LogAndDisplayException(ex);
+            }
+        }
+
+        // ---------------------- Event Methods ----------------------
+        private void OnProblemReset(object? sender, ProblemTypes e)
+        {
+            if(sender is ProjectVM vm)
+            {
+                ViewPort.Is3Dimensional = vm.ThreeDimensional;
             }
         }
     }

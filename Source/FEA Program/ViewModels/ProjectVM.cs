@@ -11,6 +11,8 @@ namespace FEA_Program.ViewModels
 {
     internal class ProjectVM: ObservableObject
     {
+        public event EventHandler<ProblemTypes>? ProblemReset;
+        
         // ---------------------- Models ----------------------
         public StressProblem Problem { get; private set; } = new();
 
@@ -23,6 +25,22 @@ namespace FEA_Program.ViewModels
 
         public NewProblemVM NewProblem { get; private set; } = new();
 
+        // ---------------------- Properties ----------------------
+
+        /// <summary>
+        /// Whether the screen should be 3D based on the problem type
+        /// </summary>
+        public bool ThreeDimensional => Problem.ProblemType switch
+        {
+            // Combine cases that return false using the 'or' pattern
+            ProblemTypes.Bar_1D or ProblemTypes.Beam_1D => false,
+
+            // Case for true
+            ProblemTypes.Truss_3D => true,
+
+            // Default case (return false)
+            _ => false
+        };
 
         // ---------------------- Commands ----------------------
         /// <summary>
@@ -181,6 +199,8 @@ namespace FEA_Program.ViewModels
             Elements.ItemRemoving += OnElementRemoving;
             Elements.LinkCollections(Nodes.Items, Materials.Items);
             Elements.AddEditor.AvailableElementTypes = new(Problem.AvailableElements);
+
+            ProblemReset?.Invoke(this, problemType);
         }
         private void LoadData(ProblemData data)
         {
