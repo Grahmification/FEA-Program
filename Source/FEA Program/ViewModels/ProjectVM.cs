@@ -57,6 +57,8 @@ namespace FEA_Program.ViewModels
         {
             try
             {
+                QueryUserAboutReset();
+
                 var filePath = IODialogs.DisplayOpenFileDialog([IOFileTypes.JSON]);
 
                 if (filePath != null && filePath != "")
@@ -69,6 +71,7 @@ namespace FEA_Program.ViewModels
                     }
                 }
             }
+            catch (OperationCanceledException) { } // Do nothing, the user chose to cancel loading the file
             catch (InvalidOperationException ex) // Unsure if this will ever happen
             {
                 Base.DisplayError(ex.Message);
@@ -160,16 +163,7 @@ namespace FEA_Program.ViewModels
 
         private void OnNewProblemAccepted(object? sender, ProblemTypes e)
         {
-            if(Nodes.Items.Count > 0)
-            {
-                var result = FormattedMessageBox.DisplayYesNoQuestion("This will clear the current problem. Do you want to continue?", "Reset Problem?");
-
-                if(result == DialogResult.No)
-                {
-                    throw new OperationCanceledException();
-                }
-            }
-
+            QueryUserAboutReset();
             ResetProblem(e);
         }
 
@@ -300,6 +294,23 @@ namespace FEA_Program.ViewModels
             output.ProblemType = Problem.ProblemType;
 
             return output;
+        }
+
+        /// <summary>
+        /// Queries the user about whether they want to reset the problem
+        /// </summary>
+        /// <exception cref="OperationCanceledException">Thrown if the user selects no</exception>
+        private void QueryUserAboutReset()
+        {
+            if (Nodes.Items.Count > 0)
+            {
+                var result = FormattedMessageBox.DisplayYesNoQuestion("This will clear the current problem. Do you want to continue?", "Reset Problem?");
+
+                if (result == DialogResult.No)
+                {
+                    throw new OperationCanceledException();
+                }
+            }
         }
     }
 }
