@@ -50,9 +50,6 @@ namespace FEA_Program.ViewModels
 
             NewProblem.Accepted += OnNewProblemAccepted;
 
-            Elements.ItemAdding += OnElementAdding;
-            Elements.ItemRemoving += OnElementRemoving;
-
             Materials.AddDefaultMaterials();
             ResetProblem(ProblemTypes.Truss_3D);
         }
@@ -185,6 +182,9 @@ namespace FEA_Program.ViewModels
             Nodes.ItemAdding += OnNodeAdding;
             Nodes.ItemRemoving += OnNodeRemoving;
 
+            Elements = new ElementsVM();
+            Elements.ItemAdding += OnElementAdding;
+            Elements.ItemRemoving += OnElementRemoving;
             Elements.LinkCollections(Nodes.Items, Materials.Items);
             Elements.AddEditor.AvailableElementTypes = new(Problem.AvailableElements);
         }
