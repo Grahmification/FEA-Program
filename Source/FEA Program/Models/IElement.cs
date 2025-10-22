@@ -32,7 +32,7 @@ namespace FEA_Program.Models
         /// <summary>
         /// Get arguments that may vary between different element types
         /// </summary>
-        public double[] ElementArgs { get; set; }
+        public double[] ElementArgs { get; set; }  // Note: The whole array must be set, or this call will fail
 
         // ---------------- Pre solution methods ----------------
 

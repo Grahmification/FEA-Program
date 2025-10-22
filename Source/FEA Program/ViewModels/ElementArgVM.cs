@@ -54,5 +54,15 @@ namespace FEA_Program.ViewModels
         {
             ValueValid = _ValidatorMethod(Value);
         }
+
+        public static double[] GetArgumentsArray(IEnumerable<ElementArgVM> arguments)
+        {
+            var output = new double[arguments.Count()];
+
+            foreach (var arg in arguments)
+                output[arg.Index] = arg.Value;
+
+            return output;
+        }
     }
 }

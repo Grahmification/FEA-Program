@@ -200,8 +200,7 @@ namespace FEA_Program.ViewModels
             if(element is not null)
             {
                 // Apply variable arguments
-                foreach (var arg in ElementArguments)
-                    element.ElementArgs[arg.Index] = arg.Value;
+                element.ElementArgs = ElementArgVM.GetArgumentsArray(ElementArguments);
 
                 // Create the output viewmodel
                 var elementVM = new ElementVM(element, [.. elementNodes], elementMaterial);
