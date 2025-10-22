@@ -21,6 +21,9 @@ namespace FEA_Program.ViewModels
         public ElementsVM Elements { get; private set; } = new();
         public DrawVM Draw { get; private set; } = new();
 
+        public NewProblemVM NewProblem { get; private set; } = new();
+
+
         // ---------------------- Commands ----------------------
         /// <summary>
         /// RelayCommand for <see cref="LoadFile"/>
@@ -45,6 +48,8 @@ namespace FEA_Program.ViewModels
             SaveFileCommand = new AsyncRelayCommand(SaveFile);
             SolveCommand = new AsyncRelayCommand(Solve);
 
+            NewProblem.Accepted += OnNewProblemAccepted;
+
             Elements.ItemAdding += OnElementAdding;
             Elements.ItemRemoving += OnElementRemoving;
 
@@ -63,9 +68,6 @@ namespace FEA_Program.ViewModels
 
                     if (saveData != null)
                     {
-                        // This this before loading data so changing it doesn't reset the problem
-                        //ToolStripComboBox_ProblemMode.SelectedIndex = (int)saveData.ProblemType;
-
                         LoadData(saveData);
                     }
                 }
@@ -157,6 +159,21 @@ namespace FEA_Program.ViewModels
                 Problem.RemoveElement(e.Model.ID);
                 Draw.RemoveElement(e.Model.ID);
             }
+        }
+
+        private void OnNewProblemAccepted(object? sender, ProblemTypes e)
+        {
+            if(Nodes.Items.Count > 0)
+            {
+                var result = FormattedMessageBox.DisplayYesNoQuestion("This will clear the current problem. Do you want to continue?", "Reset Problem?");
+
+                if(result == DialogResult.No)
+                {
+                    throw new OperationCanceledException();
+                }
+            }
+
+            ResetProblem(e);
         }
 
         // ---------------------- Private Helpers ----------------------

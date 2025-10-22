@@ -38,5 +38,19 @@
         {
             return MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+
+        /// <summary>
+        /// Displays a user message in a <see cref="MessageBox"/>
+        /// </summary>
+        /// <param name="message">The user message</param>
+        /// <param name="header">Optional header for the messagebox</param>
+        /// <returns>Result from the message box button</returns>
+        public static DialogResult DisplayYesNoQuestion(string message, string header = "")
+        {
+            if (header == "")
+                header = "Info";
+
+            return MessageBox.Show(message, header, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+        }
     }
 }
