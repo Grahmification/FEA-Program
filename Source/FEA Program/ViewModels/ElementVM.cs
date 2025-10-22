@@ -63,7 +63,7 @@ namespace FEA_Program.ViewModels
             {
                 if (e.PropertyName == nameof(IElement.SolutionValid))
                 {
-                    OnPropertyChanged(nameof(Model.MaxStress));
+                    OnPropertyChanged(nameof(IElement.MaxStress));
                 }
             }
         }
