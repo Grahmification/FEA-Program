@@ -24,7 +24,10 @@
                        IsViewCubeEdgeClicksEnabled="True"
                        ShowViewCube="{Binding Is3Dimensional}"
                        AllowLeftRightRotation="{Binding Is3Dimensional}"
-                       AllowUpDownRotation="{Binding Is3Dimensional}">
+                       AllowUpDownRotation="{Binding Is3Dimensional}"
+                       RotateAroundMouseDownPoint="True"
+                       FixedRotationPointEnabled="False"
+                       CameraRotationMode="Trackball">
             <h:AmbientLight3D Color="DimGray"  />
             <h:DirectionalLight3D Direction="{Binding Camera.LookDirection}" Color="White" />
             <h:ScreenQuadModel3D Texture="{Binding BackgroundTexture}" />
@@ -41,6 +44,13 @@
                 <h:TransformManipulator3D/>
                 <h:ViewBoxModel3D/>
             </h:GroupModel3D>
+
+            <!-- Custom Input Bindings -->
+            <h:Viewport3DX.InputBindings>
+                <MouseBinding Command="h:ViewportCommands.Rotate" Gesture="MiddleClick" />
+                <MouseBinding Command="h:ViewportCommands.Pan" Gesture="RightClick" />
+                <MouseBinding Command="h:ViewportCommands.Pan" Gesture="Shift+MiddleClick" />
+            </h:Viewport3DX.InputBindings>
         </h:Viewport3DX>
     </Grid>
 </UserControl>
