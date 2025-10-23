@@ -24,6 +24,7 @@ namespace FEA_Program.ViewModels
         public DrawVM Draw { get; private set; } = new();
 
         public NewProblemVM NewProblem { get; private set; } = new();
+        public DebugMatrixVM DebugMatrix { get; private set; } = new();
 
         // ---------------------- Properties ----------------------
 
@@ -185,10 +186,33 @@ namespace FEA_Program.ViewModels
             ResetProblem(e);
         }
 
+
+        private void OnMatriciesCalculated(object? sender, (Matrix, Matrix, Matrix) e)
+        {
+            DebugMatrix.K_Matrix = e.Item1;
+            DebugMatrix.Q_Matrix = e.Item2;
+            DebugMatrix.F_Matrix = e.Item3;
+        }
+        private void OnPartiallyReducedMatriciesCalculated(object? sender, (Matrix, Matrix) e)
+        {
+            DebugMatrix.K_Matrix_Reduced = e.Item1;
+            DebugMatrix.F_Matrix_Reduced = e.Item2;
+        }
+        private void OnFullyReducedMatriciesCalculated(object? sender, (Matrix, Matrix) e)
+        {
+            DebugMatrix.K_Matrix_Fully_Reduced = e.Item1;
+            DebugMatrix.F_Matrix_Fully_Reduced = e.Item2;
+        }
+
         // ---------------------- Private Helpers ----------------------
         private void ResetProblem(ProblemTypes problemType)
         {
             Problem = new StressProblem(problemType);
+            Problem.Solver.SolutionStarted += OnMatriciesCalculated;
+            Problem.Solver.PartiallyReducedCalculated += OnPartiallyReducedMatriciesCalculated;
+            Problem.Solver.FullyReducedCalculated += OnFullyReducedMatriciesCalculated;
+
+            DebugMatrix.ResetMatricies();
             Draw = new DrawVM();
             Nodes = new NodesVM(Problem.AvailableNodeDOFs);
             Nodes.ItemAdding += OnNodeAdding;

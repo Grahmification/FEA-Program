@@ -86,14 +86,11 @@
                 </Menu>
             </StackPanel>
 
-            <ComboBox Grid.Column="2" 
-              Width="150" 
-              Margin="5,0,5,0" 
-              VerticalAlignment="Center">
-                <ComboBoxItem IsSelected="True">Option A</ComboBoxItem>
-                <ComboBoxItem>Option B</ComboBoxItem>
-                <ComboBoxItem>Option C</ComboBoxItem>
-            </ComboBox>
+            <Menu Grid.Column="2"  VerticalAlignment="Center">
+                <MenuItem Header="_Advanced" Height="20">
+                    <MenuItem Header="_View Problem Matricies" Command="{Binding Project.DebugMatrix.ShowWindowCommand}"/>
+                </MenuItem>
+            </Menu>
         </Grid>
         
         <!-- Lower Status Bar -->
