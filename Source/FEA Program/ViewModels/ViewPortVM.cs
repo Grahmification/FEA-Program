@@ -53,20 +53,20 @@ namespace FEA_Program.ViewModels
 
         public static OrthographicCamera DefaultOrthographicCamera() => new()
         {
-            Position = new Media3D.Point3D(0, 0, 20),
-            LookDirection = new Vector3D(0, 0, -20),
+            Position = new Media3D.Point3D(0, 0, 60),
+            LookDirection = new Vector3D(0, 0, -60),
             UpDirection = new Vector3D(0, 1, 0),
             Width = 20,
-            //NearPlaneDistance = 1,
-            //FarPlaneDistance = 100,
+            NearPlaneDistance = 1,
+            FarPlaneDistance = 1500,
         };
         public static PerspectiveCamera DefaultPerspectiveCamera() => new()
         {
-            Position = new Media3D.Point3D(0, 5, 18),
-            LookDirection = new Vector3D(0, -5, -18),
+            Position = new Media3D.Point3D(0, 15, 60),
+            LookDirection = new Vector3D(0, -15, -60),
             UpDirection = new Vector3D(0, 1, 0),
-            NearPlaneDistance = 0.5,
-            FarPlaneDistance = 150
+            NearPlaneDistance = 0.1,
+            FarPlaneDistance = 1500
         };
     }
 }
