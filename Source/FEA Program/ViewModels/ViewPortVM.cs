@@ -4,6 +4,7 @@ using SharpDX;
 using Media3D = System.Windows.Media.Media3D;
 using Vector3D = System.Windows.Media.Media3D.Vector3D;
 using System.IO;
+using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
@@ -20,10 +21,14 @@ namespace FEA_Program.ViewModels
             set 
             {
                 _is3Dimensional = value;
-                Camera = value ? DefaultPerspectiveCamera() : DefaultOrthographicCamera();
+                ResetCamera();
             }
         }
         public string CoordZText => Is3Dimensional ? "Z" : "";
+
+
+        // ----------------------- Commands -----------------------------
+        public ICommand ResetCameraCommand { get; }
 
         // ----------------------- Public Methods -----------------------------
         public ViewPortVM()
@@ -39,7 +44,11 @@ namespace FEA_Program.ViewModels
                     new(){ Color = new SharpDX.Mathematics.Interop.RawColor4(1f, 1f, 1f, 1f), Position = 1f }
                 });
 
-            //AddGroupItems();
+            ResetCameraCommand = new RelayCommand(ResetCamera);
+        }
+        public void ResetCamera()
+        {
+            Camera = Is3Dimensional ? DefaultPerspectiveCamera() : DefaultOrthographicCamera();
         }
 
         public static OrthographicCamera DefaultOrthographicCamera() => new()

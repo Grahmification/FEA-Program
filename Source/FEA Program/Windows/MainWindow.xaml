@@ -64,6 +64,12 @@
                     </MenuItem>
                 </Menu>
 
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="_View" Height="20">
+                        <MenuItem Header="_Reset" Command="{Binding ViewPort.ResetCameraCommand}"/>
+                    </MenuItem>
+                </Menu>
+
                 <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
 
                 <Menu VerticalAlignment="Center">
