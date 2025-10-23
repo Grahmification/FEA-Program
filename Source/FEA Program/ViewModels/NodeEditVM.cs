@@ -1,4 +1,4 @@
-﻿using FEA_Program.Models;
+using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
@@ -65,7 +65,7 @@ namespace FEA_Program.ViewModels
 
             for (int i = 0; i < EditItem.Model.Dimension; i++)
             {
-                var userCoord = EditItem.Model.Coordinates[i] * 1000;  // Convert to mm
+                var userCoord = App.Units.Length.ToUser(EditItem.Model.Coordinates[i]);  // Convert to user units
                 var coordVM = new CoordinateVM(i, userCoord, EditItem.Model.Fixity[i] == 1);
                 coordVM.ValueChanged += OnCoordinateValueChanged;
                 EditCoordinates.Add(coordVM);
@@ -92,7 +92,7 @@ namespace FEA_Program.ViewModels
         {
             if (sender is CoordinateVM vm && EditItem is not null)
             {
-                EditItem.Model.Coordinates[e] = vm.Value / 1000.0;  // Convert from mm
+                EditItem.Model.Coordinates[e] = App.Units.Length.FromUser(vm.Value);  // Convert from user units
                 EditItem.Model.Fixity[e] = vm.Fixed ? 1 : 0;
             }
         }

@@ -103,8 +103,8 @@
                             </TreeViewItem.Header>
                             <StackPanel>
                                 <TextBlock>
-                                <Run Text="Pos: " FontWeight="Bold"/>
-                                <Run Text="{Binding Coordinates_mm, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
+                                <Run Text="{Binding Source={StaticResource Units}, Path=Length.UnitString, StringFormat={}Pos [{0}]:, Mode=OneWay}" FontWeight="Bold"/>
+                                <Run Text="{Binding UserCoordinates, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
                                 </TextBlock>
                                 <TextBlock>
                                 <Run Text="Fixity: " FontWeight="Bold"/>

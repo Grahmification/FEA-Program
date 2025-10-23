@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using FEA_Program.ViewModels;
+using System.Windows;
 
 namespace FEA_Program
 {
@@ -7,6 +8,12 @@ namespace FEA_Program
     /// </summary>
     public partial class App : System.Windows.Application
     {
+        /// <summary>
+        /// Global program units
+        /// </summary>
+        internal static UnitsVM Units { get; } = new UnitsVM();
+
+
         /// <summary>
         /// Fires when an unhandled exception occurs
         /// </summary>

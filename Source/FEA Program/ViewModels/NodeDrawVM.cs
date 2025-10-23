@@ -36,7 +36,7 @@ namespace FEA_Program.ViewModels
         {
             if (sender is NodeVM node)
             {
-                if (e.PropertyName == nameof(NodeVM.Coordinates_mm))
+                if (e.PropertyName == nameof(NodeVM.UserCoordinates))
                 {
                     OnPropertyChanged(nameof(DrawPosition));
                 }

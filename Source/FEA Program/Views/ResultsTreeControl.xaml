@@ -36,12 +36,12 @@
                             </TreeViewItem.Header>
                             <StackPanel>
                                 <TextBlock>
-                                    <Run Text="Displacement: " FontWeight="Bold"/>
-                                    <Run Text="{Binding Displacement_mm, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
+                                    <Run Text="{Binding Source={StaticResource Units}, Path=Length.UnitString, StringFormat={}Displacement [{0}]:, Mode=OneWay}" FontWeight="Bold"/>
+                                    <Run Text="{Binding UserDisplacement, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
                                 </TextBlock>
                                 <TextBlock>
-                                    <Run Text="Position: " FontWeight="Bold"/>
-                                    <Run Text="{Binding FinalPos_mm, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
+                                    <Run Text="{Binding Source={StaticResource Units}, Path=Length.UnitString, StringFormat={}Position [{0}]:, Mode=OneWay}" FontWeight="Bold"/>
+                                    <Run Text="{Binding UserFinalPos, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
                                 </TextBlock>
                                 <TextBlock>
                                     <Run Text="Reaction Force [N]: " FontWeight="Bold"/>

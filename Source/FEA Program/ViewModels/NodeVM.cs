@@ -19,9 +19,9 @@ namespace FEA_Program.ViewModels
         /// <summary>
         /// Get the node coordinates in user units
         /// </summary>
-        public double[] Coordinates_mm => Model.Coordinates.Select(coord => coord * 1000.0).ToArray();
-        public double[] Displacement_mm => Model.Displacement.Select(coord => coord * 1000.0).ToArray();
-        public double[] FinalPos_mm => Model.FinalPos.Select(coord => coord * 1000.0).ToArray();
+        public double[] UserCoordinates => Model.Coordinates.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
+        public double[] UserDisplacement => Model.Displacement.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
+        public double[] UserFinalPos => Model.FinalPos.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
 
         public bool Selected { get; set; } = false;
 
@@ -34,7 +34,7 @@ namespace FEA_Program.ViewModels
         /// <summary>
         /// Display the node ID and the coordinates nicely in a text field
         /// </summary>
-        public string IDCoordsDisplayText => $"{Model.ID} - ({string.Join(", ", Coordinates_mm.Select(c => c.ToString("F1")).ToArray() ?? [])})";
+        public string IDCoordsDisplayText => $"{Model.ID} - ({string.Join(", ", UserCoordinates.Select(c => c.ToString("F1")).ToArray() ?? [])})";
 
 
         // ---------------------- Commands ----------------------
@@ -61,8 +61,8 @@ namespace FEA_Program.ViewModels
             {
                 if (e.PropertyName == nameof(Node.Coordinates))
                 {
-                    OnPropertyChanged(nameof(Coordinates_mm));
-                    OnPropertyChanged(nameof(FinalPos_mm));
+                    OnPropertyChanged(nameof(UserCoordinates));
+                    OnPropertyChanged(nameof(UserFinalPos));
                 }
                 else if(e.PropertyName == nameof(Node.Force))
                 {
@@ -76,8 +76,8 @@ namespace FEA_Program.ViewModels
                 }
                 else if (e.PropertyName == nameof(Node.Displacement))
                 {
-                    OnPropertyChanged(nameof(Displacement_mm));
-                    OnPropertyChanged(nameof(FinalPos_mm));
+                    OnPropertyChanged(nameof(UserDisplacement));
+                    OnPropertyChanged(nameof(UserFinalPos));
                 }
             }
         }
