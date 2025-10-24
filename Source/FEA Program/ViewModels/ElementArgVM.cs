@@ -27,20 +27,20 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public int Index { get; private set; } = -1;
         public string Name { get; private set; } = "";
+        public double UserValue { get => Units.ToUser(Value); set => Value = Units.FromUser(value); }
         public double Value { get => _value; set { _value = value; ValidateValue(); ValueChanged?.Invoke(this, EventArgs.Empty); } }
-        public Units.DataUnitType UnitType { get; private set; } = Units.DataUnitType.Unitless;
-        public string UnitName => Units.UnitStrings(Units.DefaultUnit(UnitType))[0];
+        public UnitVM Units { get; private set; } = new();
         public bool ValueValid { get; private set; } = true;
 
 
         public ElementArgVM() { }
 
-        public ElementArgVM(int index, string name, Units.DataUnitType unitType, double initialValue = 0, Func<double, bool>? validatorMethod = null)
+        public ElementArgVM(int index, string name, UnitVM? units = null, double initialValue = 0, Func<double, bool>? validatorMethod = null)
         {
             Index = index;
             _value = initialValue;
             Name = name;
-            UnitType = unitType;
+            Units = units ?? new UnitVM();
 
             if (validatorMethod != null)
             {

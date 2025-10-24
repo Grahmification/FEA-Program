@@ -158,10 +158,9 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock>
-                                                <Run Text="{Binding Name, Mode=OneWay}" FontWeight="Bold"/>
-                                                <Run Text=":" FontWeight="Bold"/>
-                                                <Run Text="{Binding Value, Mode=OneWay}"/>
-                                                <Run Text="{Binding UnitName, Mode=OneWay}" />
+                                                <Run Text="{Binding Name, StringFormat={}{0}:, Mode=OneWay}" FontWeight="Bold"/>
+                                                <Run Text="{Binding UserValue, Mode=OneWay}"/>
+                                                <Run Text="{Binding Units.UnitString, Mode=OneWay}"/>
                                             </TextBlock>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>

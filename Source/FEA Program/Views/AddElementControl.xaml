@@ -116,11 +116,11 @@
                             <StackPanel Orientation="Vertical" Margin="0,5">
                                 <TextBlock Margin="5,0,0,5">
                                     <Run Text="{Binding Name, Mode=OneWay}"/>
-                                    <Run Text="{Binding UnitName, StringFormat={}[{0}]:, Mode=OneWay}" />
+                                    <Run Text="{Binding Units.UnitString, StringFormat={}[{0}]:, Mode=OneWay}" />
                                 </TextBlock>
 
                                 <TextBox Margin="10, 0, 0, 0" VerticalContentAlignment="Center" Height="20"
-                                    Text="{Binding Value, UpdateSourceTrigger=Explicit}" KeyDown="TextBox_KeyDown">
+                                    Text="{Binding UserValue, UpdateSourceTrigger=Explicit}" KeyDown="TextBox_KeyDown">
                                     <TextBox.Style>
                                         <Style TargetType="TextBox">
                                             <Setter Property="BorderBrush" Value="Gray"/>
