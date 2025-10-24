@@ -15,19 +15,19 @@ namespace FEA_Program.ViewModels
         public Material Model { get; private set; } = Material.DummyMaterial();
 
         /// <summary>
-        /// Youngs modulus in GPa
+        /// Youngs modulus in user units
         /// </summary>
-        public double E_GPa { get => Model.E / Math.Pow(1000.0, 3); set => Model.E = value * Math.Pow(1000.0, 3); }
+        public double E { get => App.Units.Modulus.ToUser(Model.E); set => Model.E = App.Units.Modulus.FromUser(value); }
 
         /// <summary>
-        /// Yield strength in MPa
+        /// Yield strength in user units
         /// </summary>
-        public double Sy_MPa { get => Model.Sy / Math.Pow(1000.0, 2); set => Model.Sy = value * Math.Pow(1000.0, 2); }
+        public double Sy { get => App.Units.Stress.ToUser(Model.Sy); set => Model.Sy = App.Units.Stress.FromUser(value); }
 
         /// <summary>
-        /// Ultimate strength in Pa
+        /// Ultimate strength in user units
         /// </summary>
-        public double Sut_MPa { get => Model.Sut / Math.Pow(1000.0, 2); set => Model.Sut = value * Math.Pow(1000.0, 2); }
+        public double Sut { get => App.Units.Stress.ToUser(Model.Sut); set => Model.Sut = App.Units.Stress.FromUser(value); }
 
         // ---------------------- Commands ----------------------
         public ICommand? EditCommand { get; }
@@ -38,8 +38,28 @@ namespace FEA_Program.ViewModels
         public MaterialVM(Material model)
         {
             Model = model;
+            Model.PropertyChanged += OnModelPropertyChanged;
             EditCommand = new RelayCommand(() => EditRequest?.Invoke(this, EventArgs.Empty));
             DeleteCommand = new RelayCommand(() => DeleteRequest?.Invoke(this, EventArgs.Empty));
+        }
+
+        private void OnModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(sender is Material m)
+            {
+                if(e.PropertyName == nameof(Material.E))
+                {
+                    OnPropertyChanged(nameof(E));
+                }
+                else if (e.PropertyName == nameof(Material.Sy))
+                {
+                    OnPropertyChanged(nameof(Sy));
+                }
+                else if (e.PropertyName == nameof(Material.Sut))
+                {
+                    OnPropertyChanged(nameof(Sut));
+                }
+            }
         }
     }
 }

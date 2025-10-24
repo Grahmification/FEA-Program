@@ -13,5 +13,10 @@ namespace FEA_Program.ViewModels
         public UnitVM Area { get; private set; } = new(DataUnitType.Area, AllUnits.mm_squared);
         public UnitVM Stress { get; private set; } = new(DataUnitType.Pressure, AllUnits.MPa);
 
+        /// <summary>
+        /// Pressure used for Young's modulus calculations
+        /// </summary>
+        public UnitVM Modulus { get; private set; } = new(DataUnitType.Pressure, AllUnits.GPa);
+
     }
 }

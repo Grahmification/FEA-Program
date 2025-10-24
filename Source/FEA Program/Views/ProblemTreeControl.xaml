@@ -44,27 +44,25 @@
                             <StackPanel>
                                 <TextBlock>
                                 <Run Text="E:     " FontWeight="Bold"/>
-                                <Run Text="{Binding E_GPa, StringFormat={}{0:F1} GPa, Mode=OneWay}"/>
+                                <Run Text="{Binding E, StringFormat={}{0:F1}, Mode=OneWay}"/>
+                                <Run Text="{Binding Source={StaticResource Units}, Path=Modulus.UnitString, Mode=OneWay}"/>
                                 </TextBlock>
 
                                 <TextBlock>
                                 <Run Text="V:     " FontWeight="Bold"/>
-                                <Run Text="{Binding Model.V, StringFormat={}{0:F1} GPa, Mode=OneWay}"/>
+                                <Run Text="{Binding Model.V, StringFormat={}{0:F1}, Mode=OneWay}"/>
                                 </TextBlock>
 
                                 <TextBlock>
                                 <Run Text="Sy:   " FontWeight="Bold"/>
-                                <Run Text="{Binding Sy_MPa, StringFormat={}{0:F1} MPa, Mode=OneWay}"/>
-                                </TextBlock>
-
-                                <TextBlock>
-                                <Run Text="Sy:   " FontWeight="Bold"/>
-                                <Run Text="{Binding Sy_MPa, StringFormat={}{0:F1} MPa, Mode=OneWay}"/>
+                                <Run Text="{Binding Sy, StringFormat={}{0:F1}, Mode=OneWay}"/>
+                                <Run Text="{Binding Source={StaticResource Units}, Path=Stress.UnitString, Mode=OneWay}"/>
                                 </TextBlock>
 
                                 <TextBlock>
                                 <Run Text="SuT: " FontWeight="Bold"/>
-                                <Run Text="{Binding Sut_MPa, StringFormat={}{0:F1} MPa, Mode=OneWay}"/>
+                                <Run Text="{Binding Sut, StringFormat={}{0:F1}, Mode=OneWay}"/>
+                                <Run Text="{Binding Source={StaticResource Units}, Path=Stress.UnitString, Mode=OneWay}"/>
                                 </TextBlock>
 
                                 <TextBlock>

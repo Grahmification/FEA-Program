@@ -83,20 +83,20 @@
             <!-- ===== Row 3+: Other Parameters ===== -->
             <StackPanel Grid.Row="3" Orientation="Vertical">
                 <StackPanel>
-                    <Label Content="E (GPa):"/>
-                    <TextBox Height="25" Margin="10, 0, 0, 0" Text="{Binding Material.E_GPa}"/>
+                    <TextBlock Text="{Binding Source={StaticResource Units}, Path=Modulus.UnitString, StringFormat={} Youngs Modulus [{0}]:, Mode=OneWay}" Margin="0,5"/>
+                    <TextBox Height="25" Margin="10, 0, 0, 0" Text="{Binding Material.E}"/>
                 </StackPanel>
                 <StackPanel>
-                    <Label Content="V (-):"/>
+                    <TextBlock Text="Poisson's Ratio [-]:"/>
                     <TextBox Height="25" Margin="10, 0, 0, 0" Text="{Binding Material.Model.V}"/>
                 </StackPanel>
                 <StackPanel>
-                    <Label Content="Sy (MPa):"/>
-                    <TextBox Height="25" Margin="10, 0, 0, 0" Text="{Binding Material.Sy_MPa}"/>
+                    <TextBlock Text="{Binding Source={StaticResource Units}, Path=Stress.UnitString, StringFormat={}Yield Strength [{0}]:, Mode=OneWay}" Margin="0,5"/>
+                    <TextBox Height="25" Margin="10, 0, 0, 0" Text="{Binding Material.Sy}"/>
                 </StackPanel>
                 <StackPanel>
-                    <Label Content="SuT (MPa):"/>
-                    <TextBox Height="25" Margin="10, 0, 0, 0" Text="{Binding Material.Sut_MPa}"/>
+                    <TextBlock Text="{Binding Source={StaticResource Units}, Path=Stress.UnitString, StringFormat={}Ultimate Strength [{0}]:, Mode=OneWay}" Margin="0,5"/>
+                    <TextBox Height="25" Margin="10, 0, 0, 0" Text="{Binding Material.Sut}"/>
                 </StackPanel>
             </StackPanel>
         </Grid>
