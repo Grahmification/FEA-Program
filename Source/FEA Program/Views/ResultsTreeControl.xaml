@@ -70,7 +70,8 @@
                             <StackPanel>
                                 <TextBlock>
                                     <Run Text="Stress: " FontWeight="Bold"/>
-                                    <Run Text="{Binding Model.MaxStress, StringFormat={}{0:F1} Pa, Mode=OneWay}"/>
+                                    <Run Text="{Binding MaxStress, StringFormat={}{0:F2}, Mode=OneWay}"/>
+                                    <Run Text="{Binding Source={StaticResource Units}, Path=Stress.UnitString, Mode=OneWay}"/>
                                 </TextBlock>
                             </StackPanel>
                         </TreeViewItem>

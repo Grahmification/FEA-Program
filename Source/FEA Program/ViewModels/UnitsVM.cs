@@ -11,6 +11,7 @@ namespace FEA_Program.ViewModels
     {
         public UnitVM Length { get; private set; } = new(DataUnitType.Length, AllUnits.mm);
         public UnitVM Area { get; private set; } = new(DataUnitType.Area, AllUnits.mm_squared);
+        public UnitVM Stress { get; private set; } = new(DataUnitType.Pressure, AllUnits.MPa);
 
     }
 }

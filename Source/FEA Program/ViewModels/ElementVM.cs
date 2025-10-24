@@ -19,6 +19,7 @@ namespace FEA_Program.ViewModels
         public int[] NodeIds => Nodes.Select(n => n.Model.ID).ToArray();
         public ElementArgVM[] Arguments { get; private set; } = [];
         public bool Selected { get; set; } = false;
+        public double MaxStress => App.Units.Stress.ToUser(Model?.MaxStress ?? 0);
 
         // ---------------------- Commands ----------------------
         public ICommand? EditCommand { get; }
@@ -64,6 +65,7 @@ namespace FEA_Program.ViewModels
                 if (e.PropertyName == nameof(IElement.SolutionValid))
                 {
                     OnPropertyChanged(nameof(IElement.MaxStress));
+                    OnPropertyChanged(nameof(MaxStress));
                 }
             }
         }
