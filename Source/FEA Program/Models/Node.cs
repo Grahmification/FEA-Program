@@ -173,6 +173,10 @@ namespace FEA_Program.Models
             OnPropertyChanged(nameof(Fixity));
             OnPropertyChanged(nameof(Force));
 
+            // Need to alert parents the state has changed
+            if (SolutionValid && !other.SolutionValid)
+                SolutionInvalidated?.Invoke(this, ID);
+
             Dimension = other.Dimension;
             SolutionValid = other.SolutionValid;
             Displacement = (double[])other.Displacement.Clone();

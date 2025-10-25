@@ -32,7 +32,10 @@
                     <DataTemplate DataType="{x:Type vm:NodeVM}">
                         <TreeViewItem>
                             <TreeViewItem.Header>
-                                <TextBlock Text="{Binding Model.ID, StringFormat={}Node {0}, Mode=OneWay}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Model.ID, StringFormat={}Node {0}, Mode=OneWay}" />
+                                    <CheckBox Content="" IsChecked="{Binding Model.SolutionValid, Mode=OneWay}" IsEnabled="False" Margin="5,0"/>
+                                </StackPanel>
                             </TreeViewItem.Header>
                             <StackPanel>
                                 <TextBlock>
@@ -65,7 +68,10 @@
                     <DataTemplate DataType="{x:Type vm:ElementVM}">
                         <TreeViewItem>
                             <TreeViewItem.Header>
-                                <TextBlock Text="{Binding Model.ID, StringFormat={}Element {0}, Mode=OneWay}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Model.ID, StringFormat={}Element {0}, Mode=OneWay}" />
+                                    <CheckBox Content="" IsChecked="{Binding Model.SolutionValid, Mode=OneWay}" IsEnabled="False" Margin="5,0"/>
+                                </StackPanel>
                             </TreeViewItem.Header>
                             <StackPanel>
                                 <TextBlock>

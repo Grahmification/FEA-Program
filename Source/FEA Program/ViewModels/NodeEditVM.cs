@@ -98,6 +98,10 @@ namespace FEA_Program.ViewModels
             {
                 EditItem.Model.Coordinates[e] = App.Units.Length.FromUser(vm.Value);  // Convert from user units
                 EditItem.Model.Fixity[e] = vm.Fixed ? 1 : 0;
+
+                // This will invalidate the solution
+                var coords = EditItem.Model.Coordinates.ToList();
+                EditItem.Model.Coordinates = [.. coords];
             }
         }
 
