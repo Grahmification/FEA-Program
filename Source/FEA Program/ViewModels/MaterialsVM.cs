@@ -48,8 +48,8 @@ namespace FEA_Program.ViewModels
         }
         public void AddDefaultMaterials()
         {
-            Add("Aluminum 6061-T6", 69, 0.3, 276, 210, MaterialType.Aluminum_Alloy);
-            Add("1045 Steel", 200, 0.29, 565, 310, MaterialType.Steel_Alloy);
+            Add("Aluminum 6061-T6", 69, 0.3, 210, 276, MaterialType.Aluminum_Alloy);
+            Add("1045 Steel", 200, 0.29, 310, 565, MaterialType.Steel_Alloy);
         }
 
         /// <summary>
