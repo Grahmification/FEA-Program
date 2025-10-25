@@ -1,7 +1,6 @@
-﻿using System.Windows.Data;
+﻿using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
-using UserControl = System.Windows.Controls.UserControl;
-using TextBox = System.Windows.Controls.TextBox;
 
 namespace FEA_Program.Views
 {
@@ -16,7 +15,7 @@ namespace FEA_Program.Views
         }
 
 
-        private void TextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void TextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {

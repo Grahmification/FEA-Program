@@ -1,13 +1,15 @@
 ﻿using HelixToolkit.Wpf.SharpDX;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
+
 
 namespace FEA_Program.Views
 {
     /// <summary>
     /// Interaction logic for ViewPortControl.xaml
     /// </summary>
-    public partial class ViewPortControl : System.Windows.Controls.UserControl
+    public partial class ViewPortControl : UserControl
     {
         public ViewPortControl()
         {

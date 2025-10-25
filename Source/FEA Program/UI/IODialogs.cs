@@ -1,4 +1,6 @@
-﻿namespace FEA_Program.UI
+﻿using Microsoft.Win32;
+
+namespace FEA_Program.UI
 {
     internal class IODialogs
     {
@@ -55,7 +57,7 @@
                 };
             }
 
-            if (saveDlg.ShowDialog() == DialogResult.OK)
+            if (saveDlg.ShowDialog() ?? false)
             {
                 return saveDlg.FileName;
             }
@@ -106,7 +108,7 @@
                 };
             }
 
-            if (openDlg.ShowDialog() == DialogResult.OK)
+            if (openDlg.ShowDialog() ?? false)
             {
                 //Get the path of specified file
                 return openDlg.FileName;

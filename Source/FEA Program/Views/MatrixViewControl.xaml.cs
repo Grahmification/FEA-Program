@@ -1,8 +1,7 @@
-﻿using UserControl = System.Windows.Controls.UserControl;
-using Brushes = System.Windows.Media.Brushes;
-using MathNet.Numerics.LinearAlgebra;
+﻿using MathNet.Numerics.LinearAlgebra;
 using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Media;
 
 namespace FEA_Program.Views
 {

@@ -5,6 +5,7 @@ using FEA_Program.ViewModels.Base;
 using MathNet.Numerics.LinearAlgebra.Double;
 using System.IO;
 using System.Text.Json;
+using System.Windows;
 using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
@@ -371,7 +372,7 @@ namespace FEA_Program.ViewModels
             {
                 var result = FormattedMessageBox.DisplayYesNoQuestion("This will clear the current problem. Do you want to continue?", "Reset Problem?");
 
-                if (result == DialogResult.No)
+                if (result == MessageBoxResult.No)
                 {
                     throw new OperationCanceledException();
                 }

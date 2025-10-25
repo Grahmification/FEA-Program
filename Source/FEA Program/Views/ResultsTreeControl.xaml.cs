@@ -1,4 +1,4 @@
-﻿using UserControl = System.Windows.Controls.UserControl;
+﻿using System.Windows.Controls;
 
 namespace FEA_Program.Views
 {

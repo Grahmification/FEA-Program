@@ -1,4 +1,6 @@
-﻿namespace FEA_Program.UI
+﻿using System.Windows;
+
+namespace FEA_Program.UI
 {
     /// <summary>
     /// Class providing a global entry point for displaying message boxes
@@ -11,12 +13,12 @@
         /// <param name="message">The user message</param>
         /// <param name="header">Optional header for the messagebox</param>
         /// <returns>Result from the message box button</returns>
-        public static DialogResult DisplayMessage(string message, string header = "")
+        public static MessageBoxResult DisplayMessage(string message, string header = "")
         {
             if (header == "")
                 header = "Info";
 
-            return MessageBox.Show(message, header, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return MessageBox.Show(message, header, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         /// <summary>
@@ -24,9 +26,9 @@
         /// </summary>
         /// <param name="message">The error message</param>
         /// <returns>Result from the message box button</returns>
-        public static DialogResult DisplayError(string message)
+        public static MessageBoxResult DisplayError(string message)
         {
-            return MessageBox.Show($"An error occurred: {message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return MessageBox.Show($"An error occurred: {message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         /// <summary>
@@ -34,9 +36,9 @@
         /// </summary>
         /// <param name="ex">The exception</param>
         /// <returns>Result from the message box button</returns>
-        public static DialogResult DisplayError(Exception ex)
+        public static MessageBoxResult DisplayError(Exception ex)
         {
-            return MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         /// <summary>
@@ -45,12 +47,12 @@
         /// <param name="message">The user message</param>
         /// <param name="header">Optional header for the messagebox</param>
         /// <returns>Result from the message box button</returns>
-        public static DialogResult DisplayYesNoQuestion(string message, string header = "")
+        public static MessageBoxResult DisplayYesNoQuestion(string message, string header = "")
         {
             if (header == "")
                 header = "Info";
 
-            return MessageBox.Show(message, header, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            return MessageBox.Show(message, header, MessageBoxButton.YesNo, MessageBoxImage.Question);
         }
     }
 }
