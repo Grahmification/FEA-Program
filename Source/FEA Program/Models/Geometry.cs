@@ -55,5 +55,21 @@ namespace FEA_Program.Models
 
             return (l, m, n);
         }
+
+        /// <summary>
+        /// Computes the magnitude of a vector with arbitrary dimensions
+        /// </summary>
+        /// <param name="vector">The input vector</param>
+        /// <returns>Absolute magnitude of the vector</returns>
+        public static double Magnitude(double[] vector)
+        {
+            DenseVector output = new(vector.Length);
+
+            for(int i =  0; i < vector.Length; i++)
+                output[i] = vector[i];
+
+            // Calculate the L2-norm (magnitude)
+            return output.L2Norm();
+        }
     }
 }

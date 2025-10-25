@@ -56,26 +56,7 @@ namespace FEA_Program.Models
                 InvalidateSolution();
             }
         } // First 3 items  = force [N], last 3 = moments [Nm]
-        public double ForceMagnitude
-        {
-            get
-            {
-                // Dimension == 1
-                DenseVector output = new([_Force[0], 0, 0]);
-
-                if (Dimension >= 2)
-                {
-                    output[1] = _Force[1];
-                }
-                else if (Dimension == 3 || Dimension == 6)
-                {
-                    output[2] = _Force[2];
-                }
-
-                // Calculate the L2-norm (magnitude)
-                return output.L2Norm();
-            }
-        } // will eventually need moment functions too
+        public double ForceMagnitude => Geometry.Magnitude(_Force.Take(3).ToArray()); // Compute based on the first 3 items
         public double[] ForceDirection
         {
             get
