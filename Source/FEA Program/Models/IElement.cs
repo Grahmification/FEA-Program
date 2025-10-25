@@ -1,4 +1,5 @@
-﻿using MathNet.Numerics.LinearAlgebra.Double;
+﻿using FEA_Program.Converters;
+using MathNet.Numerics.LinearAlgebra.Double;
 using System.ComponentModel;
 
 namespace FEA_Program.Models
@@ -98,8 +99,10 @@ namespace FEA_Program.Models
     /// <summary>
     /// Different types of elements
     /// </summary>
+    [TypeConverter(typeof(EnumDescriptionTypeConverter))]
     public enum ElementTypes
     {
+        [Description("Linear Bar")]
         BarLinear
     }
 }

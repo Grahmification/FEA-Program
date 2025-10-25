@@ -1,4 +1,6 @@
-﻿using MathNet.Numerics.LinearAlgebra.Double;
+﻿using FEA_Program.Converters;
+using MathNet.Numerics.LinearAlgebra.Double;
+using System.ComponentModel;
 
 namespace FEA_Program.Models
 {
@@ -91,10 +93,16 @@ namespace FEA_Program.Models
         }
     }
 
+    [TypeConverter(typeof(EnumDescriptionTypeConverter))]
     public enum MaterialType
     {
+        [Description("Steel Alloy")]
         Steel_Alloy,
+
+        [Description("Aluminum Alloy")]
         Aluminum_Alloy,
+
+        [Description("Other")]
         Other
     }
 }
