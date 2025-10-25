@@ -20,6 +20,8 @@ namespace FEA_Program.ViewModels
         public ElementArgVM[] Arguments { get; private set; } = [];
         public bool Selected { get; set; } = false;
         public double MaxStress => App.Units.Stress.ToUser(Model?.MaxStress ?? 0);
+        public double SafetyFactorYield => Model?.SafetyFactorYield ?? 0;
+        public double SafetyFactorUltimate => Model?.SafetyFactorUltimate ?? 0;
 
         // ---------------------- Commands ----------------------
         public ICommand? EditCommand { get; }
@@ -64,7 +66,8 @@ namespace FEA_Program.ViewModels
             {
                 if (e.PropertyName == nameof(IElement.SolutionValid))
                 {
-                    OnPropertyChanged(nameof(IElement.MaxStress));
+                    OnPropertyChanged(nameof(SafetyFactorYield));
+                    OnPropertyChanged(nameof(SafetyFactorUltimate));
                     OnPropertyChanged(nameof(MaxStress));
                 }
             }

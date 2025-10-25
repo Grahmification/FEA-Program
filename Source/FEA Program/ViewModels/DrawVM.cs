@@ -1,8 +1,28 @@
+using FEA_Program.Converters;
 using FEA_Program.ViewModels.Base;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace FEA_Program.ViewModels
 {
+    [TypeConverter(typeof(EnumDescriptionTypeConverter))]
+    internal enum ElementColorSchemes
+    {
+        [Description("Default")]
+        None,
+
+        [Description("Max Stress")]
+        MaxStress,
+
+        [Description("Yield Safety Factor")]
+        SafetyFactorYield,
+
+        [Description("Ultimate Safety Factor")]
+        SafetyFactorUltimate,
+    }
+    
+    
+    
     internal class DrawVM: ObservableObject
     {
         // Reference by ID for easy lookup
@@ -30,8 +50,8 @@ namespace FEA_Program.ViewModels
 
         // ---------------------- Element Properties ----------------------
 
-        private bool _DrawElementStressColors = false;
-        public bool DrawElementStressColors { get => _DrawElementStressColors; set { _DrawElementStressColors = value; UpdateElementColors(); } }
+        private ElementColorSchemes _ElementColorScheme = ElementColorSchemes.None;
+        public ElementColorSchemes ElementColorScheme { get => _ElementColorScheme; set { _ElementColorScheme = value; UpdateElementColors(); } }
 
 
         // ---------------------- Public Methods ----------------------
@@ -97,9 +117,17 @@ namespace FEA_Program.ViewModels
         {
             try
             {
-                if (DrawElementStressColors)
+                if(ElementColorScheme == ElementColorSchemes.MaxStress)
                 {
                     ElementDrawVM.ApplyStressColors(Elements);
+                }
+                else if (ElementColorScheme == ElementColorSchemes.SafetyFactorUltimate)
+                {
+                    ElementDrawVM.ApplySafetyFactorColors(Elements, 10, false);
+                }
+                else if (ElementColorScheme == ElementColorSchemes.SafetyFactorYield)
+                {
+                    ElementDrawVM.ApplySafetyFactorColors(Elements, 10, true);
                 }
                 else
                 {

@@ -29,6 +29,16 @@ namespace FEA_Program.Models
         public bool SolutionValid { get; }
         public double MaxStress { get; }
 
+        /// <summary>
+        /// Gets the safety factor for yielding
+        /// </summary>
+        public double SafetyFactorYield { get; }
+
+        /// <summary>
+        /// Gets the safety factor for failure
+        /// </summary>
+        public double SafetyFactorUltimate { get; }
+
 
         /// <summary>
         /// Get arguments that may vary between different element types

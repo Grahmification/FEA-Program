@@ -79,6 +79,14 @@
                                     <Run Text="{Binding MaxStress, StringFormat={}{0:F2}, Mode=OneWay}"/>
                                     <Run Text="{Binding Source={StaticResource Units}, Path=Stress.UnitString, Mode=OneWay}"/>
                                 </TextBlock>
+                                <TextBlock>
+                                    <Run Text="Safety Factor, Yield: " FontWeight="Bold"/>
+                                    <Run Text="{Binding SafetyFactorYield, StringFormat={}{0:F1}, Mode=OneWay}"/>
+                                </TextBlock>
+                                <TextBlock>
+                                    <Run Text="Safety Factor, Ultimate: " FontWeight="Bold"/>
+                                    <Run Text="{Binding SafetyFactorUltimate, StringFormat={}{0:F1}, Mode=OneWay}"/>
+                                </TextBlock>
                             </StackPanel>
                         </TreeViewItem>
                     </DataTemplate>

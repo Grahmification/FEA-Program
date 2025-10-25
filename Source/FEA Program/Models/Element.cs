@@ -24,6 +24,21 @@ namespace FEA_Program.Models
         public int NodeDOFs { get; private set; }
         public int ElementDOFs => NumOfNodes * NodeDOFs;
 
+        /// <summary>
+        /// Get the max stress in the element
+        /// </summary>
+        public abstract double MaxStress { get; }
+
+        /// <summary>
+        /// Gets the safety factor for yielding
+        /// </summary>
+        public virtual double SafetyFactorYield { get { return MaxStress == 0 ? 0 : Math.Abs(Material.Sy / MaxStress); } }
+
+        /// <summary>
+        /// Gets the safety factor for failure
+        /// </summary>
+        public virtual double SafetyFactorUltimate { get { return MaxStress == 0 ? 0 : Math.Abs(Material.Sut / MaxStress); } }
+
         public Element(int id, List<INode> nodes, Material material, int nodeDOFs) : base(id)
         {
             NodeDOFs = nodeDOFs; // This needs to be set before validation

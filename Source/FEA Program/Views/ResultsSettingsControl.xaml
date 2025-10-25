@@ -52,7 +52,8 @@
                 <Label Content="Element Settings" FontWeight="Bold"/>
 
                 <StackPanel Margin="10">
-                    <CheckBox Content="Color by Max Stress" IsChecked="{Binding Draw.DrawElementStressColors}"/>
+                    <Label Content="Element Coloring:"/>
+                    <ComboBox Margin="10, 0" SelectedItem="{Binding Draw.ElementColorScheme}" ItemsSource="{Binding Source={conv:EnumBindingSource {x:Type vm:ElementColorSchemes}}}"/>
                 </StackPanel>
 
                 <Separator Margin="10,15"/>

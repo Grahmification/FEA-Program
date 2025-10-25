@@ -71,6 +71,39 @@ namespace FEA_Program.ViewModels
         }
 
         /// <summary>
+        /// Calculates safety factors and applies a green (high sf) to red (low sf)
+        /// gradient color across a flat collection of elements.
+        /// </summary>
+        /// <param name="elements">The list of elements to process.</param>
+        /// <param name="greenLimit">The safety factor limit to be pure green</param>
+        /// <param name="yield">True to calulate based on yield safety factor</param>
+        public static void ApplySafetyFactorColors(IEnumerable<ElementDrawVM> elements, double greenLimit, bool yield = true)
+        {
+            if (elements == null || !elements.Any()) return;
+
+            // Apply colors to all elements iteratively
+            foreach (var element in elements)
+            {
+                double safetyFactor = yield ? element.Element.Model?.SafetyFactorYield ?? 0 : element.Element.Model?.SafetyFactorUltimate ?? 0;
+
+                // Normalize between the max and min
+                double minSf = 1.0;
+                double maxSf = greenLimit;
+                safetyFactor = Math.Min(maxSf, Math.Max(minSf, safetyFactor));
+
+                // normalize on a ratio of 0 (green) - 1 (red)
+                var colorRatio = (maxSf - safetyFactor) / (maxSf - minSf);
+
+                // Apply the gradient color (only is the solution is valid)
+                if (element.Element.Model?.SolutionValid ?? false)
+                {
+                    element.ColorOverride = GetGradientColor(colorRatio);
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Converts a ratio (0.0 to 1.0) into a Color using a green-to-red gradient.
         /// 0.0 is green, 1.0 is red.
         /// </summary>

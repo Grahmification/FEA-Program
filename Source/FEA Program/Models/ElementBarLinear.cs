@@ -23,7 +23,7 @@ namespace FEA_Program.Models
         /// <summary>
         /// Get the max stress in the element
         /// </summary>
-        public double MaxStress => StressMatrix().Values[0]; // This element has constant stress
+        public override double MaxStress => StressMatrix().Values[0]; // This element has constant stress
 
         /// <summary>
         /// Get arguments that may vary between different element types
