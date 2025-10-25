@@ -38,7 +38,7 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public BaseVM Base { get; set; } = new();
 
-        // ---------------------- Displacement Properties ----------------------
+        // ---------------------- Node Properties ----------------------
 
         private bool _DrawDisplaced = false;
         private double _DisplacePercentage = 0;
@@ -47,6 +47,10 @@ namespace FEA_Program.ViewModels
         public bool DrawDisplaced { get => _DrawDisplaced; set { _DrawDisplaced = value; UpdateNodeScaling(); } }
         public double DisplacePercentage { get => _DisplacePercentage; set { _DisplacePercentage = value; UpdateNodeScaling(); } }
         public double DisplaceScaling { get => _DisplaceScaling; set { _DisplaceScaling = value; UpdateNodeScaling(); } }
+
+
+        private bool _DrawReactions = false;
+        public bool DrawReactions { get => _DrawReactions; set { _DrawReactions = value; UpdateNodeReactions(); } }
 
         // ---------------------- Element Properties ----------------------
 
@@ -103,6 +107,29 @@ namespace FEA_Program.ViewModels
 
                 foreach (NodeDrawVM N in Nodes)
                     N.DisplacementScalingFactor = nodeDrawScaling;
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
+        }
+
+        /// <summary>
+        /// Update reaction force display for all nodes
+        /// </summary>
+        private void UpdateNodeReactions()
+        {
+            try
+            {
+                if (DrawReactions)
+                {
+                    NodeDrawVM.DrawReactionForces(Nodes, 2, 0.6);
+                }
+                else
+                {
+                    foreach (NodeDrawVM N in Nodes)
+                        N.ReactionForces.Clear();
+                }
             }
             catch (Exception ex)
             {

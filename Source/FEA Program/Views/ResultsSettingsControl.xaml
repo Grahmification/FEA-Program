@@ -29,7 +29,11 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" >
-                <Label Content="Displacement Settings" FontWeight="Bold"/>
+                <Label Content="Node Settings" FontWeight="Bold"/>
+
+                <StackPanel Margin="10">
+                    <CheckBox Content="Draw Reaction Forces" IsChecked="{Binding Draw.DrawReactions}"/>
+                </StackPanel>
 
                 <StackPanel Margin="10">
                     <CheckBox Content="Draw Displaced" IsChecked="{Binding Draw.DrawDisplaced}"/>

@@ -18,7 +18,8 @@
 
     <Window.Resources>
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
-        
+        <conv:VectorToLengthConverter x:Key="VectorToLengthConverter"/>
+
         <!-- Simple ToolBar style that removes grip and overflow -->
         <Style x:Key="ToolBarNoGripNoOverflow" TargetType="ToolBar">
             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
@@ -171,6 +172,15 @@
                                     <vhx:NodeVisual3D Position="{Binding DrawPosition}" Color="{Binding NodeColor}">
                                         <vhx:FixityVisual3D ShowX="{Binding Node.FixedX}" ShowY="{Binding Node.FixedY}" ShowZ="{Binding Node.FixedZ}" Color="{Binding FixityColor}"/>
                                         <vhx:ArrowVisual3D Direction="{Binding Force}" Length="{Binding Node.Model.ForceMagnitude}"/>
+
+                                        <!-- Reaction Forces -->
+                                        <h:ItemsModel3D ItemsSource="{Binding ReactionForces}">
+                                            <h:ItemsModel3D.ItemTemplate>
+                                                <DataTemplate>
+                                                    <vhx:ArrowVisual3D Direction="{Binding}" Length="{Binding Converter={StaticResource VectorToLengthConverter}}" Color="MediumPurple"/>
+                                                </DataTemplate>
+                                            </h:ItemsModel3D.ItemTemplate>
+                                        </h:ItemsModel3D>
                                     </vhx:NodeVisual3D>
                                 </DataTemplate>
                             </h:ItemsModel3D.ItemTemplate>

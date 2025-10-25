@@ -1,7 +1,10 @@
 ﻿using HelixToolkit.Wpf.SharpDX;
 using SharpDX;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using Color = System.Windows.Media.Color;
+using Matrix = SharpDX.Matrix;
 
 namespace FEA_Program.Views.Helix
 {
@@ -40,12 +43,12 @@ namespace FEA_Program.Views.Helix
 
         // DependencyProperty: Color
         public static readonly DependencyProperty ColorProperty = DependencyProperty.Register(
-            nameof(Color), typeof(Color4), typeof(ArrowVisual3D),
-            new PropertyMetadata(new Color4(1, 0, 0, 1), OnColorChanged));
+            nameof(Color), typeof(Color), typeof(ArrowVisual3D),
+            new PropertyMetadata(Colors.Red, OnColorChanged));
 
-        public Color4 Color
+        public Color Color
         {
-            get => (Color4)GetValue(ColorProperty);
+            get => (Color)GetValue(ColorProperty);
             set => SetValue(ColorProperty, value);
         }
 
@@ -60,7 +63,7 @@ namespace FEA_Program.Views.Helix
                 Geometry = builder.ToMeshGeometry3D(),
                 Material = new PhongMaterial
                 {
-                    DiffuseColor = Color,
+                    DiffuseColor = new Color4(Color.ScR, Color.ScG, Color.ScB, Color.ScA),
                     AmbientColor = new Color4(0.3f),
                     SpecularColor = new Color4(0.5f),
                 }
@@ -98,7 +101,7 @@ namespace FEA_Program.Views.Helix
 
         private void UpdateColor()
         {
-            var color4 = Color;
+            var color4 = new Color4(Color.ScR, Color.ScG, Color.ScB, Color.ScA);
             if (shaftModel.Material is PhongMaterial mat1)
                 mat1.DiffuseColor = color4;
             if (headModel.Material is PhongMaterial mat2)
