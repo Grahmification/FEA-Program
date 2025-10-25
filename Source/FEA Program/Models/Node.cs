@@ -56,29 +56,9 @@ namespace FEA_Program.Models
                 InvalidateSolution();
             }
         } // First 3 items  = force [N], last 3 = moments [Nm]
-        public double ForceMagnitude => Geometry.Magnitude(_Force.Take(3).ToArray()); // Compute based on the first 3 items
-        public double[] ForceDirection
-        {
-            get
-            {
-                if (Dimension == 1)
-                {
-                    return [.. new DenseVector([_Force[0]]).Normalize(1)];
-                }
-                else if (Dimension == 2)
-                {
-                    return [.. new DenseVector([_Force[0], _Force[1]]).Normalize(1)];
-                }
-                else // dimensions = 3 or 6
-                {
-                    return [.. new DenseVector([_Force[0], _Force[1], _Force[2]]).Normalize(1)];
-                }
-            }
-        }
 
         public double[] Displacement { get; private set; } 
         public double[] ReactionForce { get; private set; } // reaction force in [N], reaction moments in [Nm]
-        public double[] FinalPos => _Coordinates.Zip(Displacement, (coord, disp) => coord + disp).ToArray();
 
         public Node(int id, int dimension) : base(id)
         {

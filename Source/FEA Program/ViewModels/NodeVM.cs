@@ -21,7 +21,8 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public double[] UserCoordinates => Model.Coordinates.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
         public double[] UserDisplacement => Model.Displacement.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
-        public double[] UserFinalPos => Model.FinalPos.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
+        public double[] UserFinalPos => UserCoordinates.Zip(UserDisplacement, (coord, disp) => coord + disp).ToArray();
+        public double ForceMagnitude => Geometry.Magnitude(Model.Force.Take(3).ToArray()); // Compute based on the first 3 items
 
         public bool Selected { get; set; } = false;
 
@@ -29,7 +30,7 @@ namespace FEA_Program.ViewModels
         public bool FixedY => Model.Fixity.Length > 1 && Model.Fixity[1] == 1;
         public bool FixedZ => Model.Fixity.Length > 2 && Model.Fixity[2] == 1;
 
-        public bool HasForce => Model.ForceMagnitude > 0;
+        public bool HasForce => ForceMagnitude > 0;
 
         /// <summary>
         /// Display the node ID and the coordinates nicely in a text field
@@ -64,20 +65,21 @@ namespace FEA_Program.ViewModels
                     OnPropertyChanged(nameof(UserCoordinates));
                     OnPropertyChanged(nameof(UserFinalPos));
                 }
+                else if (e.PropertyName == nameof(Node.Displacement))
+                {
+                    OnPropertyChanged(nameof(UserDisplacement));
+                    OnPropertyChanged(nameof(UserFinalPos));
+                }
                 else if(e.PropertyName == nameof(Node.Force))
                 {
                     OnPropertyChanged(nameof(HasForce));
+                    OnPropertyChanged(nameof(ForceMagnitude));
                 }
                 else if (e.PropertyName == nameof(Node.Fixity))
                 {
                     OnPropertyChanged(nameof(FixedX));
                     OnPropertyChanged(nameof(FixedY));
                     OnPropertyChanged(nameof(FixedZ));
-                }
-                else if (e.PropertyName == nameof(Node.Displacement))
-                {
-                    OnPropertyChanged(nameof(UserDisplacement));
-                    OnPropertyChanged(nameof(UserFinalPos));
                 }
             }
         }

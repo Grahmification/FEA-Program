@@ -195,7 +195,7 @@
                             <StackPanel>
                                 <TextBlock>
                                 <Run Text="Magnitude [N]: " FontWeight="Bold"/>
-                                <Run Text="{Binding Model.ForceMagnitude, StringFormat=N2, Mode=OneWay}"/>
+                                <Run Text="{Binding ForceMagnitude, StringFormat=N2, Mode=OneWay}"/>
                                 </TextBlock>
                                 <TextBlock>
                                 <Run Text="Components [N]: " FontWeight="Bold"/>

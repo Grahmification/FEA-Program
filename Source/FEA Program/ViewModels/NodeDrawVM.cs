@@ -18,7 +18,7 @@ namespace FEA_Program.ViewModels
 
         public Vector3 DrawPosition => ArrayToVector(GetScaledDisplacement_mm());
         public Vector3 Force => ArrayToVector(Node.Model.Force);
-        public double ForceLength => ScaleForceMagnitude(Node.Model.ForceMagnitude);
+        public double ForceLength => ScaleForceMagnitude(Node.ForceMagnitude);
 
         public Color NodeColor => Node.Selected ? SelectedColor : DefaultNodeColor;
         public Color FixityColor => Node.Selected ? SelectedColor : DefaultFixityColor;

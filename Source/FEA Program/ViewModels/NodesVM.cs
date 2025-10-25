@@ -49,7 +49,7 @@ namespace FEA_Program.ViewModels
             _nonZeroForceCollection.Filter += (_, e) =>
             {
                 if (e.Item is NodeVM node)
-                    e.Accepted = node.Model.ForceMagnitude != 0;
+                    e.Accepted = node.ForceMagnitude != 0;
                 else
                     e.Accepted = false;
             };
