@@ -94,7 +94,7 @@ namespace FEA_Program.ViewModels
         public bool ArgumentsValid => ElementArguments.Count == 0 || ElementArguments.All(arg => arg.ValueValid);
 
         // ---------------------- Sub VMs ----------------------
-        public BaseVM Base { get; private set; } = new();
+        public BaseVM Base { get; set; } = new();
 
         // ---------------------- Commands ----------------------
         public ICommand AcceptCommand { get; }
@@ -175,38 +175,45 @@ namespace FEA_Program.ViewModels
         // ---------------------- Private Helpers ----------------------
         private void AcceptEdit()
         {
-            // Get nodes and material corresponding to element
-            if (SelectedMaterial is null)
-                throw new ArgumentException("Cannot create element: No material selected.");
-
-            var elementMaterial = SelectedMaterial;
-
-            List<NodeVM> elementNodes = NodeSelectors
-            .Where(selector => selector.SelectedNode != null)
-            .Select(selector => selector.SelectedNode)
-            .Cast<NodeVM>()
-            .ToList();
-
-            // Create the new Element
-            IElement? element = null;
-
-            switch (SelectedElementType)
+            try
             {
-                case ElementTypes.BarLinear:
-                    element = new ElementBarLinear(1, _NewID, [.. elementNodes.Select(n => n.Model).Cast<INode>()], elementMaterial.Model, elementNodes[0].Model.Dimension);
-                    break;
+                // Get nodes and material corresponding to element
+                if (SelectedMaterial is null)
+                    throw new ArgumentException("Cannot create element: No material selected.");
+
+                var elementMaterial = SelectedMaterial;
+
+                List<NodeVM> elementNodes = NodeSelectors
+                .Where(selector => selector.SelectedNode != null)
+                .Select(selector => selector.SelectedNode)
+                .Cast<NodeVM>()
+                .ToList();
+
+                // Create the new Element
+                IElement? element = null;
+
+                switch (SelectedElementType)
+                {
+                    case ElementTypes.BarLinear:
+                        element = new ElementBarLinear(1, _NewID, [.. elementNodes.Select(n => n.Model).Cast<INode>()], elementMaterial.Model, elementNodes[0].Model.Dimension);
+                        break;
+                }
+
+                if (element is not null)
+                {
+                    // Apply variable arguments
+                    element.ElementArgs = ElementArgVM.GetArgumentsArray(ElementArguments);
+
+                    // Create the output viewmodel
+                    var elementVM = new ElementVM(element, [.. elementNodes], elementMaterial);
+                    AcceptEdits?.Invoke(this, elementVM);
+
+                    HideEditor(); // Do this after the event in case an error occurs
+                }
             }
-
-            if(element is not null)
+            catch (Exception ex)
             {
-                // Apply variable arguments
-                element.ElementArgs = ElementArgVM.GetArgumentsArray(ElementArguments);
-
-                // Create the output viewmodel
-                var elementVM = new ElementVM(element, [.. elementNodes], elementMaterial);
-                AcceptEdits?.Invoke(this, elementVM);
-
-                HideEditor(); // Do this after the event in case an error occurs
+                Base.LogAndDisplayException(ex);
             }
         }
         private void DeselectAllNodes()

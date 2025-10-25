@@ -17,6 +17,9 @@ namespace FEA_Program.ViewModels
 
         public ProblemTypes? SelectedProblemType { get; set; } = null;
 
+        // ---------------------- Sub VMs ----------------------
+        public BaseVM Base { get; set; } = new();
+
         // ---------------------- Commands ----------------------
         public ICommand CreateCommand { get; }
         public ICommand AcceptCommand { get; }
@@ -47,7 +50,14 @@ namespace FEA_Program.ViewModels
 
         private void Create()
         {
-            DislayWindow([ProblemTypes.Beam_1D, ProblemTypes.Truss_3D]);
+            try
+            {
+                DislayWindow([ProblemTypes.Beam_1D, ProblemTypes.Truss_3D]);
+            }
+            catch(Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
         private void Accept()
         {
@@ -57,12 +67,23 @@ namespace FEA_Program.ViewModels
                     Accepted?.Invoke(this, SelectedProblemType.Value);
             }
             catch (OperationCanceledException) { }
-            
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
+
             _window?.Close();
         }
         private void Cancel()
         {
-            _window?.Close();
+            try
+            {
+                _window?.Close();
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
     }
 }

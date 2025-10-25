@@ -33,6 +33,12 @@ namespace FEA_Program.ViewModels
             AddCommand = new RelayCommand(AddElementWithEditor);
             AddEditor.AcceptEdits += OnAcceptEdits;
         }
+        public void SetBase(BaseVM baseVM)
+        {
+            Base = baseVM;
+            AddEditor.Base = baseVM;
+        }
+
         public void LinkCollections(ObservableCollection<NodeVM> nodes, ObservableCollection<MaterialVM> materials)
         {
             _nodes = nodes;
@@ -90,16 +96,30 @@ namespace FEA_Program.ViewModels
         // ---------------------- Event Methods ----------------------
         private void OnEditRequest(object? sender, EventArgs e)
         {
-            if (sender is ElementVM vm)
+            try
             {
-                //Editor.DisplayEditor(vm, true);
+                if (sender is ElementVM vm)
+                {
+                    //Editor.DisplayEditor(vm, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
             }
         }
         private void OnDeleteRequest(object? sender, EventArgs e)
         {
-            if(sender is ElementVM vm)
+            try
             {
-                DeleteVM(vm);
+                if (sender is ElementVM vm)
+                {
+                    DeleteVM(vm);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
             }
         }
 
@@ -135,9 +155,16 @@ namespace FEA_Program.ViewModels
 
         private void AddElementWithEditor()
         {
-            // Allocate an unused ID
-            int ID = IDClass.CreateUniqueId(Items.Select(m => m.Model).Cast<IHasID>().ToList());
-            AddEditor.DisplayEditor(ID, _materials, _nodes);
+            try
+            {
+                // Allocate an unused ID
+                int ID = IDClass.CreateUniqueId(Items.Select(m => m.Model).Cast<IHasID>().ToList());
+                AddEditor.DisplayEditor(ID, _materials, _nodes);
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
 
     }

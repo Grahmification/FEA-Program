@@ -56,6 +56,12 @@ namespace FEA_Program.ViewModels
 
             NonZeroForceItems = _nonZeroForceCollection.View;
         }
+        public void SetBase(BaseVM baseVM)
+        {
+            Base = baseVM;
+            Editor.Base = baseVM;
+            ForceEditor.Base = baseVM;
+        }
 
         /// <summary>
         /// Import a dataset, usually when loading from a file
@@ -73,23 +79,44 @@ namespace FEA_Program.ViewModels
         // ---------------------- Event Methods ----------------------
         private void OnEditForceRequest(object? sender, EventArgs e)
         {
-            if (sender is NodeVM vm)
+            try
             {
-                ForceEditor.DisplayEditor(vm);
+                if (sender is NodeVM vm)
+                {
+                    ForceEditor.DisplayEditor(vm);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
             }
         }
         private void OnEditRequest(object? sender, EventArgs e)
         {
-            if (sender is NodeVM vm)
+            try
             {
-                Editor.DisplayEditor(vm, true);
+                if (sender is NodeVM vm)
+                {
+                    Editor.DisplayEditor(vm, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
             }
         }
         private void OnDeleteRequest(object? sender, EventArgs e)
         {
-            if(sender is NodeVM vm)
+            try
             {
-                DeleteVM(vm);
+                if (sender is NodeVM vm)
+                {
+                    DeleteVM(vm);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
             }
         }
 
@@ -137,11 +164,18 @@ namespace FEA_Program.ViewModels
         }
         private void AddNodeWithEditor()
         {
-            int ID = IDClass.CreateUniqueId(Items.Select(m => m.Model).Cast<IHasID>().ToList());
-            var node = new Node(ID, _problemDOFs);
+            try
+            {
+                int ID = IDClass.CreateUniqueId(Items.Select(m => m.Model).Cast<IHasID>().ToList());
+                var node = new Node(ID, _problemDOFs);
 
-            var vm = new NodeVM(node);
-            Editor.DisplayEditor(vm, false);
+                var vm = new NodeVM(node);
+                Editor.DisplayEditor(vm, false);
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
 
     }

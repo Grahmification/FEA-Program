@@ -26,6 +26,12 @@ namespace FEA_Program.ViewModels
         }
         public string CoordZText => Is3Dimensional ? "Z" : "";
 
+        // ---------------------- Sub VMs ----------------------
+        
+        /// <summary>
+        /// Base VM for handling errors and status
+        /// </summary>
+        public BaseVM Base { get; set; } = new();
 
         // ----------------------- Commands -----------------------------
         public ICommand ResetCameraCommand { get; }
@@ -48,7 +54,14 @@ namespace FEA_Program.ViewModels
         }
         public void ResetCamera()
         {
-            Camera = Is3Dimensional ? DefaultPerspectiveCamera() : DefaultOrthographicCamera();
+            try
+            {
+                Camera = Is3Dimensional ? DefaultPerspectiveCamera() : DefaultOrthographicCamera();
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
 
         public static OrthographicCamera DefaultOrthographicCamera() => new()

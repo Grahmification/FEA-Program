@@ -13,6 +13,11 @@ namespace FEA_Program.ViewModels
         public ObservableCollection<ElementDrawVM> Elements { get; private set; } = [];
         public ObservableCollection<NodeDrawVM> Nodes { get; private set; } = [];
 
+        /// <summary>
+        /// Base VM for handling errors and status
+        /// </summary>
+        public BaseVM Base { get; set; } = new();
+
         // ---------------------- Displacement Properties ----------------------
 
         private bool _DrawDisplaced = false;
@@ -72,10 +77,17 @@ namespace FEA_Program.ViewModels
         /// </summary>
         private void UpdateNodeScaling()
         {
-            double nodeDrawScaling = DrawDisplaced ? DisplaceScaling * DisplacePercentage / 100.0 : 0;
+            try
+            {
+                double nodeDrawScaling = DrawDisplaced ? DisplaceScaling * DisplacePercentage / 100.0 : 0;
 
-            foreach (NodeDrawVM N in Nodes)
-                N.DisplacementScalingFactor = nodeDrawScaling;
+                foreach (NodeDrawVM N in Nodes)
+                    N.DisplacementScalingFactor = nodeDrawScaling;
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
 
         /// <summary>
@@ -83,17 +95,24 @@ namespace FEA_Program.ViewModels
         /// </summary>
         private void UpdateElementColors()
         {
-            if (DrawElementStressColors)
+            try
             {
-                ElementDrawVM.ApplyStressColors(Elements);
-            }
-            else
-            {
-                foreach(var e in Elements)
+                if (DrawElementStressColors)
                 {
-                    // Set to default color
-                    e.ColorOverride = null;
+                    ElementDrawVM.ApplyStressColors(Elements);
                 }
+                else
+                {
+                    foreach (var e in Elements)
+                    {
+                        // Set to default color
+                        e.ColorOverride = null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
             }
         }
 

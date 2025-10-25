@@ -27,6 +27,11 @@ namespace FEA_Program.ViewModels
             AddCommand = new RelayCommand(AddMaterialWithEditor);
             Editor.AcceptEdits += OnAcceptEdits;
         }
+        public void SetBase(BaseVM baseVM)
+        {
+            Base = baseVM;
+            Editor.Base = baseVM;
+        }
 
         public void Add(string Name, double E_GPa, double V, double Sy_MPa, double Sut_MPa, MaterialType subtype)
         {
@@ -64,20 +69,34 @@ namespace FEA_Program.ViewModels
         // ---------------------- Event Methods ----------------------
         private void OnEditRequest(object? sender, EventArgs e)
         {
-            if (sender is MaterialVM vm)
+            try
             {
-                Editor.DisplayEditor(vm, true);
+                if (sender is MaterialVM vm)
+                {
+                    Editor.DisplayEditor(vm, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
             }
         }
         private void OnDeleteRequest(object? sender, EventArgs e)
         {
-            if(sender is MaterialVM vm)
+            try
             {
-                _Materials.Remove(vm.Model.ID);
-                Items.Remove(vm);
+                if (sender is MaterialVM vm)
+                {
+                    _Materials.Remove(vm.Model.ID);
+                    Items.Remove(vm);
 
-                vm.DeleteRequest -= OnDeleteRequest;
-                vm.EditRequest -= OnEditRequest;
+                    vm.DeleteRequest -= OnDeleteRequest;
+                    vm.EditRequest -= OnEditRequest;
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
             }
         }
 
@@ -112,11 +131,18 @@ namespace FEA_Program.ViewModels
         }
         private void AddMaterialWithEditor()
         {
-            int ID = IDClass.CreateUniqueId(_Materials.Values.Select(m => m.Model).Cast<IHasID>().ToList());
-            var material = new Material($"Material {Items.Count + 1}", 70 * 1e9, ID, MaterialType.Other);
+            try
+            {
+                int ID = IDClass.CreateUniqueId(_Materials.Values.Select(m => m.Model).Cast<IHasID>().ToList());
+                var material = new Material($"Material {Items.Count + 1}", 70 * 1e9, ID, MaterialType.Other);
 
-            var vm = new MaterialVM(material);
-            Editor.DisplayEditor(vm, false);
+                var vm = new MaterialVM(material);
+                Editor.DisplayEditor(vm, false);
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
     }
 }

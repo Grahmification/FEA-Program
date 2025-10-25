@@ -26,11 +26,15 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public ObservableCollection<CoordinateVM> EditCoordinates { get; } = [];
 
-
         /// <summary>
         /// True if editing an existing item
         /// </summary>
         public bool Editing { get; private set; } = false;
+
+        /// <summary>
+        /// Base VM for handling errors and status
+        /// </summary>
+        public BaseVM Base { get; set; } = new();
 
         // ---------------------- Commands ----------------------
         public ICommand AcceptCommand { get; }
@@ -101,28 +105,49 @@ namespace FEA_Program.ViewModels
         // ---------------------- Private Helpers ----------------------
         private void AcceptEdit()
         {
-            if (_inputItem != null && EditItem != null)
+            try
             {
-                // Copy edited parameters
-                _inputItem.Model.ImportParameters(EditItem.Model);
-                AcceptEdits?.Invoke(this, _inputItem);
-            }
+                if (_inputItem != null && EditItem != null)
+                {
+                    // Copy edited parameters
+                    _inputItem.Model.ImportParameters(EditItem.Model);
+                    AcceptEdits?.Invoke(this, _inputItem);
+                }
 
-            HideEditor(); // Do this after the event in case an error occurs
+                HideEditor(); // Do this after the event in case an error occurs
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
         private void CancelEdit()
         {
-            HideEditor();
-            if (_inputItem != null)
+            try
             {
-                CancelEdits?.Invoke(this, _inputItem);
+                HideEditor();
+                if (_inputItem != null)
+                {
+                    CancelEdits?.Invoke(this, _inputItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
             }
         }
         private void SetFixity(bool fix)
         {
-            foreach(var vm in EditCoordinates)
+            try
             {
-                vm.Fixed = fix;
+                foreach (var vm in EditCoordinates)
+                {
+                    vm.Fixed = fix;
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
             }
         }
     }

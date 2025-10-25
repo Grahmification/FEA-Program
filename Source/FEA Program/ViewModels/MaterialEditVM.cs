@@ -27,6 +27,11 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public bool Editing { get; private set; } = false;
 
+        /// <summary>
+        /// Base VM for handling errors and status
+        /// </summary>
+        public BaseVM Base { get; set; } = new();
+
         // ---------------------- Commands ----------------------
         public ICommand AcceptCommand { get; }
         public ICommand CancelCommand { get; }
@@ -55,21 +60,35 @@ namespace FEA_Program.ViewModels
         // ---------------------- Private Helpers ----------------------
         private void AcceptEdit()
         {
-            if (_inputMaterial != null && Material != null)
+            try
             {
-                // Copy edited parameters
-                _inputMaterial.Model.ImportParameters(Material.Model);
-                AcceptEdits?.Invoke(this, _inputMaterial);
-            }
+                if (_inputMaterial != null && Material != null)
+                {
+                    // Copy edited parameters
+                    _inputMaterial.Model.ImportParameters(Material.Model);
+                    AcceptEdits?.Invoke(this, _inputMaterial);
+                }
 
-            HideEditor(); // Do this after the event in case an error occurs
+                HideEditor(); // Do this after the event in case an error occurs
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
         private void CancelEdit()
         {
-            HideEditor();
-            if (_inputMaterial != null)
+            try
             {
-                CancelEdits?.Invoke(this, _inputMaterial);
+                HideEditor();
+                if (_inputMaterial != null)
+                {
+                    CancelEdits?.Invoke(this, _inputMaterial);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
             }
         }
     }

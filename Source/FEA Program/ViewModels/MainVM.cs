@@ -27,7 +27,10 @@ namespace FEA_Program.ViewModels
                 Base.Debugging = _debugging;
                 Base.ProgramVersion = ProgramExtensions.GetAssemblyVersion();
 
+                Project.SetBase(Base);
                 Project.ProblemReset += OnProblemReset;
+
+                ViewPort.Base = Base;
             }
             catch (Exception ex)
             {

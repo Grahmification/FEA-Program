@@ -72,6 +72,16 @@ namespace FEA_Program.ViewModels
             Materials.AddDefaultMaterials();
             ResetProblem(ProblemTypes.Truss_3D);
         }
+        public void SetBase(BaseVM baseVM)
+        {
+            Base = baseVM;
+            NewProblem.Base = baseVM;
+            Draw.Base = baseVM;
+            Nodes.SetBase(baseVM);
+            Materials.SetBase(baseVM);
+            Elements.SetBase(baseVM);
+        }
+
         public async Task LoadFile()
         {
             try
@@ -214,11 +224,14 @@ namespace FEA_Program.ViewModels
 
             DebugMatrix.ResetMatricies();
             Draw = new DrawVM();
+            Draw.Base = Base;
             Nodes = new NodesVM(Problem.AvailableNodeDOFs);
+            Nodes.SetBase(Base);
             Nodes.ItemAdding += OnNodeAdding;
             Nodes.ItemRemoving += OnNodeRemoving;
 
             Elements = new ElementsVM();
+            Elements.SetBase(Base);
             Elements.ItemAdding += OnElementAdding;
             Elements.ItemRemoving += OnElementRemoving;
             Elements.LinkCollections(Nodes.Items, Materials.Items);

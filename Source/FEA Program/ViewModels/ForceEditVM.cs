@@ -64,6 +64,11 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public bool? ShowEditor { get; private set; } = null;
 
+        /// <summary>
+        /// Base VM for handling errors and status
+        /// </summary>
+        public BaseVM Base { get; set; } = new();
+
         // ---------------------- Commands ----------------------
         public ICommand AcceptCommand { get; }
         public ICommand CancelCommand { get; }
@@ -155,28 +160,42 @@ namespace FEA_Program.ViewModels
         }
         private void AcceptEdit()
         {
-            double[] force = ForceComponents.Select(component => component.Value).ToArray();
+            try
+            {
+                double[] force = ForceComponents.Select(component => component.Value).ToArray();
 
-            // We're editing, update the changed parameters
-            if (Editing && _inputItem != null)
-            {
-                _inputItem.Model.Force = force;
-            }
-            // We're adding new forces
-            else if (!Editing)
-            {
-                // Set the edited forces for each checked node
-                foreach (var vm in Nodes.Where(vm => vm.IsSelected))
+                // We're editing, update the changed parameters
+                if (Editing && _inputItem != null)
                 {
-                    vm.Node.Model.Force = force;
+                    _inputItem.Model.Force = force;
                 }
-            }
+                // We're adding new forces
+                else if (!Editing)
+                {
+                    // Set the edited forces for each checked node
+                    foreach (var vm in Nodes.Where(vm => vm.IsSelected))
+                    {
+                        vm.Node.Model.Force = force;
+                    }
+                }
 
-            HideEditor(); // Do this after the event in case an error occurs
+                HideEditor(); // Do this after the event in case an error occurs
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
         private void CancelEdit()
         {
-            HideEditor();
+            try
+            {
+                HideEditor();
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
         private void DeselectAllNodes()
         {
