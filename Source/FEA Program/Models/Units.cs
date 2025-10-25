@@ -3,339 +3,105 @@
     internal class Units
     {
         // ----------------- UPDATE THESE IF NEW UNITS ARE ADDED -------------------
-        private static double ConversionFactor(int Unit)
+        private static double ConversionFactor(Unit unit) => unit switch
         {
-            switch (Unit)
-            {
-                // ---------------- Unitless ------------------
-                case (int)AllUnits.Unitless:
-                    {
-                        return 1.0;
-                    }
+            // ---------------- Unitless ------------------
+            Unit.Unitless => 1.0,
+            // ---------------- Length ------------------
+            Unit.m => 1.0,
+            Unit.mm => 0.001,
+            Unit.cm => 0.01,
+            Unit.inch => 0.0254,
+            Unit.ft => 0.3048d,
+            // ---------------- Area ------------------
+            Unit.m_squared => ConversionFactor(Unit.m) * ConversionFactor(Unit.m),
+            Unit.mm_squared => ConversionFactor(Unit.mm) * ConversionFactor(Unit.mm),
+            Unit.cm_squared => ConversionFactor(Unit.cm) * ConversionFactor(Unit.cm),
+            Unit.in_squared => ConversionFactor(Unit.inch) * ConversionFactor(Unit.inch),
+            Unit.ft_squared => ConversionFactor(Unit.ft) * ConversionFactor(Unit.ft),
+            // -------------------- Force ---------------------------
+            Unit.N => 1.0,
+            Unit.lb => 4.44822,
+            // ----------------- Pressure ----------------------
+            Unit.Pa => 1,
+            Unit.KPa => 1000,
+            Unit.MPa => 1000 * 1000,
+            Unit.GPa => 1000 * 1000 * 1000,
+            Unit.Psi => 6894.76,
+            Unit.Bar => 100000,
+            //Default
+            _ => 1.0
+        };
 
-                // ---------------- Length ------------------
-                case (int)AllUnits.m:
-                    {
-                        return 1.0d;
-                    }
-                case (int)AllUnits.mm:
-                    {
-                        return 0.001d;
-                    }
-                case (int)AllUnits.cm:
-                    {
-                        return 0.01d;
-                    }
-                case (int)AllUnits.inch:
-                    {
-                        return 0.0254d;
-                    }
-                case (int)AllUnits.ft:
-                    {
-                        return 0.3048d;
-                    }
-
-                // ---------------------------Area----------------------
-                case (int)AllUnits.m_squared:
-                    {
-                        return ConversionFactor((int)AllUnits.m) * ConversionFactor((int)AllUnits.m);
-                    }
-                case (int)AllUnits.mm_squared:
-                    {
-                        return ConversionFactor((int)AllUnits.mm) * ConversionFactor((int)AllUnits.mm);
-                    }
-                case (int)AllUnits.cm_squared:
-                    {
-                        return ConversionFactor((int)AllUnits.cm) * ConversionFactor((int)AllUnits.cm);
-                    }
-                case (int)AllUnits.in_squared:
-                    {
-                        return ConversionFactor((int)AllUnits.inch) * ConversionFactor((int)AllUnits.inch);
-                    }
-                case (int)AllUnits.ft_squared:
-                    {
-                        return ConversionFactor((int)AllUnits.ft) * ConversionFactor((int)AllUnits.ft);
-                    }
-
-                // -------------------- Force ---------------------------
-
-                case (int)AllUnits.N:
-                    {
-                        return 1d;
-                    }
-                case (int)AllUnits.lb:
-                    {
-                        return 4.44822d;
-                    }
-
-                // ----------------- Pressure ----------------------
-                case (int)AllUnits.Pa:
-                    {
-                        return 1d;
-                    }
-                case (int)AllUnits.KPa:
-                    {
-                        return 1000d;
-                    }
-                case (int)AllUnits.MPa:
-                    {
-                        return 1000 * 1000;
-                    }
-                case (int)AllUnits.GPa:
-                    {
-                        return 1000 * 1000 * 1000;
-                    }
-                case (int)AllUnits.Psi:
-                    {
-                        return 6894.76d;
-                    }
-                case (int)AllUnits.Bar:
-                    {
-                        return 100000d;
-                    }
-
-                default:
-                    {
-                        return (double)default;
-                    }
-            }
-        }
-        public static string[] UnitStrings(AllUnits Unit)
+        public static string[] UnitStrings(Unit unit) => unit switch
         {
-            switch (Unit)
-            {
-                // ---------------- Unitless ------------------
-                case AllUnits.Unitless:
-                    {
-                        return ["-"];
-                    }
+            // ---------------- Unitless ------------------
+            Unit.Unitless => ["-"],
+            // ---------------- Length ------------------
+            Unit.m => ["m"],
+            Unit.mm => ["mm"],
+            Unit.cm => ["cm"],
+            Unit.inch => ["in", "inch", "\""],
+            Unit.ft => ["ft", "feet", "'"],
+            // ---------------- Area ------------------
+            Unit.m_squared => ["m^2"],
+            Unit.mm_squared => ["mm^2"],
+            Unit.cm_squared => ["cm^2"],
+            Unit.in_squared => ["in^2", "sqin"],
+            Unit.ft_squared => ["ft^2", "sqft"],
+            // -------------------- Force ---------------------------
+            Unit.N => ["N"],
+            Unit.lb => ["lb", "lbs"],
+            // ----------------- Pressure ----------------------
+            Unit.Pa => ["Pa", "pa"],
+            Unit.KPa => ["KPa", "kpa", "Kpa"],
+            Unit.MPa => ["MPa", "mpa", "Mpa"],
+            Unit.GPa => ["GPa", "gpa", "Gpa"],
+            Unit.Psi => ["psi", "Psi"],
+            Unit.Bar => ["bar", "Bar"],
+            //Default
+            _ => ["-"]
+        };
 
-                // -------------------- Length -------------------
-                case AllUnits.m:
-                    {
-                        return new[] { "m" };
-                    }
-                case AllUnits.mm:
-                    {
-                        return new[] { "mm" };
-                    }
-                case AllUnits.cm:
-                    {
-                        return new[] { "cm" };
-                    }
-                case AllUnits.inch:
-                    {
-                        return new[] { "in", "inch", "\"" };
-                    }
-                case AllUnits.ft:
-                    {
-                        return new[] { "ft", "feet", "'" };
-                    }
-
-                // ---------------------------Area----------------------
-
-                case AllUnits.m_squared:
-                    {
-                        return new[] { "m^2" };
-                    }
-                case AllUnits.mm_squared:
-                    {
-                        return new[] { "mm^2" };
-                    }
-                case AllUnits.cm_squared:
-                    {
-                        return new[] { "cm^2" };
-                    }
-                case AllUnits.in_squared:
-                    {
-                        return new[] { "in^2", "sqin" };
-                    }
-                case AllUnits.ft_squared:
-                    {
-                        return new[] { "ft^2", "sqft" };
-                    }
-
-                // -------------------- Force ---------------------------
-
-                case AllUnits.N:
-                    {
-                        return new[] { "N" };
-                    }
-                case AllUnits.lb:
-                    {
-                        return new[] { "lb", "lbs" };
-                    }
-
-                // ----------------- Pressure ----------------------
-                case AllUnits.Pa:
-                    {
-                        return new[] { "Pa", "pa" };
-                    }
-                case AllUnits.KPa:
-                    {
-                        return new[] { "KPa", "kpa", "Kpa" };
-                    }
-                case AllUnits.MPa:
-                    {
-                        return new[] { "MPa", "mpa", "Mpa" };
-                    }
-                case AllUnits.GPa:
-                    {
-                        return new[] { "GPa", "gpa", "Gpa" };
-                    }
-                case AllUnits.Psi:
-                    {
-                        return new[] { "psi", "Psi" };
-                    }
-                case AllUnits.Bar:
-                    {
-                        return new[] { "bar", "Bar" };
-                    }
-
-                default:
-                    {
-                        return null;
-                    }
-            }
-        }
-        public static AllUnits DefaultUnit(DataUnitType UnitType)
+        public static Unit DefaultUnit(UnitType unitType) => unitType switch
         {
-            switch (UnitType)
-            {
-                case DataUnitType.Unitless:
-                    {
-                        return AllUnits.Unitless;
-                    }
+            UnitType.Length => Unit.m,
+            UnitType.Area => Unit.m_squared,
+            UnitType.Force => Unit.N,
+            UnitType.Pressure => Unit.Pa,
+            UnitType.Unitless => Unit.Unitless,
+            _ => Unit.Unitless
+        };
 
-                case DataUnitType.Length:
-                    {
-                        return AllUnits.m;
-                    }
-
-                case DataUnitType.Area:
-                    {
-                        return AllUnits.m_squared;
-                    }
-
-                case DataUnitType.Force:
-                    {
-                        return AllUnits.N;
-                    }
-
-                case DataUnitType.Pressure:
-                    {
-                        return AllUnits.Pa;
-                    }
-
-                default:
-                    {
-                        return default;
-                    }
-            }
-        }
-        public static int[] UnitTypeRange(DataUnitType UnitType)
+        public static int[] UnitTypeRange(UnitType unitType) => unitType switch
         {
-            switch (UnitType)
-            {
-                case DataUnitType.Length:
-                    {
-                        return new[] { 0, 4 };
-                    }
-
-                case DataUnitType.Area:
-                    {
-                        return new[] { 5, 9 };
-                    }
-
-                case DataUnitType.Force:
-                    {
-                        return new[] { 10, 11 };
-                    }
-
-                case DataUnitType.Pressure:
-                    {
-                        return new[] { 12, 17 };
-                    }
-
-                case DataUnitType.Unitless:
-                    {
-                        return [18, 18];
-                    }
-
-                default:
-                    {
-                        return null;
-                    }
-            }
-        }
+            UnitType.Length => [0, 4],
+            UnitType.Area => [5, 9],
+            UnitType.Force => [10, 11],
+            UnitType.Pressure => [12, 17],
+            UnitType.Unitless => [18, 18],
+            _ => [18, 18]
+        };
 
         // ----------------------------------------------------------------------------
-        public static List<string> TypeUnitStrings(DataUnitType UnitType)
+        public static List<string> TypeUnitStrings(UnitType unitType)
         {
-            int[] range = UnitTypeRange(UnitType);
+            // Get the range of enum values (e.g., [start_index, end_index])
+            int[] range = UnitTypeRange(unitType);
+            int startIndex = range[0];
+            int endIndex = range[1];
 
-            var output = new List<string>();
-
-            for (int i = range[0], loopTo = range[1]; i <= loopTo; i++) // search through the enum range for that type
-            {
-                foreach (string S in UnitStrings((AllUnits)i)) // get all the strings for each enum and add to output
-                    output.Add(S);
-            }
-
-            return output;
-        }
-        public static AllUnits UnitEnums(string UnitString)
-        {
-            for (int I = 0, loopTo = Enum.GetNames(typeof(AllUnits)).Count() - 1; I <= loopTo; I++)
-            {
-                if (UnitStrings((AllUnits)I).Contains(UnitString))
-                {
-                    return (AllUnits)I;
-                }
-            }
-            return (AllUnits)(-1); // if could not find
-        }
-        public static double Convert(AllUnits InputUnit, double Data, AllUnits OutputUnit)
-        {
-            return Data * ConversionFactor((int)InputUnit) / ConversionFactor((int)OutputUnit);
+            // Use LINQ to generate the sequence of enum values, map them to strings,
+            // and flatten the resulting lists into a single List<string>.
+            return Enumerable.Range(startIndex, endIndex - startIndex + 1)
+                .Cast<Unit>()
+                .SelectMany(unit => UnitStrings(unit))
+                .ToList();
         }
 
-
-
-        public enum DataUnitType
+        public static double Convert(Unit inputUnit, double data, Unit outputUnit)
         {
-            Length = 0, // m
-            Area = 1, // m^2
-            Force = 2, // N
-            Pressure = 3, // Pa
-            Unitless = 4 // [-]
-        }
-        public enum AllUnits
-        {
-            // --------------- Length -------------------
-            mm,
-            cm,
-            m,
-            inch,
-            ft,
-            // ------------- Area -----------------------
-            mm_squared,
-            cm_squared,
-            m_squared,
-            in_squared,
-            ft_squared,
-            // ------------- Force -----------------------
-            N,
-            lb,
-            // ------------- Pressure ---------------
-            KPa,
-            MPa,
-            GPa,
-            Pa,
-            Psi,
-            Bar,
-            // ------------- Unitless ---------------
-            Unitless,
+            return data * ConversionFactor(inputUnit) / ConversionFactor(outputUnit);
         }
     }
 }

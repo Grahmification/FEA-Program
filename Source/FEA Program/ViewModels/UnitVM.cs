@@ -1,5 +1,5 @@
 ﻿using FEA_Program.ViewModels.Base;
-using static FEA_Program.Models.Units;
+using FEA_Program.Models;
 
 
 namespace FEA_Program.ViewModels
@@ -9,19 +9,19 @@ namespace FEA_Program.ViewModels
     /// </summary>
     internal class UnitVM: ObservableObject
     {
-        private AllUnits _Unit;
+        private Unit _Unit;
 
         public event EventHandler? UnitChanged;
         
-        public DataUnitType UnitType { get; private set; }
-        public AllUnits Unit { get => _Unit; set { _Unit = value; UnitChanged?.Invoke(this, EventArgs.Empty); } }
-        public string UnitString => UnitStrings(Unit)[0];
+        public UnitType UnitType { get; private set; }
+        public Unit Unit { get => _Unit; set { _Unit = value; UnitChanged?.Invoke(this, EventArgs.Empty); } }
+        public string UnitString => Units.UnitStrings(Unit)[0];
 
  
-        public UnitVM(DataUnitType? unitType = null, AllUnits? unit = null) 
+        public UnitVM(UnitType? unitType = null, Unit? unit = null) 
         {
-            UnitType = unitType ?? DataUnitType.Unitless;
-            _Unit = unit ?? DefaultUnit(UnitType);
+            UnitType = unitType ?? UnitType.Unitless;
+            _Unit = unit ?? Units.DefaultUnit(UnitType);
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace FEA_Program.ViewModels
         /// <returns></returns>
         public double ToUser(double value)
         {
-            return Convert(DefaultUnit(UnitType), value, Unit);
+            return Units.Convert(Units.DefaultUnit(UnitType), value, Unit);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace FEA_Program.ViewModels
         /// <returns></returns>
         public double FromUser(double value)
         {
-            return Convert(Unit, value, DefaultUnit(UnitType));
+            return Units.Convert(Unit, value, Units.DefaultUnit(UnitType));
         }
 
     }
