@@ -98,6 +98,8 @@ namespace FEA_Program.ViewModels
                     {
                         LoadData(saveData);
                     }
+
+                    Base.SetStatus($"Loaded {filePath}");
                 }
             }
             catch (OperationCanceledException) { } // Do nothing, the user chose to cancel loading the file
@@ -129,6 +131,8 @@ namespace FEA_Program.ViewModels
                     var saveData = GetSaveData();
 
                     await SaveData.JsonSerializer.SerializeToJsonFile(saveData, filePath);
+
+                    Base.SetStatus($"Saved to {filePath}");
                 }
             }
             catch (Exception ex)
@@ -150,6 +154,8 @@ namespace FEA_Program.ViewModels
                 {
                     FormattedMessageBox.DisplayMessage("Solution succeeded, but with invalid values. Check for unconstrained degrees of freedom.");
                 }
+
+                Base.SetStatus("Solved Problem");
             }
             catch (Exception ex)
             {
@@ -238,6 +244,8 @@ namespace FEA_Program.ViewModels
             Elements.AddEditor.AvailableElementTypes = new(Problem.AvailableElements);
 
             ProblemReset?.Invoke(this, problemType);
+
+            Base.SetStatus("Ready");
         }
         private void LoadData(ProblemData data)
         {

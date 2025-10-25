@@ -102,7 +102,7 @@
         <!-- Lower Status Bar -->
         <StatusBar DockPanel.Dock="Bottom" Background="#F2F2F2" Height="24">
             <StatusBarItem>
-                <TextBlock Text="Ready" Style="{StaticResource StatusText}"/>
+                <TextBlock Text="{Binding Base.Status}" Style="{StaticResource StatusText}"/>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
                 <TextBlock Text="{Binding Project.Problem.ProblemType}" Style="{StaticResource StatusText}"/>

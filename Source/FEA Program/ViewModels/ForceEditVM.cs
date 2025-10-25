@@ -88,6 +88,7 @@ namespace FEA_Program.ViewModels
         /// <param name="dimension"></param>
         public void DisplayEditorAdd(List<NodeVM> nodes, int dimension)
         {
+            Base.ClearStatus();
             ResetItems();
             Editing = false;
 
@@ -110,6 +111,7 @@ namespace FEA_Program.ViewModels
         /// <param name="editItem"></param>
         public void DisplayEditor(NodeVM editItem)
         {
+            Base.ClearStatus();
             ResetItems();
 
             // If we're editing, select the node
@@ -177,6 +179,8 @@ namespace FEA_Program.ViewModels
                     {
                         vm.Node.Model.Force = force;
                     }
+
+                    Base.SetStatus("Added force");
                 }
 
                 HideEditor(); // Do this after the event in case an error occurs

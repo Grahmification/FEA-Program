@@ -142,6 +142,8 @@ namespace FEA_Program.ViewModels
             Items.Add(vm);
             vm.DeleteRequest += OnDeleteRequest;
             vm.EditRequest += OnEditRequest;
+
+            Base.SetStatus($"Added Element {vm.Model?.ID}");
         }
         private void DeleteVM(ElementVM vm)
         {
@@ -151,12 +153,16 @@ namespace FEA_Program.ViewModels
             Items.Remove(vm);
             vm.DeleteRequest -= OnDeleteRequest;
             vm.EditRequest -= OnEditRequest;
+
+            Base.SetStatus($"Deleted Element {vm.Model?.ID}");
         }
 
         private void AddElementWithEditor()
         {
             try
             {
+                Base.ClearStatus();
+                
                 // Allocate an unused ID
                 int ID = IDClass.CreateUniqueId(Items.Select(m => m.Model).Cast<IHasID>().ToList());
                 AddEditor.DisplayEditor(ID, _materials, _nodes);

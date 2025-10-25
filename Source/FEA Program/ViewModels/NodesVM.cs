@@ -151,6 +151,8 @@ namespace FEA_Program.ViewModels
                 if (e.PropertyName == nameof(Node.Force))
                     _nonZeroForceCollection.View.Refresh();
             };
+
+            Base.SetStatus($"Added Node {vm.Model.ID}");
         }
         private void DeleteVM(NodeVM vm)
         {
@@ -161,11 +163,15 @@ namespace FEA_Program.ViewModels
             vm.DeleteRequest -= OnDeleteRequest;
             vm.EditRequest -= OnEditRequest;
             vm.EditForceRequest -= OnEditForceRequest;
+
+            Base.SetStatus($"Deleted Node {vm.Model.ID}");
         }
         private void AddNodeWithEditor()
         {
             try
             {
+                Base.ClearStatus();
+
                 int ID = IDClass.CreateUniqueId(Items.Select(m => m.Model).Cast<IHasID>().ToList());
                 var node = new Node(ID, _problemDOFs);
 
