@@ -23,6 +23,7 @@ namespace FEA_Program.ViewModels
         public double[] UserDisplacement => Model.Displacement.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
         public double[] UserFinalPos => UserCoordinates.Zip(UserDisplacement, (coord, disp) => coord + disp).ToArray();
         public double ForceMagnitude => Geometry.Magnitude(Model.Force.Take(3).ToArray()); // Compute based on the first 3 items
+        public bool DisplacementIsValid => ArrayHasValidValues(Model.Displacement);
 
         public bool Selected { get; set; } = false;
 
@@ -69,6 +70,7 @@ namespace FEA_Program.ViewModels
                 {
                     OnPropertyChanged(nameof(UserDisplacement));
                     OnPropertyChanged(nameof(UserFinalPos));
+                    OnPropertyChanged(nameof(DisplacementIsValid));
                 }
                 else if(e.PropertyName == nameof(Node.Force))
                 {
@@ -89,6 +91,23 @@ namespace FEA_Program.ViewModels
         {
             // Set all force components to zero
             Model.Force = new double[Model.Dimension];
+        }
+
+        /// <summary>
+        /// Check an array for invalid values
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns>True if all values are valid</returns>
+        public static bool ArrayHasValidValues(double[] values)
+        {
+            for (int i = 0; i < values.Length; i++)
+            {
+                // Handle erroneous values
+                if (double.IsNaN(values[i]) || double.IsInfinity(values[i]))
+                    return false;
+            }
+
+            return true;
         }
     }
 }

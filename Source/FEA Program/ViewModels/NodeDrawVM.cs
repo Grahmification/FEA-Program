@@ -16,7 +16,7 @@ namespace FEA_Program.ViewModels
         // ---------------------- Properties ----------------------
         public NodeVM Node { get; private set; } = new();
 
-        public Vector3 DrawPosition => ArrayToVector(GetScaledDisplacement_mm());
+        public Vector3 DrawPosition => ArrayToVector(GetDrawPosition());
         public Vector3 Force => ArrayToVector(Node.Model.Force);
         public double ForceLength => ScaleForceMagnitude(Node.ForceMagnitude);
 
@@ -68,7 +68,7 @@ namespace FEA_Program.ViewModels
                 }
             }
         }
-        private double[] GetScaledDisplacement_mm()
+        private double[] GetDrawPosition()
         {
             var scaleFactor = DisplacementScalingFactor;
 
@@ -78,7 +78,15 @@ namespace FEA_Program.ViewModels
             var output = new double[Node.Model.Dimension];
 
             for (int i = 0; i < Node.Model.Coordinates.Length; i++)
-                output[i] = (Node.Model.Coordinates[i] + Node.Model.Displacement[i] * scaleFactor) * 1000.0; // convert to mm
+            {
+                output[i] = Node.Model.Coordinates[i];
+
+                // Don't show invalid displacements
+                if (Node.DisplacementIsValid)
+                    output[i] += Node.Model.Displacement[i] * scaleFactor;
+
+                output[i] *= 1000; // Convert to screen units
+            }
 
             return output;
         }
@@ -156,11 +164,11 @@ namespace FEA_Program.ViewModels
             foreach (var node in nodes)
             {
                 var reaction = node.Node.Model.ReactionForce;
-       
+
                 for (int i = 0; i < reaction.Length; i++)
                 {
-                    // If a force component is non-zero, add it's normalized value
-                    if (reaction[i] != 0)
+                    // If a force component is non-zero and valid, add it's normalized value
+                    if (reaction[i] != 0 && !double.IsInfinity(reaction[i]) && !double.IsNaN(reaction[i]))
                     {
                         double sign = Math.Sign(reaction[i]);
                         double mag = Math.Abs(reaction[i]);
