@@ -94,6 +94,27 @@ namespace FEA_Program.ViewModels
             _Elements.Remove(id);
         }
 
+        /// <summary>
+        /// Reset all elements and nodes in the VM
+        /// </summary>
+        public void ResetCollections()
+        {
+            _Elements.Clear();
+            Elements.Clear();
+            _Nodes.Clear();
+            Nodes.Clear();
+        }
+
+        /// <summary>
+        /// Apply all active settings, redrawing all elements and nodes
+        /// </summary>
+        public void ApplySettings()
+        {
+            UpdateNodeScaling();
+            UpdateNodeReactions();
+            UpdateElementColors();
+        }
+
         // ---------------------- Private Helpers ----------------------
 
         /// <summary>

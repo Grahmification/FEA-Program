@@ -42,7 +42,7 @@ namespace FEA_Program.ViewModels
         {
             if (sender is NodeVM node)
             {
-                if (e.PropertyName == nameof(NodeVM.UserCoordinates))
+                if (e.PropertyName == nameof(NodeVM.UserCoordinates) || e.PropertyName == nameof(NodeVM.UserDisplacement))
                 {
                     OnPropertyChanged(nameof(DrawPosition));
                 }

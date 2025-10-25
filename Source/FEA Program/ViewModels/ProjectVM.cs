@@ -147,6 +147,9 @@ namespace FEA_Program.ViewModels
             {
                 bool result = await Task.Run(() => Problem.Solve());
 
+                // Refresh all result display settings
+                Draw.ApplySettings();
+
                 if (result)
                 {
                     FormattedMessageBox.DisplayMessage("Solved Successfully!");
@@ -230,8 +233,7 @@ namespace FEA_Program.ViewModels
             Problem.Solver.FullyReducedCalculated += OnFullyReducedMatriciesCalculated;
 
             DebugMatrix.ResetMatricies();
-            Draw = new DrawVM();
-            Draw.Base = Base;
+            Draw.ResetCollections();
             Nodes = new NodesVM(Problem.AvailableNodeDOFs);
             Nodes.SetBase(Base);
             Nodes.ItemAdding += OnNodeAdding;
