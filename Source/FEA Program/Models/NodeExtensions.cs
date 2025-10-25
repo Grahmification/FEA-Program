@@ -77,5 +77,23 @@ namespace FEA_Program.Models
             return new DenseVector(vectorData);
         }
 
+
+        /// <summary>
+        /// Returns true if a node already exists at the given location
+        /// </summary>
+        /// <param name="coords"></param>
+        /// <returns></returns>
+        public static bool NodeExistsAtLocation(double[] coords, IEnumerable<Node> existingNodes)
+        {
+            foreach (Node node in existingNodes)
+            {
+                // This should work regardless of dimension
+                if (node.Coordinates.Take(node.Dimension).SequenceEqual(coords.Take(node.Dimension)))
+                    return true;
+            }
+
+            return false;
+        }
+
     }
 }
