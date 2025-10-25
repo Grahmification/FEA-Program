@@ -97,7 +97,7 @@ namespace FEA_Program.Views.Helix
             // Update material color (in case FillColor changed)
             tubeModel.Material = new PhongMaterial()
             {
-                DiffuseColor = new Color4(FillColor.ScR, FillColor.ScG, FillColor.ScB, FillColor.ScA)
+                DiffuseColor = Utils.ToColor4(FillColor)
             };
         }
 

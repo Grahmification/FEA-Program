@@ -1,23 +1,25 @@
 ﻿using HelixToolkit.Wpf.SharpDX;
 using SharpDX;
 using System.Windows;
+using System.Windows.Media;
 using TranslateTransform3D = System.Windows.Media.Media3D.TranslateTransform3D;
+using Color = System.Windows.Media.Color;
 
 namespace FEA_Program.Views.Helix
 {
     internal class NodeVisual3D : GroupModel3D
     {
         public static readonly DependencyProperty ColorProperty = DependencyProperty.Register(
-            nameof(Color), typeof(Color4), typeof(NodeVisual3D),
-            new PropertyMetadata(new Color4(0, 1, 0, 1), OnColorChanged));
+            nameof(Color), typeof(Color), typeof(NodeVisual3D),
+            new PropertyMetadata(Colors.Green, OnColorChanged));
 
         public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
                 nameof(Position), typeof(Vector3), typeof(NodeVisual3D),
                 new PropertyMetadata(new Vector3(), OnPositionChanged));
 
-        public Color4 Color
+        public Color Color
         {
-            get => (Color4)GetValue(ColorProperty);
+            get => (Color)GetValue(ColorProperty);
             set => SetValue(ColorProperty, value);
         }
 
@@ -40,7 +42,7 @@ namespace FEA_Program.Views.Helix
                 Geometry = meshBuilder.ToMeshGeometry3D(),
                 Material = new PhongMaterial
                 {
-                    DiffuseColor = Color,
+                    DiffuseColor = Utils.ToColor4(Color),
                     AmbientColor = new Color4(0.3f),
                     SpecularColor = new Color4(0.5f),
                 }
@@ -63,7 +65,7 @@ namespace FEA_Program.Views.Helix
         private void UpdateChildrenColor()
         {
             // Create a shared PhongMaterial with the new color
-            var mat = new PhongMaterial { DiffuseColor = Color };
+            var mat = new PhongMaterial { DiffuseColor = Utils.ToColor4(Color) };
 
             // Apply to all MeshGeometryModel3D children
             foreach (var mesh in Children.OfType<MeshGeometryModel3D>())

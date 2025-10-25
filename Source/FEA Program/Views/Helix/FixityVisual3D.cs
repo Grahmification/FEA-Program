@@ -1,7 +1,9 @@
 ﻿using HelixToolkit.Wpf.SharpDX;
 using SharpDX;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using Color = System.Windows.Media.Color;
 using MeshGeometry3D = HelixToolkit.Wpf.SharpDX.MeshGeometry3D;
 
 namespace FEA_Program.Views.Helix
@@ -17,12 +19,12 @@ namespace FEA_Program.Views.Helix
 
 
         public static readonly DependencyProperty ColorProperty = DependencyProperty.Register(
-            nameof(Color), typeof(Color4), typeof(FixityVisual3D),
-            new PropertyMetadata(new Color4(0, 0, 1, 1), (d, e) => ((FixityVisual3D)d).UpdateColor()));
+            nameof(Color), typeof(Color), typeof(FixityVisual3D),
+            new PropertyMetadata(Colors.Blue, (d, e) => ((FixityVisual3D)d).UpdateColor()));
 
-        public Color4 Color
+        public Color Color
         {
-            get => (Color4)GetValue(ColorProperty);
+            get => (Color)GetValue(ColorProperty);
             set => SetValue(ColorProperty, value);
         }
 
@@ -84,7 +86,7 @@ namespace FEA_Program.Views.Helix
         }
         private void UpdateColor()
         {
-            var mat = new PhongMaterial { DiffuseColor = Color };
+            var mat = new PhongMaterial { DiffuseColor = Utils.ToColor4(Color) };
             _rectX.Material = mat;
             _rectY.Material = mat;
             _rectZ.Material = mat;
@@ -100,7 +102,7 @@ namespace FEA_Program.Views.Helix
             return new MeshGeometryModel3D
             {
                 Geometry = mesh,
-                Material = new PhongMaterial { DiffuseColor = Color }
+                Material = new PhongMaterial { DiffuseColor = Utils.ToColor4(Color) }
             };
         }
     }

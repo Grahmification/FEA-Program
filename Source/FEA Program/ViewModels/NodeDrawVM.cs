@@ -2,14 +2,16 @@
 using SharpDX;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows.Media;
+using Color = System.Windows.Media.Color;
 
 namespace FEA_Program.ViewModels
 {
     internal class NodeDrawVM: ObservableObject
     {
-        public static Color4 SelectedColor = new(1, 1, 0, 1);
-        public static Color4 DefaultNodeColor = new(0, 1, 0, 1);
-        public static Color4 DefaultFixityColor = new(0, 0, 1, 1);
+        public static Color SelectedColor = Colors.Yellow;
+        public static Color DefaultNodeColor = Colors.LightGreen;
+        public static Color DefaultFixityColor = Colors.Blue;
 
         // ---------------------- Properties ----------------------
         public NodeVM Node { get; private set; } = new();
@@ -18,8 +20,8 @@ namespace FEA_Program.ViewModels
         public Vector3 Force => ArrayToVector(Node.Model.Force);
         public double ForceLength => ScaleForceMagnitude(Node.Model.ForceMagnitude);
 
-        public Color4 NodeColor => Node.Selected ? SelectedColor : DefaultNodeColor;
-        public Color4 FixityColor => Node.Selected ? SelectedColor : DefaultFixityColor;
+        public Color NodeColor => Node.Selected ? SelectedColor : DefaultNodeColor;
+        public Color FixityColor => Node.Selected ? SelectedColor : DefaultFixityColor;
         public ObservableCollection<Vector3> ReactionForces { get; private set; } = [];
 
         /// <summary>

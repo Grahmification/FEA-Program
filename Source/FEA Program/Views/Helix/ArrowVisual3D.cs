@@ -63,7 +63,7 @@ namespace FEA_Program.Views.Helix
                 Geometry = builder.ToMeshGeometry3D(),
                 Material = new PhongMaterial
                 {
-                    DiffuseColor = new Color4(Color.ScR, Color.ScG, Color.ScB, Color.ScA),
+                    DiffuseColor = Utils.ToColor4(Color),
                     AmbientColor = new Color4(0.3f),
                     SpecularColor = new Color4(0.5f),
                 }
@@ -101,7 +101,7 @@ namespace FEA_Program.Views.Helix
 
         private void UpdateColor()
         {
-            var color4 = new Color4(Color.ScR, Color.ScG, Color.ScB, Color.ScA);
+            var color4 = Utils.ToColor4(Color);
             if (shaftModel.Material is PhongMaterial mat1)
                 mat1.DiffuseColor = color4;
             if (headModel.Material is PhongMaterial mat2)
