@@ -15,6 +15,10 @@
 
     <UserControl.Resources>
         <conv:NumberArrayToStringConverter x:Key="NumberArrayToStringConverter"/>
+
+        <conv:BoolToColorConverter x:Key="ValidValueConverter"
+                                    TrueColor="Black"
+                                    FalseColor="Orange" />
     </UserControl.Resources>
 
     <Grid>
@@ -33,7 +37,7 @@
                         <TreeViewItem>
                             <TreeViewItem.Header>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Model.ID, StringFormat={}Node {0}, Mode=OneWay}" />
+                                    <TextBlock Text="{Binding Model.ID, StringFormat={}Node {0}, Mode=OneWay}" Foreground="{Binding DisplacementIsValid, Converter={StaticResource ValidValueConverter}, Mode=OneWay}"/>
                                     <CheckBox Content="" IsChecked="{Binding Model.SolutionValid, Mode=OneWay}" IsEnabled="False" Margin="5,0"/>
                                 </StackPanel>
                             </TreeViewItem.Header>
