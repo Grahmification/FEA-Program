@@ -3,7 +3,7 @@ using SharpDX;
 using System.Windows;
 using TranslateTransform3D = System.Windows.Media.Media3D.TranslateTransform3D;
 
-namespace FEA_Program.Views
+namespace FEA_Program.Views.Helix
 {
     internal class NodeVisual3D : GroupModel3D
     {

@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Media;
 using Color = System.Windows.Media.Color;
 
-namespace FEA_Program.Views
+namespace FEA_Program.Views.Helix
 {
     /// <summary>
     /// Visual for a floor plane grid

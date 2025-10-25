@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Media.Media3D;
 using MeshGeometry3D = HelixToolkit.Wpf.SharpDX.MeshGeometry3D;
 
-namespace FEA_Program.Views
+namespace FEA_Program.Views.Helix
 {
     /// <summary>
     /// Visual for node fixity
@@ -62,7 +62,7 @@ namespace FEA_Program.Views
         {
             // Build rectangles
             var builder = new MeshBuilder();
-            builder.AddBox(Vector3.Zero, Size*1.5, Size*1.5, 0.1 * Size);
+            builder.AddBox(Vector3.Zero, Size * 1.5, Size * 1.5, 0.1 * Size);
             var rectGeom = builder.ToMeshGeometry3D();
 
             _rectX = CreateRectModel(rectGeom);
@@ -101,7 +101,7 @@ namespace FEA_Program.Views
             {
                 Geometry = mesh,
                 Material = new PhongMaterial { DiffuseColor = Color }
-        };
+            };
         }
     }
 }

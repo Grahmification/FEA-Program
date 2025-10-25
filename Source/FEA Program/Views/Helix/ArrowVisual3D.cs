@@ -3,7 +3,7 @@ using SharpDX;
 using System.Windows;
 using System.Windows.Media.Media3D;
 
-namespace FEA_Program.Views
+namespace FEA_Program.Views.Helix
 {
     /// <summary>
     /// 3D visual for an arrow with adjustable length and direction
@@ -109,7 +109,7 @@ namespace FEA_Program.Views
         {
             // If length is zero, hide the arrow
             Visibility = Length == 0 ? Visibility.Hidden : Visibility.Visible;
-            
+
             var dir = Direction;
             if (dir.LengthSquared() < 1e-6f) dir = new Vector3(0, 1, 0);
             dir.Normalize();

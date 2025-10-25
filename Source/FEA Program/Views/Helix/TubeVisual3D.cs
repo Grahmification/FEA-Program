@@ -6,7 +6,7 @@ using Color = System.Windows.Media.Color;
 
 
 
-namespace FEA_Program.Views
+namespace FEA_Program.Views.Helix
 {
     public class TubeVisual3D : GroupModel3D
     {

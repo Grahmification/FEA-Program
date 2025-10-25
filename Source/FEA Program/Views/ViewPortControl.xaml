@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:h="clr-namespace:HelixToolkit.Wpf.SharpDX;assembly=HelixToolkit.Wpf.SharpDX"
              xmlns:vm="clr-namespace:FEA_Program.ViewModels"
+             xmlns:vhx="clr-namespace:FEA_Program.Views.Helix"
              xmlns:conv="clr-namespace:FEA_Program.Converters"
              xmlns:local="clr-namespace:FEA_Program.Views"
              mc:Ignorable="d" 
@@ -32,7 +33,7 @@
             <h:DirectionalLight3D Direction="{Binding Camera.LookDirection}" Color="White" />
             <h:ScreenQuadModel3D Texture="{Binding BackgroundTexture}" />
 
-            <local:GridVisual3D Color="Gray" Visibility="{Binding Is3Dimensional, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <vhx:GridVisual3D Color="Gray" Visibility="{Binding Is3Dimensional, Converter={StaticResource BoolToVisibilityConverter}}"/>
             <h:CoordinateSystemModel3D CoordinateSystemLabelZ="{Binding CoordZText}"/>
 
             <!-- ✨ Allow external views to inject multiple extra 3D elements -->
