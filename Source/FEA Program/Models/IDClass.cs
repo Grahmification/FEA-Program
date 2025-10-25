@@ -16,8 +16,13 @@ namespace FEA_Program.Models
     /// <summary>
     /// Base definition for a class that has an ID
     /// </summary>
-    internal abstract class IDClass(int ID = Constants.InvalidID) : ObservableObject, IHasID, IComparable<IHasID>
+    internal abstract class IDClass(int ID = IDClass.InvalidID) : ObservableObject, IHasID, IComparable<IHasID>
     {
+        /// <summary>
+        /// Number used to indicate an invalid ID
+        /// </summary>
+        public const int InvalidID = -1;
+
         /// <summary>
         /// The idenfier for the class
         /// </summary>

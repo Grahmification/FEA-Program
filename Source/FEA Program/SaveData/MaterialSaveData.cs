@@ -7,7 +7,7 @@ namespace FEA_Program.SaveData
     /// </summary>
     internal class MaterialSaveData
     {
-        public int ID { get; set; } = Constants.InvalidID;
+        public int ID { get; set; } = IDClass.InvalidID;
         public string Name { get; set; } = "";
         public MaterialType Subtype { get; set; } = MaterialType.Other;
 

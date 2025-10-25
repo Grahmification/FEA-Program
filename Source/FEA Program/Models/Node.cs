@@ -205,6 +205,6 @@ namespace FEA_Program.Models
         /// Gets an empty node for reference use
         /// </summary>
         /// <returns></returns>
-        public static Node DummyNode(int dimension = 1) => new(Constants.InvalidID, dimension);
+        public static Node DummyNode(int dimension = 1) => new(InvalidID, dimension);
     }
 }

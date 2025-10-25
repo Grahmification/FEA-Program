@@ -7,8 +7,8 @@ namespace FEA_Program.SaveData
     /// </summary>
     internal class ElementProblemData
     {
-        public int ID { get; set; } = Constants.InvalidID;
-        public int MaterialID { get; set; } = Constants.InvalidID;
+        public int ID { get; set; } = IDClass.InvalidID;
+        public int MaterialID { get; set; } = IDClass.InvalidID;
         public int[] NodeIDs { get; set; } = [];
         public int NodeDOFs { get; set; } = 1;
         public ElementTypes ElementType { get; set; } = ElementTypes.BarLinear;

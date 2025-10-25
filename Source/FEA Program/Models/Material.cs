@@ -2,7 +2,7 @@
 
 namespace FEA_Program.Models
 {
-    internal class Material(string name, double e, int id = Constants.InvalidID, MaterialType subtype = MaterialType.Other) : IDClass(id), ICloneable
+    internal class Material(string name, double e, int id = IDClass.InvalidID, MaterialType subtype = MaterialType.Other) : IDClass(id), ICloneable
     {
         public string Name { get; set; } = name;
         public MaterialType Subtype { get; set; } = subtype;
