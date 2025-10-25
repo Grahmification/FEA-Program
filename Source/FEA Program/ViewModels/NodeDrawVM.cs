@@ -16,6 +16,8 @@ namespace FEA_Program.ViewModels
 
         public Vector3 DrawPosition => ArrayToVector(GetScaledDisplacement_mm());
         public Vector3 Force => ArrayToVector(Node.Model.Force);
+        public double ForceLength => ScaleForceMagnitude(Node.Model.ForceMagnitude);
+
         public Color4 NodeColor => Node.Selected ? SelectedColor : DefaultNodeColor;
         public Color4 FixityColor => Node.Selected ? SelectedColor : DefaultFixityColor;
         public ObservableCollection<Vector3> ReactionForces { get; private set; } = [];
@@ -45,6 +47,7 @@ namespace FEA_Program.ViewModels
                 else if (e.PropertyName == nameof(NodeVM.HasForce))
                 {
                     OnPropertyChanged(nameof(Force));
+                    OnPropertyChanged(nameof(ForceLength));
                 }
                 else if (e.PropertyName == (nameof(NodeVM.Selected)))
                 {
@@ -90,6 +93,34 @@ namespace FEA_Program.ViewModels
             (float)(array.Length > 0 ? array[0] : 0.0),
             (float)(array.Length > 1 ? array[1] : 0.0),
             (float)(array.Length > 2 ? array[2] : 0.0));
+        }
+
+        /// <summary>
+        /// Scales an input value (0 to 100) to a linear output range.
+        /// </summary>
+        /// <param name="inputValue">The input force value</param>
+        /// <returns>The scaled value between the specified limits</returns>
+        public static double ScaleForceMagnitude(double inputValue)
+        {
+            if (inputValue == 0)
+                return 0; // Hide the force if the value is zero
+            
+            // Define the input and output ranges (These are fixed constants)
+            const double inputMin = 0.0;
+            const double inputMax = 100.0;
+
+            const double outputMin = 1;
+            const double outputMax = 3;
+
+            // Ensure the input value is clamped within the expected range (0 to 100)
+            // This prevents the output from going outside the 0.5 to 2.0 range if invalid input is provided.
+            double clampedValue = Math.Clamp(inputValue, inputMin, inputMax);
+
+            // Calculate the ratio of the input value within its range (0.0 to 1.0)
+            double ratio = (clampedValue - inputMin) / (inputMax - inputMin);
+
+            // Calculate the corresponding position in the output range
+            return outputMin + ratio * (outputMax - outputMin);
         }
 
         /// <summary>

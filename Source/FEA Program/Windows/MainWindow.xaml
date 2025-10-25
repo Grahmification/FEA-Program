@@ -171,7 +171,7 @@
                                 <DataTemplate>
                                     <vhx:NodeVisual3D Position="{Binding DrawPosition}" Color="{Binding NodeColor}">
                                         <vhx:FixityVisual3D ShowX="{Binding Node.FixedX}" ShowY="{Binding Node.FixedY}" ShowZ="{Binding Node.FixedZ}" Color="{Binding FixityColor}"/>
-                                        <vhx:ArrowVisual3D Direction="{Binding Force}" Length="{Binding Node.Model.ForceMagnitude}"/>
+                                        <vhx:ArrowVisual3D Direction="{Binding Force}" Length="{Binding ForceLength}"/>
 
                                         <!-- Reaction Forces -->
                                         <h:ItemsModel3D ItemsSource="{Binding ReactionForces}">
