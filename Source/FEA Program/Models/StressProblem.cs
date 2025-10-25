@@ -1,6 +1,4 @@
-﻿using FEA_Program.Converters;
-using MathNet.Numerics.LinearAlgebra.Double;
-using System.ComponentModel;
+﻿using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FEA_Program.Models
 {
@@ -149,18 +147,5 @@ namespace FEA_Program.Models
             return elementsToDelete.Select(element => element.ID).ToArray();
         }
 
-    }
-
-    [TypeConverter(typeof(EnumDescriptionTypeConverter))]
-    public enum ProblemTypes
-    {
-        [Description("Bar 1D")]
-        Bar_1D,
-
-        [Description("Beam 1D")]
-        Beam_1D,
-
-        [Description("Truss 3D")]
-        Truss_3D
     }
 }
