@@ -119,12 +119,29 @@ namespace FEA_Program.Views.Helix
 
             // Compute rotation
             var baseDir = new Vector3(0, 1, 0);
-            var axis = Vector3.Cross(baseDir, dir);
-            float angle = MathF.Acos(Vector3.Dot(baseDir, dir));
+            var dot = MathUtil.Clamp(Vector3.Dot(baseDir, dir), -1f, 1f);
 
-            Matrix rotation = Matrix.Identity;
-            if (axis.LengthSquared() > 1e-6f)
+            Matrix rotation;
+
+            // Check if vectors are nearly the same or opposite
+            if (dot > 0.9999f)
+            {
+                rotation = Matrix.Identity;  // Same direction - no rotation
+            }
+            else if (dot < -0.9999f)
+            {
+                // Opposite direction - flip by 180° rotation around *any* perpendicular axis
+                // Since baseDir is (0,1,0), we can use X axis (1,0,0)
+                rotation = Matrix.RotationAxis(Vector3.UnitX, MathUtil.Pi);
+            }
+            else
+            {
+                // Normal rotation using cross product
+                var axis = Vector3.Cross(baseDir, dir);
+                axis.Normalize();
+                float angle = MathF.Acos(dot);
                 rotation = Matrix.RotationAxis(axis, angle);
+            }
 
             Matrix scale = Matrix.Scaling((float)Length * 2);  // Scale the arrow twice as large arbitrarily
             Matrix transform = scale * rotation;
