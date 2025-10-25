@@ -31,6 +31,7 @@ namespace FEA_Program.ViewModels
                 Project.ProblemReset += OnProblemReset;
 
                 ViewPort.Base = Base;
+                ViewPort.ResetCamera();
             }
             catch (Exception ex)
             {
