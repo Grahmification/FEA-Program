@@ -114,7 +114,7 @@
                                     <TextBlock Margin="6,0,0,0" VerticalAlignment="Center">
                                         <Run Text="{Binding Node.Model.ID, Mode=OneWay}"/>
                                         <Run Text=" - ("/>
-                                        <Run Text="{Binding Node.Coordinates_mm, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
+                                        <Run Text="{Binding Node.UserCoordinates, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
                                         <Run Text=")"/>
                                     </TextBlock>
                                 </StackPanel>
