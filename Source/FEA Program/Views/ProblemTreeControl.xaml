@@ -27,54 +27,26 @@
                 </TreeViewItem.Header>
 
                 <TreeViewItem.Resources>
-                    <DataTemplate DataType="{x:Type vm:MaterialVM}">
-                        <TreeViewItem>
-                            <TreeViewItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Model.Name}" />
+                    <HierarchicalDataTemplate DataType="{x:Type vm:MaterialVM}" ItemsSource="{Binding Properties}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Model.Name}" />
 
-                                    <StackPanel.ContextMenu>
-                                        <ContextMenu Focusable="False">
-                                            <MenuItem Header="Edit" Command="{Binding EditCommand}" Focusable="False"/>
-                                            <MenuItem Header="Delete" Command="{Binding DeleteCommand}" Focusable="False"/>
-                                        </ContextMenu>
-                                    </StackPanel.ContextMenu>
-                                </StackPanel>
-                            </TreeViewItem.Header>
-                            <StackPanel>
-                                <TextBlock>
-                                <Run Text="E:     " FontWeight="Bold"/>
-                                <Run Text="{Binding E, StringFormat={}{0:F1}, Mode=OneWay}"/>
-                                <Run Text="{Binding Source={StaticResource Units}, Path=Modulus.UnitString, Mode=OneWay}"/>
-                                </TextBlock>
-
-                                <TextBlock>
-                                <Run Text="V:     " FontWeight="Bold"/>
-                                <Run Text="{Binding Model.V, StringFormat={}{0:F1}, Mode=OneWay}"/>
-                                </TextBlock>
-
-                                <TextBlock>
-                                <Run Text="Sy:   " FontWeight="Bold"/>
-                                <Run Text="{Binding Sy, StringFormat={}{0:F1}, Mode=OneWay}"/>
-                                <Run Text="{Binding Source={StaticResource Units}, Path=Stress.UnitString, Mode=OneWay}"/>
-                                </TextBlock>
-
-                                <TextBlock>
-                                <Run Text="SuT: " FontWeight="Bold"/>
-                                <Run Text="{Binding Sut, StringFormat={}{0:F1}, Mode=OneWay}"/>
-                                <Run Text="{Binding Source={StaticResource Units}, Path=Stress.UnitString, Mode=OneWay}"/>
-                                </TextBlock>
-
-                                <TextBlock>
-                                <Run Text="Type: " FontWeight="Bold"/>
-                                <Run Text="{Binding Model.Subtype, Mode=OneWay}"/>
-                                </TextBlock>
-                            </StackPanel>
-                        </TreeViewItem>
+                            <StackPanel.ContextMenu>
+                                <ContextMenu Focusable="False">
+                                    <MenuItem Header="Edit" Command="{Binding EditCommand}" Focusable="False"/>
+                                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}" Focusable="False"/>
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type vm:TreePropertyVM}">
+                        <TextBlock>
+                                <Run Text="{Binding DisplayName, StringFormat={}{0}:, Mode=OneWay}" FontWeight="Bold"/>
+                                <Run Text="{Binding DisplayValue, Mode=OneWay}"/>
+                        </TextBlock>
                     </DataTemplate>
                 </TreeViewItem.Resources>
             </TreeViewItem>
-
 
             <!-- Nodes Sub Tree -->
             <TreeViewItem x:Name="NodesTree" IsExpanded="True" ItemsSource="{Binding Nodes.Items}">

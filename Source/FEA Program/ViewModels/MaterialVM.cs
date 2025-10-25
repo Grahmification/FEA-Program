@@ -1,5 +1,7 @@
 ﻿using FEA_Program.Models;
+using FEA_Program.UI;
 using FEA_Program.ViewModels.Base;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
@@ -13,6 +15,11 @@ namespace FEA_Program.ViewModels
 
         // ---------------------- Properties ----------------------
         public Material Model { get; private set; } = Material.DummyMaterial();
+
+        /// <summary>
+        /// Properties for treeview display
+        /// </summary>
+        public ObservableCollection<TreePropertyVM> Properties { get; private set; } = [];
 
         /// <summary>
         /// Youngs modulus in user units
@@ -41,6 +48,13 @@ namespace FEA_Program.ViewModels
             Model.PropertyChanged += OnModelPropertyChanged;
             EditCommand = new RelayCommand(() => EditRequest?.Invoke(this, EventArgs.Empty));
             DeleteCommand = new RelayCommand(() => DeleteRequest?.Invoke(this, EventArgs.Empty));
+
+            // Create tree properties
+            Properties.Add(new TreePropertyVM(this, nameof(E), () => E.ToString("F1")) { Name = "E", Unit = App.Units.Modulus});
+            Properties.Add(new TreePropertyVM(Model, nameof(Material.V), () => Model.V.ToString("F2")) { Name = "V" });
+            Properties.Add(new TreePropertyVM(this, nameof(Sy), () => Sy.ToString("F1")) { Name = "Sy", Unit = App.Units.Stress });
+            Properties.Add(new TreePropertyVM(this, nameof(Sut), () => Sut.ToString("F1")) { Name = "Sut", Unit = App.Units.Stress });
+            Properties.Add(new TreePropertyVM(Model, nameof(Material.Subtype), () => Attributes.GetDescription(Model.Subtype)) { Name = "Type" });
         }
 
         private void OnModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

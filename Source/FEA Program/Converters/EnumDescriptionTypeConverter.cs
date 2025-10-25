@@ -1,7 +1,5 @@
-﻿using System.ComponentModel;
-using System.Reflection;
-
-// Tutorial: https://brianlagunas.com/a-better-way-to-data-bind-enums-in-wpf/
+﻿using FEA_Program.UI;
+using System.ComponentModel;
 
 namespace FEA_Program.Converters
 {
@@ -15,17 +13,7 @@ namespace FEA_Program.Converters
         {
             if (destinationType == typeof(string))
             {
-                if (value != null)
-                {
-                    FieldInfo? fi = value.GetType().GetField(value?.ToString() ?? "");
-                    if (fi != null)
-                    {
-                        var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
-                        return ((attributes.Length > 0) && (!String.IsNullOrEmpty(attributes[0].Description))) ? attributes[0].Description : value?.ToString() ?? "";
-                    }
-                }
-
-                return string.Empty;
+                return Attributes.GetDescription(value);
             }
 
             return base.ConvertTo(context, culture, value, destinationType) ?? "";
