@@ -18,5 +18,7 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public UnitVM Modulus { get; private set; } = new(UnitType.Pressure, Unit.GPa);
 
+        public UnitVM Force { get; private set; } = new(UnitType.Force, Unit.N);
+
     }
 }

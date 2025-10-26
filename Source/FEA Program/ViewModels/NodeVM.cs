@@ -23,6 +23,11 @@ namespace FEA_Program.ViewModels
         public ObservableCollection<TreePropertyVM> Properties { get; private set; } = [];
 
         /// <summary>
+        /// Force properties for treeview display
+        /// </summary>
+        public ObservableCollection<TreePropertyVM> ForceProperties { get; private set; } = [];
+
+        /// <summary>
         /// Get the node coordinates in user units
         /// </summary>
         public double[] UserCoordinates => Model.Coordinates.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
@@ -84,6 +89,13 @@ namespace FEA_Program.ViewModels
                 vm.PropertyChanged += OnTreePropertyPropertyChanged;
                 Properties.Add(vm);
             }
+
+            // Create force tree properties
+            ForceProperties.Add(new TreePropertyVM(this, nameof(ForceMagnitude), () => ForceMagnitude.ToString("F2")) { Name = "Magnitude", Unit = App.Units.Force});
+            ForceProperties.Add(new TreePropertyVM(Model, nameof(Node.Force), () => string.Join(", ", Model.Force.Select(f => f.ToString("F1")))) { Name = "Components", Unit = App.Units.Force, UnitsAfterValue = false });
+
+            foreach (var vm in ForceProperties)
+                vm.PropertyChanged += OnTreePropertyPropertyChanged;
         }
 
         private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
