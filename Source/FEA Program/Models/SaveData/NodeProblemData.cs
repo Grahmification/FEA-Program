@@ -1,6 +1,4 @@
-﻿using FEA_Program.Models;
-
-namespace FEA_Program.SaveData
+﻿namespace FEA_Program.Models.SaveData
 {
     /// <summary>
     /// Save file data for a node with no results included

@@ -1,5 +1,5 @@
 using FEA_Program.Models;
-using FEA_Program.SaveData;
+using FEA_Program.Models.SaveData;
 using FEA_Program.UI;
 using FEA_Program.ViewModels.Base;
 using MathNet.Numerics.LinearAlgebra.Double;
@@ -93,7 +93,7 @@ namespace FEA_Program.ViewModels
 
                 if (filePath != null && filePath != "")
                 {
-                    var saveData = await SaveData.JsonSerializer.DeserializeFromJsonFile<ProblemData>(filePath);
+                    var saveData = await Models.SaveData.JsonSerializer.DeserializeFromJsonFile<ProblemData>(filePath);
 
                     if (saveData != null)
                     {
@@ -131,7 +131,7 @@ namespace FEA_Program.ViewModels
                 {
                     var saveData = GetSaveData();
 
-                    await SaveData.JsonSerializer.SerializeToJsonFile(saveData, filePath);
+                    await Models.SaveData.JsonSerializer.SerializeToJsonFile(saveData, filePath);
 
                     Base.SetStatus($"Saved to {filePath}");
                 }

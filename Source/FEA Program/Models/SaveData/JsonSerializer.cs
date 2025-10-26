@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text.Json;
 
-namespace FEA_Program.SaveData
+namespace FEA_Program.Models.SaveData
 {
     /// <summary>
     /// A static helper class for serializing and deserializing arbitrary C# objects 
