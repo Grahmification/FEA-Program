@@ -28,6 +28,11 @@ namespace FEA_Program.ViewModels
         public ObservableCollection<TreePropertyVM> ForceProperties { get; private set; } = [];
 
         /// <summary>
+        /// Properties for results treeview display
+        /// </summary>
+        public ObservableCollection<TreePropertyVM> ResultProperties { get; private set; } = [];
+
+        /// <summary>
         /// Get the node coordinates in user units
         /// </summary>
         public double[] UserCoordinates => Model.Coordinates.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
@@ -95,6 +100,14 @@ namespace FEA_Program.ViewModels
             ForceProperties.Add(new TreePropertyVM(Model, nameof(Node.Force), () => string.Join(", ", Model.Force.Select(f => f.ToString("F1")))) { Name = "Components", Unit = App.Units.Force, UnitsAfterValue = false });
 
             foreach (var vm in ForceProperties)
+                vm.PropertyChanged += OnTreePropertyPropertyChanged;
+
+            // Create result tree properties
+            ResultProperties.Add(new TreePropertyVM(this, nameof(UserDisplacement), () => string.Join(", ", UserDisplacement.Select(f => f.ToString("G3")))) { Name = "Displacement", Unit = App.Units.Length, UnitsAfterValue = false });
+            ResultProperties.Add(new TreePropertyVM(this, nameof(UserFinalPos), () => string.Join(", ", UserFinalPos.Select(f => f.ToString("G2")))) { Name = "Position", Unit = App.Units.Length, UnitsAfterValue = false });
+            ResultProperties.Add(new TreePropertyVM(Model, nameof(Node.ReactionForce), () => string.Join(", ", Model.ReactionForce.Select(f => f.ToString("G2")))) { Name = "Reaction Force", Unit = App.Units.Force, UnitsAfterValue = false });
+
+            foreach (var vm in ResultProperties)
                 vm.PropertyChanged += OnTreePropertyPropertyChanged;
         }
 
