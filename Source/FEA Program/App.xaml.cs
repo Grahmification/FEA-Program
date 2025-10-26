@@ -1,12 +1,13 @@
 ﻿using FEA_Program.ViewModels;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace FEA_Program
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : System.Windows.Application
+    public partial class App : Application
     {
         /// <summary>
         /// Global program units
@@ -19,9 +20,9 @@ namespace FEA_Program
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            System.Windows.MessageBox.Show($"An unhandled exception just occurred: {e.Exception.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show($"An unhandled exception occurred: {e.Exception.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             e.Handled = true;
         }
     }
