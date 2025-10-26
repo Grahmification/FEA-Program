@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -23,7 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\dna_icon_32px.ico"/>
+    <Resource Include="Resources\arrow_icon_32px.png" />
+    <Resource Include="Resources\cube_icon_32px.png" />
+    <Resource Include="Resources\dna_icon_32px.ico" />
+    <Resource Include="Resources\element_icon_32px.png" />
+    <Resource Include="Resources\material_icon_32px.png" />
   </ItemGroup>
 
 </Project>

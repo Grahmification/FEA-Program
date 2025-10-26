@@ -72,16 +72,41 @@
                 <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
 
                 <Menu VerticalAlignment="Center">
-                    <MenuItem Header="Add Node" Height="20" Command="{Binding Project.Nodes.AddCommand}"/>
+                    <MenuItem Header="Add Node" Height="20" Command="{Binding Project.Nodes.AddCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="/FEA Program;component/Resources/cube_icon_32px.png" Height="14" Width="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </Menu>
+
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
+                
                 <Menu VerticalAlignment="Center">
-                    <MenuItem Header="Add Material" Height="20" Command="{Binding Project.Materials.AddCommand}"/>
+                    <MenuItem Header="Add Material" Height="20" Command="{Binding Project.Materials.AddCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="/FEA Program;component/Resources/material_icon_32px.png" Height="16" Width="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem> 
                 </Menu>
+
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
+
                 <Menu VerticalAlignment="Center">
-                    <MenuItem Header="Add Element" Height="20" Command="{Binding Project.Elements.AddCommand}"/>
+                    <MenuItem Header="Add Element" Height="20" Command="{Binding Project.Elements.AddCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="/FEA Program;component/Resources/element_icon_32px.png" Height="12" Width="12"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </Menu>
+
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
+
                 <Menu VerticalAlignment="Center">
-                    <MenuItem Header="Add Force" Height="20" Command="{Binding Project.Nodes.AddForceCommand}"/>
+                    <MenuItem Header="Add Force" Height="20" Command="{Binding Project.Nodes.AddForceCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="/FEA Program;component/Resources/arrow_icon_32px.png" Height="18" Width="18"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </Menu>
 
                 <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
