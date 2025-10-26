@@ -29,6 +29,8 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public double DisplacementScalingFactor { get; set; } = 0;
 
+        public string NodeText { get; set; } = "";
+
         public NodeDrawVM() { }
 
         public NodeDrawVM(NodeVM node)
@@ -55,6 +57,7 @@ namespace FEA_Program.ViewModels
                 {
                     OnPropertyChanged(nameof(NodeColor));
                     OnPropertyChanged(nameof(FixityColor));
+                    SetTextForSelection();
                 }
             }
         }
@@ -89,6 +92,21 @@ namespace FEA_Program.ViewModels
             }
 
             return output;
+        }
+
+        /// <summary>
+        /// Sets the node text based on it being selected
+        /// </summary>
+        private void SetTextForSelection()
+        {
+            if (Node.Selected)
+            {
+                NodeText = "Node" + Node.IDCoordsDisplayText;
+            }
+            else
+            {
+                NodeText = "";
+            }
         }
 
 
