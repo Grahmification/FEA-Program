@@ -8,6 +8,11 @@ namespace FEA_Program.ViewModels
 {
     internal class NodeVM: ObservableObject
     {
+        /// <summary>
+        /// Names of each noode coordinate, sorted by index
+        /// </summary>
+        public static string[] CoordinateNames = ["X", "Y", "Z"];
+
         // ---------------------- Events ----------------------
 
         public event EventHandler? EditRequest;
@@ -73,7 +78,6 @@ namespace FEA_Program.ViewModels
             DeleteForceCommand = new RelayCommand(DeleteForce);
 
             // Create tree properties
-            string[] coordinateNames = ["X", "Y", "Z"];
 
             // Need to hardcode indexes or can end up with undefined functionality
             Func<string>[] valueFunctions = [
@@ -86,7 +90,7 @@ namespace FEA_Program.ViewModels
             {
                 var vm = new TreePropertyVM(this, nameof(UserCoordinates), valueFunctions[i])
                 {
-                    Name = coordinateNames[i],
+                    Name = CoordinateNames[i],
                     Unit = App.Units.Length,
                     UnitsAfterValue = false
                 };

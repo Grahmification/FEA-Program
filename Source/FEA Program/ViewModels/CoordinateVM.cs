@@ -8,8 +8,6 @@ namespace FEA_Program.ViewModels
     /// </summary>
     internal class CoordinateVM : ObservableObject
     {
-        public static string[] Labels = ["X", "Y", "Z"];
-
         private double _value = 0;
         private bool _fixed = false;
         private int _index = -1;
@@ -19,7 +17,7 @@ namespace FEA_Program.ViewModels
         public event EventHandler<int>? ValueChanged;
 
         // ---------------------- Properties ----------------------
-        public string Label => Labels[_index];
+        public string Label => NodeVM.CoordinateNames[_index];
         public double Value { get => _value; set { _value = value; ValueChanged?.Invoke(this, _index); } }
         public bool Fixed { get => _fixed; set { _fixed = value; ValueChanged?.Invoke(this, _index); } }
 
