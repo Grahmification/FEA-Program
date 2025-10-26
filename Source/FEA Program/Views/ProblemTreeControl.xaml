@@ -56,32 +56,33 @@
                     </StackPanel>
                 </TreeViewItem.Header>
 
-                <TreeViewItem.Resources>
-                    <DataTemplate DataType="{x:Type vm:NodeVM}">
-                        <TreeViewItem>
-                            <TreeViewItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Model.ID, StringFormat={}Node {0}, Mode=OneWay}" />
+                <!-- Handle Node Selection -->
+                <TreeViewItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsSelected" Value="{Binding Selected, Mode=OneWayToSource}" />
+                    </Style>
+                </TreeViewItem.ItemContainerStyle>
 
-                                    <StackPanel.ContextMenu>
-                                        <ContextMenu Focusable="False">
-                                            <MenuItem Header="Edit" Command="{Binding EditCommand}" Focusable="False"/>
-                                            <MenuItem Header="Delete" Command="{Binding DeleteCommand}" Focusable="False"/>
-                                        </ContextMenu>
-                                    </StackPanel.ContextMenu>
-                                </StackPanel>
-                            </TreeViewItem.Header>
-                            <StackPanel>
-                                <TextBlock>
-                                <Run Text="{Binding Source={StaticResource Units}, Path=Length.UnitString, StringFormat={}Pos [{0}]:, Mode=OneWay}" FontWeight="Bold"/>
-                                <Run Text="{Binding UserCoordinates, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
-                                </TextBlock>
-                                <TextBlock>
-                                <Run Text="Fixity: " FontWeight="Bold"/>
-                                <Run Text="{Binding Model.Fixity, Converter={StaticResource NumberArrayToStringConverter}, Mode=OneWay}"/>
-                                </TextBlock>
-                            </StackPanel>
-                        </TreeViewItem>
+                <TreeViewItem.Resources>
+                    <!-- Header -->
+                    <HierarchicalDataTemplate DataType="{x:Type vm:NodeVM}" ItemsSource="{Binding Properties}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Model.ID, StringFormat={}Node {0}, Mode=OneWay}" />
+
+                            <StackPanel.ContextMenu>
+                                <ContextMenu Focusable="False">
+                                    <MenuItem Header="Edit" Command="{Binding EditCommand}" Focusable="False"/>
+                                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}" Focusable="False"/>
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <!-- Sub-items -->
+                    <DataTemplate DataType="{x:Type vm:TreePropertyVM}">
+                        <TextBlock>
+                                <Run Text="{Binding DisplayName, StringFormat={}{0}:, Mode=OneWay}" FontWeight="Bold"/>
+                                <Run Text="{Binding DisplayValue, Mode=OneWay}"/>
+                        </TextBlock>
                     </DataTemplate>
                 </TreeViewItem.Resources>
             </TreeViewItem>

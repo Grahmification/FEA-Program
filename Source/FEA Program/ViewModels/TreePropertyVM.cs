@@ -29,6 +29,7 @@ namespace FEA_Program.ViewModels
         public string Name { get; set; } = "";
         public UnitVM? Unit { get; set; } = null;
         public bool UnitsAfterValue { get; set; } = true;
+        public bool Selected { get; set; } = false;
 
         // ------------------ View specific properties ----------------------
         public string DisplayName => !UnitsAfterValue && Unit != null ? $"{Name} [{Unit.UnitString}]" : Name;

@@ -1,5 +1,6 @@
 ﻿using FEA_Program.Models;
 using FEA_Program.ViewModels.Base;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 
@@ -15,6 +16,11 @@ namespace FEA_Program.ViewModels
 
         // ---------------------- Properties ----------------------
         public Node Model { get; private set; } = Node.DummyNode();
+
+        /// <summary>
+        /// Properties for treeview display
+        /// </summary>
+        public ObservableCollection<TreePropertyVM> Properties { get; private set; } = [];
 
         /// <summary>
         /// Get the node coordinates in user units
@@ -55,6 +61,29 @@ namespace FEA_Program.ViewModels
             DeleteCommand = new RelayCommand(() => DeleteRequest?.Invoke(this, EventArgs.Empty));
             EditForceCommand = new RelayCommand(() => EditForceRequest?.Invoke(this, EventArgs.Empty));
             DeleteForceCommand = new RelayCommand(DeleteForce);
+
+            // Create tree properties
+            string[] coordinateNames = ["X", "Y", "Z"];
+
+            // Need to hardcode indexes or can end up with undefined functionality
+            Func<string>[] valueFunctions = [
+                () => $"{UserCoordinates[0]:F2}" + (Model.Fixity[0] == 1 ? " (Fixed)" : ""),
+                () => $"{UserCoordinates[1]:F2}" + (Model.Fixity[1] == 1 ? " (Fixed)" : ""),
+                () => $"{UserCoordinates[2]:F2}" + (Model.Fixity[2] == 1 ? " (Fixed)" : "")
+             ];
+
+            for(int i = 0; i < Model.Dimension; i++)
+            {
+                var vm = new TreePropertyVM(this, nameof(UserCoordinates), valueFunctions[i])
+                {
+                    Name = coordinateNames[i],
+                    Unit = App.Units.Length,
+                    UnitsAfterValue = false
+                };
+
+                vm.PropertyChanged += OnTreePropertyPropertyChanged;
+                Properties.Add(vm);
+            }
         }
 
         private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -82,6 +111,17 @@ namespace FEA_Program.ViewModels
                     OnPropertyChanged(nameof(FixedX));
                     OnPropertyChanged(nameof(FixedY));
                     OnPropertyChanged(nameof(FixedZ));
+                }
+            }
+        }
+        private void OnTreePropertyPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (sender is TreePropertyVM vm)
+            {
+                if (e.PropertyName == nameof(TreePropertyVM.Selected))
+                {
+                    // Propagate selections to this VM
+                    Selected = vm.Selected;
                 }
             }
         }
