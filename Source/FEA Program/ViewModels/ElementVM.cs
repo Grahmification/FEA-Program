@@ -1,5 +1,7 @@
 ﻿using FEA_Program.Models;
+using FEA_Program.UI;
 using FEA_Program.ViewModels.Base;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 
@@ -18,6 +20,12 @@ namespace FEA_Program.ViewModels
         public IElement? Model { get; private set; } = null;
         public int[] NodeIds => Nodes.Select(n => n.Model.ID).ToArray();
         public ElementArgVM[] Arguments { get; private set; } = [];
+
+        /// <summary>
+        /// Properties for treeview display
+        /// </summary>
+        public ObservableCollection<TreePropertyVM> Properties { get; private set; } = [];
+
         public bool Selected { get; set; } = false;
         public double MaxStress => App.Units.Stress.ToUser(Model?.MaxStress ?? 0);
         public double SafetyFactorYield => Model?.SafetyFactorYield ?? 0;
@@ -49,6 +57,20 @@ namespace FEA_Program.ViewModels
 
             // Arguments should only be changed from these VMs, so synchronization only needs to be called at startup
             SynchronizeArguments();
+
+            // Setup tree properties
+            Properties.Add(new TreePropertyVM(Model, nameof(IElement.ElementType), () => Attributes.GetDescription(Model.ElementType)) { Name = "Type" });
+            Properties.Add(new TreePropertyVM(this, nameof(Material), () => Material.Model.Name) { Name = "Material" });
+            Properties.Add(new TreePropertyVM(this, nameof(Nodes), () => string.Join(", ", Nodes.Select(n => n.Model.ID.ToString()))) { Name = "Nodes" });
+
+            // Create a tree item for each argument
+            foreach (var arg in Arguments)
+            {
+                Properties.Add(new TreePropertyVM(arg, nameof(ElementArgVM.Value), arg.UserValue.ToString) { Name = arg.Name, Unit = arg.Units });
+            }
+
+            foreach(var prop in Properties)
+                prop.PropertyChanged += OnTreePropertyPropertyChanged;
         }
 
         // ---------------------- Event Handlers ----------------------
@@ -57,6 +79,17 @@ namespace FEA_Program.ViewModels
             if (sender is ElementArgVM vm && Model is not null)
             {
                 Model.ElementArgs[vm.Index] = vm.Value;
+            }
+        }
+        private void OnTreePropertyPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (sender is TreePropertyVM vm)
+            {
+                if (e.PropertyName == nameof(TreePropertyVM.Selected))
+                {
+                    // Propagate selections to this VM
+                    Selected = vm.Selected;
+                }
             }
         }
 
