@@ -8,7 +8,7 @@
         xmlns:v="clr-namespace:FEA_Program.Views"
         xmlns:local="clr-namespace:FEA_Program.Windows"
         mc:Ignorable="d"
-        Title="FEA Program" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+        Title="FEA Program" Height="450" Width="800" WindowStartupLocation="CenterScreen" Icon="/Resources/dna_icon_32px.ico">
 
     <Window.DataContext>
         <vm:MainVM/>

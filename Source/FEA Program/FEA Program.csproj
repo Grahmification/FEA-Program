@@ -7,7 +7,12 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>Resources\dna_icon_256px.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\dna_icon_256px.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.27.3" />
@@ -15,6 +20,10 @@
     <PackageReference Include="OpenTK" Version="4.9.4" />
     <PackageReference Include="OpenTK.GLControl" Version="4.0.2" />
     <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\dna_icon_32px.ico"/>
   </ItemGroup>
 
 </Project>
