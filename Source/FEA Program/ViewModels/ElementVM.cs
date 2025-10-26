@@ -35,6 +35,7 @@ namespace FEA_Program.ViewModels
         public double MaxStress => App.Units.Stress.ToUser(Model?.MaxStress ?? 0);
         public double SafetyFactorYield => Model?.SafetyFactorYield ?? 0;
         public double SafetyFactorUltimate => Model?.SafetyFactorUltimate ?? 0;
+        public bool StressIsValid => !double.IsNaN(MaxStress) && !double.IsInfinity(MaxStress);
 
         // ---------------------- Commands ----------------------
         public ICommand? EditCommand { get; }
@@ -115,6 +116,7 @@ namespace FEA_Program.ViewModels
                     OnPropertyChanged(nameof(SafetyFactorYield));
                     OnPropertyChanged(nameof(SafetyFactorUltimate));
                     OnPropertyChanged(nameof(MaxStress));
+                    OnPropertyChanged(nameof(StressIsValid));
                 }
             }
         }

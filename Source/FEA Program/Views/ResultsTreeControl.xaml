@@ -77,7 +77,7 @@
                     <!-- Header -->
                     <HierarchicalDataTemplate DataType="{x:Type vm:ElementVM}" ItemsSource="{Binding ResultProperties}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Model.ID, StringFormat={}Element {0}, Mode=OneWay}" />
+                            <TextBlock Text="{Binding Model.ID, StringFormat={}Element {0}, Mode=OneWay}" Foreground="{Binding StressIsValid, Converter={StaticResource ValidValueConverter}, Mode=OneWay}"/>
                             <CheckBox Content="" IsChecked="{Binding Model.SolutionValid, Mode=OneWay}" IsEnabled="False" Margin="5,0"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
