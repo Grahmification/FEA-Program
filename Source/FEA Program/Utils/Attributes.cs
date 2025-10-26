@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Reflection;
 
-namespace FEA_Program.UI
+namespace FEA_Program.Utils
 {
     internal class Attributes
     {

@@ -1,4 +1,4 @@
-﻿using FEA_Program.UI;
+﻿using FEA_Program.Utils;
 using FEA_Program.ViewModels.Base;
 using FEA_Program.Windows;
 using MathNet.Numerics.LinearAlgebra;

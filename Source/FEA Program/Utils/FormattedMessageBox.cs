@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace FEA_Program.UI
+namespace FEA_Program.Utils
 {
     /// <summary>
     /// Class providing a global entry point for displaying message boxes

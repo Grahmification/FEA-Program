@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
 
-namespace FEA_Program.UI
+namespace FEA_Program.Utils
 {
     internal class IODialogs
     {

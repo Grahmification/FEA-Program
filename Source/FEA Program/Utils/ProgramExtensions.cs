@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace FEA_Program.UI
+namespace FEA_Program.Utils
 {
     internal class ProgramExtensions
     {
