@@ -69,7 +69,7 @@ namespace FEA_Program.Views.Helix
                 FontColor = new Color4(0, 0, 0, 1),
                 FontSize = 12,
                 FontWeight = FontWeights.Regular,
-                BackgroundColor = new Color4(0.8f, 0.8f, 0.8f, 0.8f),
+                BackgroundColor = new Color4(0.8f, 0.8f, 0.8f, 0.5f),
                 Padding = new Thickness(2),
             };
 
@@ -78,6 +78,7 @@ namespace FEA_Program.Views.Helix
                 Geometry = _textGeometry,
                 Visibility = Visibility.Hidden, // Hide until explicitly shown
                 IsHitTestVisible = false,  // Not clickable
+                FixedSize = false,  // Prevents scaling with zoom 
             };
 
             // Keeps the text on top
@@ -123,7 +124,7 @@ namespace FEA_Program.Views.Helix
 
         private void UpdateText()
         {
-            _textGeometry.TextInfo = new TextInfo(Text, new Vector3(0.5f, 0.5f, 0.5f));
+            _textGeometry.TextInfo = new TextInfo(Text, new Vector3(0.9f, 0.9f, 0.9f)) { Scale = 0.03f };
             _textVisual.Visibility = Text == "" ? Visibility.Hidden : Visibility.Visible;
         }
     }

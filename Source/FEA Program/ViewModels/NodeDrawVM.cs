@@ -101,7 +101,9 @@ namespace FEA_Program.ViewModels
         {
             if (Node.Selected)
             {
-                NodeText = "Node" + Node.IDCoordsDisplayText;
+                string[] coordNames = ["X",  "Y", "Z"];
+                var textLines = Node.UserCoordinates.Select((coord, i) => $"{coordNames[i]}: {coord:F1}");
+                NodeText = $"Node {Node.Model.ID}" + "\n" + string.Join("\n", textLines);
             }
             else
             {
