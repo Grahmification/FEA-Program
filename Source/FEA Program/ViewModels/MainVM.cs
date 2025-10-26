@@ -1,6 +1,7 @@
 ﻿using FEA_Program.Models;
 using FEA_Program.UI;
 using FEA_Program.ViewModels.Base;
+using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
@@ -19,9 +20,17 @@ namespace FEA_Program.ViewModels
         public ProjectVM Project { get; private set; } = new();
         public ViewPortVM ViewPort { get; private set; } = new();
 
+        // ---------------------- Commands ----------------------
+        /// <summary>
+        /// RelayCommand for <see cref="CloseApplication"/>
+        /// </summary>
+        public ICommand ExitCommand { get; private set; }
+
 
         public MainVM()
         {
+            ExitCommand = new RelayCommand(CloseApplication);
+
             try
             {
                 Base.Debugging = _debugging;
@@ -46,6 +55,16 @@ namespace FEA_Program.ViewModels
             {
                 ViewPort.Is3Dimensional = vm.ThreeDimensional;
             }
+        }
+
+        // ------------------ Private Helpers ---------------------
+
+        /// <summary>
+        /// Closes the application
+        /// </summary>
+        private void CloseApplication()
+        {
+            App.Current.Shutdown();
         }
     }
 }
