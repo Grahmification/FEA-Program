@@ -8,7 +8,7 @@
         xmlns:v="clr-namespace:FEA_Program.Views"
         xmlns:local="clr-namespace:FEA_Program.Windows"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="FEA Program" Height="450" Width="800" WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
         <vm:MainVM/>
@@ -112,7 +112,7 @@
         <Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width ="275"/>
+                    <ColumnDefinition Width ="275" MinWidth="200"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
