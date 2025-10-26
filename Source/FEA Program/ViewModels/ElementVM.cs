@@ -26,6 +26,11 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public ObservableCollection<TreePropertyVM> Properties { get; private set; } = [];
 
+        /// <summary>
+        /// Properties for treeview resultsdisplay
+        /// </summary>
+        public ObservableCollection<TreePropertyVM> ResultProperties { get; private set; } = [];
+
         public bool Selected { get; set; } = false;
         public double MaxStress => App.Units.Stress.ToUser(Model?.MaxStress ?? 0);
         public double SafetyFactorYield => Model?.SafetyFactorYield ?? 0;
@@ -70,6 +75,14 @@ namespace FEA_Program.ViewModels
             }
 
             foreach(var prop in Properties)
+                prop.PropertyChanged += OnTreePropertyPropertyChanged;
+
+            // Create results tree properties
+            ResultProperties.Add(new TreePropertyVM(this, nameof(MaxStress), () => MaxStress.ToString("F2")) { Name = "Stress", Unit = App.Units.Stress });
+            ResultProperties.Add(new TreePropertyVM(this, nameof(SafetyFactorYield), () => SafetyFactorYield.ToString("F1")) { Name = "Safety Factor, Yield"});
+            ResultProperties.Add(new TreePropertyVM(this, nameof(SafetyFactorUltimate), () => SafetyFactorUltimate.ToString("F1")) { Name = "Safety Factor, Ultimate" });
+
+            foreach (var prop in ResultProperties)
                 prop.PropertyChanged += OnTreePropertyPropertyChanged;
         }
 

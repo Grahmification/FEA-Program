@@ -66,33 +66,30 @@
                     </StackPanel>
                 </TreeViewItem.Header>
 
+                <!-- Handle Selection -->
+                <TreeViewItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsSelected" Value="{Binding Selected, Mode=OneWayToSource}" />
+                    </Style>
+                </TreeViewItem.ItemContainerStyle>
+
                 <TreeViewItem.Resources>
-                    <DataTemplate DataType="{x:Type vm:ElementVM}">
-                        <TreeViewItem>
-                            <TreeViewItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Model.ID, StringFormat={}Element {0}, Mode=OneWay}" />
-                                    <CheckBox Content="" IsChecked="{Binding Model.SolutionValid, Mode=OneWay}" IsEnabled="False" Margin="5,0"/>
-                                </StackPanel>
-                            </TreeViewItem.Header>
-                            <StackPanel>
-                                <TextBlock>
-                                    <Run Text="Stress: " FontWeight="Bold"/>
-                                    <Run Text="{Binding MaxStress, StringFormat={}{0:F2}, Mode=OneWay}"/>
-                                    <Run Text="{Binding Source={StaticResource Units}, Path=Stress.UnitString, Mode=OneWay}"/>
-                                </TextBlock>
-                                <TextBlock>
-                                    <Run Text="Safety Factor, Yield: " FontWeight="Bold"/>
-                                    <Run Text="{Binding SafetyFactorYield, StringFormat={}{0:F1}, Mode=OneWay}"/>
-                                </TextBlock>
-                                <TextBlock>
-                                    <Run Text="Safety Factor, Ultimate: " FontWeight="Bold"/>
-                                    <Run Text="{Binding SafetyFactorUltimate, StringFormat={}{0:F1}, Mode=OneWay}"/>
-                                </TextBlock>
-                            </StackPanel>
-                        </TreeViewItem>
+                    <!-- Header -->
+                    <HierarchicalDataTemplate DataType="{x:Type vm:ElementVM}" ItemsSource="{Binding ResultProperties}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Model.ID, StringFormat={}Element {0}, Mode=OneWay}" />
+                            <CheckBox Content="" IsChecked="{Binding Model.SolutionValid, Mode=OneWay}" IsEnabled="False" Margin="5,0"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <!-- Sub-items -->
+                    <DataTemplate DataType="{x:Type vm:TreePropertyVM}">
+                        <TextBlock>
+                                <Run Text="{Binding DisplayName, StringFormat={}{0}:, Mode=OneWay}" FontWeight="Bold"/>
+                                <Run Text="{Binding DisplayValue, Mode=OneWay}"/>
+                        </TextBlock>
                     </DataTemplate>
                 </TreeViewItem.Resources>
+
             </TreeViewItem>
 
         </TreeView>
