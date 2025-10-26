@@ -3,11 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:h="clr-namespace:HelixToolkit.Wpf.SharpDX;assembly=HelixToolkit.Wpf.SharpDX"
         xmlns:vm="clr-namespace:FEA_Program.ViewModels"
         xmlns:conv="clr-namespace:FEA_Program.Converters"
         xmlns:v="clr-namespace:FEA_Program.Views"
-        xmlns:vhx="clr-namespace:FEA_Program.Views.Helix"
         xmlns:local="clr-namespace:FEA_Program.Windows"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
@@ -18,7 +16,6 @@
 
     <Window.Resources>
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
-        <conv:VectorToLengthConverter x:Key="VectorToLengthConverter"/>
 
         <!-- Simple ToolBar style that removes grip and overflow -->
         <Style x:Key="ToolBarNoGripNoOverflow" TargetType="ToolBar">
@@ -163,44 +160,7 @@
                 <GridSplitter Grid.Column="0" Width="5"/>
 
                 <!-- 3D Viewer -->
-                <v:ViewPortControl Grid.Column="1" DataContext="{Binding ViewPort}">
-                    <v:ViewPortControl.DrawItems>
-                        <!-- Nodes -->
-                        <h:ItemsModel3D ItemsSource="{Binding DataContext.Project.Draw.Nodes, RelativeSource={RelativeSource AncestorType=Window}}">
-                            <h:ItemsModel3D.ItemTemplate>
-                                <DataTemplate>
-                                    <vhx:NodeVisual3D Position="{Binding DrawPosition}" Color="{Binding NodeColor}" Text="{Binding NodeText}">
-                                        <vhx:FixityVisual3D ShowX="{Binding Node.FixedX}" ShowY="{Binding Node.FixedY}" ShowZ="{Binding Node.FixedZ}" Color="{Binding FixityColor}"/>
-                                        <vhx:ArrowVisual3D Direction="{Binding Force}" Length="{Binding ForceLength}"/>
-
-                                        <!-- Reaction Forces -->
-                                        <h:ItemsModel3D ItemsSource="{Binding ReactionForces}">
-                                            <h:ItemsModel3D.ItemTemplate>
-                                                <DataTemplate>
-                                                    <vhx:ArrowVisual3D Direction="{Binding}" Length="{Binding Converter={StaticResource VectorToLengthConverter}}" Color="MediumPurple"/>
-                                                </DataTemplate>
-                                            </h:ItemsModel3D.ItemTemplate>
-                                        </h:ItemsModel3D>
-                                    </vhx:NodeVisual3D>
-                                </DataTemplate>
-                            </h:ItemsModel3D.ItemTemplate>
-                        </h:ItemsModel3D>
-
-                        <!-- Elements -->
-                        <h:ItemsModel3D ItemsSource="{Binding DataContext.Project.Draw.Elements, RelativeSource={RelativeSource AncestorType=Window}}">
-                            <h:ItemsModel3D.ItemTemplate>
-                                <DataTemplate>
-                                    <vhx:TubeVisual3D 
-                                        StartPoint="{Binding Nodes[0].DrawPosition}" 
-                                        EndPoint="{Binding Nodes[1].DrawPosition}"
-                                        FillColor="{Binding ElementColor}"/>
-                                </DataTemplate>
-                            </h:ItemsModel3D.ItemTemplate>
-                        </h:ItemsModel3D>
-
-
-                    </v:ViewPortControl.DrawItems>
-                </v:ViewPortControl>
+                <v:ProblemViewportControl Grid.Column="1" DataContext="{Binding}"/>
             </Grid>
         </Grid>
     </DockPanel>
