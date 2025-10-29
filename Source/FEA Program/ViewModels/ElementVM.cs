@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
-    internal class ElementVM: ObservableObject
+    internal class ElementVM: ObservableObject, ISelectable
     {
         // ---------------------- Events ----------------------
 

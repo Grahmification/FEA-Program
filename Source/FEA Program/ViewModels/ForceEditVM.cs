@@ -10,7 +10,7 @@ namespace FEA_Program.ViewModels
     /// Used for displaying a list of nodes with checkboxes
     /// </summary>
     /// <param name="node">The node to diplay</param>
-    internal class NodeSelectVM: ObservableObject
+    internal class NodeSelectVM : ObservableObject
     {
         public NodeVM Node { get; private set; }
         public bool IsSelected { get; set; } = false;
@@ -19,6 +19,7 @@ namespace FEA_Program.ViewModels
         {
             Node = node;
             PropertyChanged += OnThisPropertyChanged;
+            Node.PropertyChanged += OnNodePropertyChanged;
         }
         private void OnThisPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
@@ -26,6 +27,17 @@ namespace FEA_Program.ViewModels
             {
                 // Select the node if the box is checked
                 Node.Selected = IsSelected;
+            }
+        }
+        private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (sender is NodeVM vm)
+            {
+                if (e.PropertyName == nameof(NodeVM.Selected))
+                {
+                    // Select the box if the node has been selected
+                    IsSelected = vm.Selected;
+                }
             }
         }
     }
@@ -69,6 +81,12 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public BaseVM Base { get; set; } = new();
 
+        /// <summary>
+        /// Handles node and element selection
+        /// </summary>
+        public SelectionVM SelectionManager { get; set; } = new();
+
+
         // ---------------------- Commands ----------------------
         public ICommand AcceptCommand { get; }
         public ICommand CancelCommand { get; }
@@ -88,6 +106,8 @@ namespace FEA_Program.ViewModels
         /// <param name="dimension"></param>
         public void DisplayEditorAdd(List<NodeVM> nodes, int dimension)
         {
+            SelectionManager.AllowMultiSelect = true;
+            SelectionManager.DeselectAll();
             Base.ClearStatus();
             ResetItems();
             Editing = false;
@@ -133,7 +153,8 @@ namespace FEA_Program.ViewModels
         }
         public void HideEditor()
         {
-            DeselectAllNodes();
+            SelectionManager.DeselectAll();
+            SelectionManager.AllowMultiSelect = false;
             ShowEditor = null;  // Do this instead of false because of how converter is setup
         }
 
@@ -201,13 +222,6 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
-        private void DeselectAllNodes()
-        {
-            if (_inputItem != null)
-                _inputItem.Selected = false;
 
-            foreach(var node in  Nodes)
-                node.Node.Selected = false;
-        }
     }
 }

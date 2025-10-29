@@ -96,6 +96,8 @@ namespace FEA_Program.ViewModels
         // ---------------------- Sub VMs ----------------------
         public BaseVM Base { get; set; } = new();
 
+        public SelectionVM SelectionManager { get; set; } = new();
+
         // ---------------------- Commands ----------------------
         public ICommand AcceptCommand { get; }
         public ICommand CancelCommand { get; }
@@ -110,6 +112,8 @@ namespace FEA_Program.ViewModels
 
         public void DisplayEditor(int newID, ObservableCollection<MaterialVM> materials, ObservableCollection<NodeVM> nodes)
         {
+            SelectionManager.AllowMultiSelect = true;
+            
             // Reset fields
             SelectedElementType = null;
             SelectedMaterial = null;
@@ -128,7 +132,9 @@ namespace FEA_Program.ViewModels
         public void HideEditor()
         {
             // We're closing, deselect all nodes
-            DeselectAllNodes();
+            SelectionManager.AllowMultiSelect = false;
+            SelectionManager.DeselectAll();
+
             ShowEditor = null;  // Do this instead of false because of how converter is setup
         }
 
@@ -161,9 +167,9 @@ namespace FEA_Program.ViewModels
         private void OnNodeSelectionChanged(object? sender, EventArgs e)
         {
             // Deselect all, then select the ones which matter
-            DeselectAllNodes();
+            SelectionManager.DeselectAll();
 
-            foreach(var selector in NodeSelectors)
+            foreach (var selector in NodeSelectors)
                 if (selector.SelectedNode != null)
                 {
                     selector.SelectedNode.Selected = true;
@@ -216,10 +222,6 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
-        private void DeselectAllNodes()
-        {
-            foreach (var node in _nodes)
-                node.Selected = false;
-        }
+
     }
 }

@@ -27,6 +27,8 @@ namespace FEA_Program.ViewModels
         public NewProblemVM NewProblem { get; private set; } = new();
         public DebugMatrixVM DebugMatrix { get; private set; } = new();
 
+        public SelectionVM SelectionManager { get; private set; } = new();
+
         // ---------------------- Properties ----------------------
 
         /// <summary>
@@ -173,9 +175,12 @@ namespace FEA_Program.ViewModels
         {
             Problem.AddNode(e.Model);
             Draw.AddNode(e);
+            SelectionManager.AddItem(e);
         }
         private void OnNodeRemoving(object? sender, NodeVM e)
         {
+            SelectionManager.RemoveItem(e);
+
             // Get the list of hanging element IDs
             List<int> elementIds = [.. Problem.RemoveNode(e.Model.ID)];
             Draw.RemoveNode(e.Model.ID);
@@ -189,10 +194,13 @@ namespace FEA_Program.ViewModels
             {
                 Problem.AddElement(e.Model);
                 Draw.AddElement(e);
+                SelectionManager.AddItem(e);
             }
         }
         private void OnElementRemoving(object? sender, ElementVM e)
         {
+            SelectionManager.RemoveItem(e);
+
             if (e.Model != null)
             {
                 Problem.RemoveElement(e.Model.ID);
@@ -238,6 +246,7 @@ namespace FEA_Program.ViewModels
             Nodes.SetBase(Base);
             Nodes.ItemAdding += OnNodeAdding;
             Nodes.ItemRemoving += OnNodeRemoving;
+            Nodes.ForceEditor.SelectionManager = SelectionManager;
 
             Elements = new ElementsVM();
             Elements.SetBase(Base);
@@ -245,6 +254,7 @@ namespace FEA_Program.ViewModels
             Elements.ItemRemoving += OnElementRemoving;
             Elements.LinkCollections(Nodes.Items, Materials.Items);
             Elements.AddEditor.AvailableElementTypes = new(Problem.AvailableElements);
+            Elements.AddEditor.SelectionManager = SelectionManager;
 
             ProblemReset?.Invoke(this, problemType);
 

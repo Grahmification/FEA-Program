@@ -26,7 +26,7 @@
                 <h:ItemsModel3D ItemsSource="{Binding DataContext.Project.Draw.Nodes, RelativeSource={RelativeSource AncestorType={x:Type local:ProblemViewportControl}}}">
                     <h:ItemsModel3D.ItemTemplate>
                         <DataTemplate>
-                            <vhx:NodeVisual3D Position="{Binding DrawPosition}" Color="{Binding NodeColor}">
+                            <vhx:NodeVisual3D Position="{Binding DrawPosition}" Color="{Binding NodeColor}" Selected="{Binding Node.Selected, Mode=OneWayToSource}">
                                 <vhx:FixityVisual3D ShowX="{Binding Node.FixedX}" ShowY="{Binding Node.FixedY}" ShowZ="{Binding Node.FixedZ}" Color="{Binding FixityColor}"/>
                                 <vhx:ArrowVisual3D Direction="{Binding Force}" Length="{Binding ForceLength}"/>
                                 <vhx:TextVisual3D Text="{Binding NodeText}"/>
@@ -52,7 +52,8 @@
                             <vhx:TubeVisual3D 
                                         StartPoint="{Binding Nodes[0].DrawPosition}" 
                                         EndPoint="{Binding Nodes[1].DrawPosition}"
-                                        FillColor="{Binding ElementColor}"/>
+                                        FillColor="{Binding ElementColor}"
+                                        Selected="{Binding Element.Selected, Mode=OneWayToSource}"/>
                         </DataTemplate>
                     </h:ItemsModel3D.ItemTemplate>
                 </h:ItemsModel3D>

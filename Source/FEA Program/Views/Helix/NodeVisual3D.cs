@@ -18,6 +18,9 @@ namespace FEA_Program.Views.Helix
                 nameof(Position), typeof(Vector3), typeof(NodeVisual3D),
                 new PropertyMetadata(new Vector3(), OnPositionChanged));
 
+        public static readonly DependencyProperty SelectedProperty = DependencyProperty.Register(
+            nameof(Selected), typeof(bool), typeof(NodeVisual3D), new PropertyMetadata(false));
+
         public Color Color
         {
             get => (Color)GetValue(ColorProperty);
@@ -28,6 +31,12 @@ namespace FEA_Program.Views.Helix
         {
             get => (Vector3)GetValue(PositionProperty);
             set => SetValue(PositionProperty, value);
+        }
+
+        public bool Selected
+        {
+            get => (bool)GetValue(SelectedProperty);
+            set => SetValue(SelectedProperty, value);
         }
 
         public double Size { get; set; } = 1;
@@ -50,6 +59,8 @@ namespace FEA_Program.Views.Helix
             };
 
             Children.Add(box);
+
+            Mouse3DDown += OnMouse3DDown;
         }
 
         private static void OnColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -75,6 +86,17 @@ namespace FEA_Program.Views.Helix
         private void UpdateTransform()
         {
             Transform = new TranslateTransform3D(Position.X, Position.Y, Position.Z);
+        }
+
+        protected override void OnMouse3DDown(object? sender, RoutedEventArgs e)
+        {
+            if (e is not Mouse3DEventArgs args)
+                return;
+
+            if (args.Viewport is null)
+                return;
+
+            Selected = !Selected;
         }
     }
 }

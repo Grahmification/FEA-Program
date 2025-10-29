@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
-    internal class NodeVM: ObservableObject
+    internal class NodeVM: ObservableObject, ISelectable
     {
         /// <summary>
         /// Names of each noode coordinate, sorted by index

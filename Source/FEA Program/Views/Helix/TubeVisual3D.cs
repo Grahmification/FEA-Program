@@ -32,6 +32,9 @@ namespace FEA_Program.Views.Helix
             DependencyProperty.Register(nameof(FillColor), typeof(Color), typeof(TubeVisual3D),
                 new PropertyMetadata(Colors.LightGray, OnMaterialChanged));
 
+        public static readonly DependencyProperty SelectedProperty = DependencyProperty.Register(
+            nameof(Selected), typeof(bool), typeof(TubeVisual3D), new PropertyMetadata(false));
+
         public Vector3 StartPoint
         {
             get => (Vector3)GetValue(StartPointProperty);
@@ -53,6 +56,12 @@ namespace FEA_Program.Views.Helix
             set => SetValue(FillColorProperty, value);
         }
 
+        public bool Selected
+        {
+            get => (bool)GetValue(SelectedProperty);
+            set => SetValue(SelectedProperty, value);
+        }
+
 
         public TubeVisual3D()
         {
@@ -60,6 +69,8 @@ namespace FEA_Program.Views.Helix
             tubeModel = new MeshGeometryModel3D();
 
             Children.Add(tubeModel);
+
+            Mouse3DDown += OnMouse3DDown;
 
             // Build initial mesh and set color
             RebuildTube();
@@ -101,5 +112,15 @@ namespace FEA_Program.Views.Helix
             };
         }
 
+        protected override void OnMouse3DDown(object? sender, RoutedEventArgs e)
+        {
+            if (e is not Mouse3DEventArgs args)
+                return;
+
+            if (args.Viewport is null)
+                return;
+
+            Selected = !Selected;
+        }
     }
 }
