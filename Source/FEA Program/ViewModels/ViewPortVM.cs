@@ -11,7 +11,9 @@ namespace FEA_Program.ViewModels
     internal class ViewPortVM: ObservableObject
     {
         private bool _is3Dimensional = true;
-        
+
+        public event EventHandler? ZoomExtentsRequested;
+
         public EffectsManager? EffectsManager { get; }
         public Camera Camera { get; private set; }
         public Stream? BackgroundTexture { get; }
@@ -35,6 +37,7 @@ namespace FEA_Program.ViewModels
 
         // ----------------------- Commands -----------------------------
         public ICommand ResetCameraCommand { get; }
+        public ICommand ZoomToExtentsCommand { get; }
 
         // ----------------------- Public Methods -----------------------------
         public ViewPortVM()
@@ -51,6 +54,7 @@ namespace FEA_Program.ViewModels
                 });
 
             ResetCameraCommand = new RelayCommand(ResetCamera);
+            ZoomToExtentsCommand = new RelayCommand(ZoomToExtents);
         }
         public void ResetCamera()
         {
@@ -62,6 +66,10 @@ namespace FEA_Program.ViewModels
             {
                 Base.LogAndDisplayException(ex);
             }
+        }
+        public void ZoomToExtents()
+        {
+            ZoomExtentsRequested?.Invoke(this, EventArgs.Empty);
         }
 
         public static OrthographicCamera DefaultOrthographicCamera() => new()

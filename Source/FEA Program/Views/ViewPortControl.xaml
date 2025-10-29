@@ -20,7 +20,8 @@
     </UserControl.Resources>
 
     <Grid>
-        <h:Viewport3DX EffectsManager="{Binding EffectsManager}"
+        <h:Viewport3DX x:Name="viewPort" 
+                       EffectsManager="{Binding EffectsManager}"
                        Camera="{Binding Camera}"
                        IsViewCubeEdgeClicksEnabled="True"
                        ShowViewCube="{Binding Is3Dimensional}"
@@ -51,6 +52,7 @@
                 <MouseBinding Command="h:ViewportCommands.Rotate" Gesture="MiddleClick" />
                 <MouseBinding Command="h:ViewportCommands.Pan" Gesture="RightClick" />
                 <MouseBinding Command="h:ViewportCommands.Pan" Gesture="Shift+MiddleClick" />
+                <KeyBinding Command="h:ViewportCommands.ZoomExtents" Gesture="Control+E"/>
             </h:Viewport3DX.InputBindings>
         </h:Viewport3DX>
     </Grid>

@@ -66,6 +66,7 @@
                 <Menu VerticalAlignment="Center">
                     <MenuItem Header="_View" Height="20">
                         <MenuItem Header="_Reset" Command="{Binding ViewPort.ResetCameraCommand}"/>
+                        <MenuItem Header="_Zoom to Extents (Ctrl+E)" Command="{Binding ViewPort.ZoomToExtentsCommand}"/>
                     </MenuItem>
                 </Menu>
 
