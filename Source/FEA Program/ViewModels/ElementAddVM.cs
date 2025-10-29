@@ -11,30 +11,31 @@ namespace FEA_Program.ViewModels
     /// </summary>
     internal class NodeSelectionVM : ObservableObject
     {
+        private NodeVM? _SelectedNode;
+
         public event EventHandler? SelectionChanged;
+        public event EventHandler? SelectionChanging;
 
         public int NodeNumber { get; }
         public ObservableCollection<NodeVM> AvailableNodes { get; }
-        public NodeVM? SelectedNode { get; set; } = null;
+        public NodeVM? SelectedNode {
+            get => _SelectedNode;
+            set
+            {
+                // Only if the value has changed to prevent raising excessive events
+                if (value != _SelectedNode)
+                {
+                    SelectionChanging?.Invoke(this, EventArgs.Empty);
+                    _SelectedNode = value;
+                    SelectionChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        } 
 
-        public NodeSelectionVM(int nodeNumber, ObservableCollection<NodeVM> availableNodes, int selectedIndex = 0)
+        public NodeSelectionVM(int nodeNumber, ObservableCollection<NodeVM> availableNodes)
         {
             NodeNumber = nodeNumber;
             AvailableNodes = availableNodes;
-
-            if(availableNodes.Count > selectedIndex)
-                SelectedNode = AvailableNodes[selectedIndex];
-            else if(availableNodes.Count > 0)
-                SelectedNode = AvailableNodes[0];
-
-            PropertyChanged += OnThisPropertyChanged;
-        }
-        private void OnThisPropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(SelectedNode))
-            {
-                SelectionChanged?.Invoke(this, EventArgs.Empty);
-            }
         }
 
         /// <summary>
@@ -113,6 +114,10 @@ namespace FEA_Program.ViewModels
         public void DisplayEditor(int newID, ObservableCollection<MaterialVM> materials, ObservableCollection<NodeVM> nodes)
         {
             SelectionManager.AllowMultiSelect = true;
+
+            foreach (var node in nodes)
+                node.PropertyChanged += OnNodeSelectionChanged;
+
             
             // Reset fields
             SelectedElementType = null;
@@ -125,7 +130,7 @@ namespace FEA_Program.ViewModels
             SelectedMaterial = Materials.FirstOrDefault() ?? null;
 
             // Make sure validation updates
-            OnNodeSelectionChanged(this, EventArgs.Empty);
+            OnNodeSelectorValueChanged(this, EventArgs.Empty);
 
             ShowEditor = true;
         }
@@ -134,6 +139,9 @@ namespace FEA_Program.ViewModels
             // We're closing, deselect all nodes
             SelectionManager.AllowMultiSelect = false;
             SelectionManager.DeselectAll();
+
+            foreach (var node in _nodes)
+                node.PropertyChanged -= OnNodeSelectionChanged;
 
             ShowEditor = null;  // Do this instead of false because of how converter is setup
         }
@@ -156,26 +164,78 @@ namespace FEA_Program.ViewModels
 
             for (int i = 0; i < NumberOfNodes; i++)
             {
-                var selector = new NodeSelectionVM(i, _nodes, i);
-                selector.SelectionChanged += OnNodeSelectionChanged;
+                var selector = new NodeSelectionVM(i, _nodes);
+                selector.SelectionChanged += OnNodeSelectorValueChanged;
+                selector.SelectionChanging += OnNodeSelectorValueChanging;
+
+                // Set the initial node selection if we have enough
+                if (_nodes.Count > i)
+                    selector.SelectedNode = _nodes[i];
+
                 NodeSelectors.Add(selector);
             }
 
             // Update list of element arguments
             ElementArguments = SelectedElementType == null ? [] : new(ElementVM.ElementArgs(SelectedElementType.Value));
         }
-        private void OnNodeSelectionChanged(object? sender, EventArgs e)
+
+        private void OnNodeSelectorValueChanging(object? sender, EventArgs e)
         {
-            // Deselect all, then select the ones which matter
-            SelectionManager.DeselectAll();
-
-            foreach (var selector in NodeSelectors)
-                if (selector.SelectedNode != null)
-                {
-                    selector.SelectedNode.Selected = true;
-                }
-
+            if (sender is NodeSelectionVM vm)
+            {
+                // Deselect the old node without firing the OnNodeSelectionChanged method
+                SelectNodeWithoutEvent(vm.SelectedNode, false);
+            }
+        }
+        private void OnNodeSelectorValueChanged(object? sender, EventArgs e)
+        {
+            if (sender is NodeSelectionVM vm)
+            {
+                // Select the new node without firing the OnNodeSelectionChanged method
+                SelectNodeWithoutEvent(vm.SelectedNode, true);
+            }
             NodeSelectionValid = NodeSelectionVM.CheckForValidSelections(NodeSelectors);
+        }
+
+        /// <summary>
+        /// Fires when a NodeVM's selected property was changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnNodeSelectionChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (sender is NodeVM vm && e.PropertyName == nameof(NodeVM.Selected))
+            {
+                // A node was selected
+                if(vm.Selected)
+                {
+                    // If we have a null item, set that one first
+                    foreach (var selector in NodeSelectors)
+                    {
+                        if (selector.SelectedNode == null)
+                        {
+                            selector.SelectedNode = vm;
+                            return;
+                        }
+                    }
+
+                    // No items are null, set the last one
+                    if(NodeSelectors.Count > 0)
+                    {
+                        NodeSelectors.Last().SelectedNode = vm;
+                    }
+                }
+                // A node was deselected
+                else
+                {
+                    // Deselect any matching selectors
+                    foreach(var selector in NodeSelectors)
+                    {
+                        if(selector.SelectedNode == vm)
+                            selector.SelectedNode = null;
+                    }
+                }
+            }
         }
 
         // ---------------------- Private Helpers ----------------------
@@ -220,6 +280,21 @@ namespace FEA_Program.ViewModels
             catch (Exception ex)
             {
                 Base.LogAndDisplayException(ex);
+            }
+        }
+
+        /// <summary>
+        /// Select or deselect a node without calling the SelectionChanged handler
+        /// </summary>
+        /// <param name="vm"></param>
+        /// <param name="select"></param>
+        private void SelectNodeWithoutEvent(NodeVM? nodeVM, bool select)
+        {
+            if (nodeVM is not null)
+            {
+                nodeVM.PropertyChanged -= OnNodeSelectionChanged;
+                nodeVM.Selected = select;
+                nodeVM.PropertyChanged += OnNodeSelectionChanged;
             }
         }
 
