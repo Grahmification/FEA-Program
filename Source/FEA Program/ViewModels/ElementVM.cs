@@ -147,7 +147,7 @@ namespace FEA_Program.ViewModels
             // Case for ElementBarLinear
             ElementTypes.TrussLinear => new()
             {
-                new ElementArgVM(0, "Area", App.Units.Area, validatorMethod: (x) => x > 0)
+                new ElementArgVM(0, "Area", App.Units.Area, validatorMethod: (x) => x > 0) {UserValue = 1}
             },
             // Default case: return an empty list
             _ => []

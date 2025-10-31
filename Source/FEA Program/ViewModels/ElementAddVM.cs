@@ -168,10 +168,6 @@ namespace FEA_Program.ViewModels
                 selector.SelectionChanged += OnNodeSelectorValueChanged;
                 selector.SelectionChanging += OnNodeSelectorValueChanging;
 
-                // Set the initial node selection if we have enough
-                if (_nodes.Count > i)
-                    selector.SelectedNode = _nodes[i];
-
                 NodeSelectors.Add(selector);
             }
 
