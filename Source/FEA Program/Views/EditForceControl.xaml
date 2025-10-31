@@ -67,7 +67,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="" Width="20"/>
-                <Label Grid.Column="1" Content="Force Component (N)" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding Source={StaticResource Units}, Path=Force.UnitString, StringFormat={}Force Component ({0}), Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
             </Grid>
 

@@ -144,7 +144,7 @@ namespace FEA_Program.ViewModels
 
             for (int i = 0; i < EditItem.Model.Dimension; i++)
             {
-                var coordVM = new CoordinateVM(i, EditItem.Model.Force[i], false);
+                var coordVM = new CoordinateVM(i, EditItem.Force[i], false);
                 coordVM.ValueChanged += OnCoordinateValueChanged;
                 ForceComponents.Add(coordVM);
             }
@@ -169,7 +169,7 @@ namespace FEA_Program.ViewModels
         {
             if (sender is CoordinateVM vm && EditItem is not null)
             {
-                EditItem.Model.Force[e] = vm.Value; 
+                EditItem.Model.Force[e] = App.Units.Force.FromUser(vm.Value); 
             }
         }
 
@@ -185,7 +185,7 @@ namespace FEA_Program.ViewModels
         {
             try
             {
-                double[] force = ForceComponents.Select(component => component.Value).ToArray();
+                double[] force = ForceComponents.Select(component => App.Units.Force.FromUser(component.Value)).ToArray();
 
                 // We're editing, update the changed parameters
                 if (Editing && _inputItem != null)

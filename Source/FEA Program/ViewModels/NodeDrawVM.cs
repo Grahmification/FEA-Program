@@ -17,8 +17,8 @@ namespace FEA_Program.ViewModels
         public NodeVM Node { get; private set; } = new();
 
         public Vector3 DrawPosition => ArrayToVector(GetDrawPosition());
-        public Vector3 Force => ArrayToVector(Node.Model.Force);
-        public double ForceLength => ScaleForceMagnitude(Node.ForceMagnitude);
+        public Vector3 Force => ArrayToVector(Node.Model.Force); // Use underlying model force so arrow length doesn't change when units change
+        public double ForceLength => ScaleForceMagnitude(Force.Length());
 
         public Color NodeColor => Node.Selected ? SelectedColor : DefaultNodeColor;
         public Color FixityColor => Node.Selected ? SelectedColor : DefaultFixityColor;
