@@ -53,7 +53,9 @@
                                         StartPoint="{Binding Nodes[0].DrawPosition}" 
                                         EndPoint="{Binding Nodes[1].DrawPosition}"
                                         FillColor="{Binding ElementColor}"
-                                        Selected="{Binding Element.Selected, Mode=OneWayToSource}"/>
+                                        Selected="{Binding Element.Selected, Mode=OneWayToSource}">
+                                <vhx:TextVisual3D Text="{Binding ElementText}"/>
+                            </vhx:TubeVisual3D>
                         </DataTemplate>
                     </h:ItemsModel3D.ItemTemplate>
                 </h:ItemsModel3D>

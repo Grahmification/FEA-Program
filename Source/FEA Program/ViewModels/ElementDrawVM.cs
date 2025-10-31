@@ -1,4 +1,5 @@
-﻿using FEA_Program.ViewModels.Base;
+﻿using FEA_Program.Models;
+using FEA_Program.ViewModels.Base;
 using System.ComponentModel;
 using System.Windows.Media;
 using Color = System.Windows.Media.Color;
@@ -16,6 +17,7 @@ namespace FEA_Program.ViewModels
 
         public Color ? ColorOverride { get; set; } = null;
         public Color ElementColor => Element.Selected ? SelectedColor : (ColorOverride ?? DefaultElementColor);
+        public string ElementText { get; set; } = "";
 
         // ---------------------- Commands ----------------------
 
@@ -35,9 +37,27 @@ namespace FEA_Program.ViewModels
                 if (e.PropertyName == (nameof(ElementVM.Selected)))
                 {
                     OnPropertyChanged(nameof(ElementColor));
+                    SetTextForSelection();
                 }
             }
         }
+
+
+        /// <summary>
+        /// Sets the display text based on it being selected
+        /// </summary>
+        private void SetTextForSelection()
+        {
+            if (Element.Selected)
+            {
+                ElementText = $"Element {Element.Model?.ID}";
+            }
+            else
+            {
+                ElementText = "";
+            }
+        }
+
 
 
         // ---------------------- Static Methods ----------------------

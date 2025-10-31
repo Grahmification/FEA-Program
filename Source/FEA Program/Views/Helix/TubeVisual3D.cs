@@ -3,6 +3,7 @@ using SharpDX;
 using System.Windows;
 using System.Windows.Media;
 using Color = System.Windows.Media.Color;
+using Matrix = SharpDX.Matrix;
 
 
 
@@ -97,11 +98,52 @@ namespace FEA_Program.Views.Helix
                 return;
             }
 
-            // Build cylinder mesh between two points
+            // Build a cylinder mesh along the X-axis, centered at the origin
             var mb = new MeshBuilder(true, true); // generate normals & tangents
-            mb.AddCylinder(StartPoint, EndPoint, Radius, DefaultTessellation);
+            var halfLength = Vector3.Distance(StartPoint, EndPoint) / 2f;
+            mb.AddCylinder(
+                new Vector3(-halfLength, 0, 0), // start
+                new Vector3(halfLength, 0, 0),  // end
+                Radius,
+                DefaultTessellation
+            );
 
             tubeModel.Geometry = mb.ToMeshGeometry3D();
+
+            // Rotate + Translate the cylinder so it ends on both points
+            // Compute transform: rotate + translate
+            var direction = EndPoint - StartPoint;
+            direction.Normalize();
+
+            // Default cylinder direction (local) is along +X
+            var defaultDir = Vector3.UnitX;
+
+            // Compute rotation from +X to actual direction
+            Quaternion rotation;
+            float dot = Vector3.Dot(defaultDir, direction);
+            if (dot > 0.9999f)
+            {
+                rotation = Quaternion.Identity;
+            }
+            else if (dot < -0.9999f)
+            {
+                // Opposite direction — rotate 180 deg around Y axis
+                rotation = Quaternion.RotationAxis(Vector3.UnitY, MathUtil.Pi);
+            }
+            else
+            {
+                var axis = Vector3.Cross(defaultDir, direction);
+                axis.Normalize();
+                float angle = MathF.Acos(dot);
+                rotation = Quaternion.RotationAxis(axis, angle);
+            }
+
+            // Center of the cylinder
+            var center = (StartPoint + EndPoint) * 0.5f;
+
+            // Apply transform
+            var transform = Matrix.AffineTransformation(1.0f, rotation, center);
+            Transform = new System.Windows.Media.Media3D.MatrixTransform3D(transform.ToMatrix3D());
         }
         private void UpdateMaterial()
         {
