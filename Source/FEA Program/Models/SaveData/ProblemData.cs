@@ -10,6 +10,6 @@
         public List<MaterialSaveData> Materials { get; set; } = [];
         public Dictionary<int, int[]> ConnectivityMatrix { get; set; } = [];
 
-        public ProblemTypes ProblemType { get; set; } = ProblemTypes.Bar_1D;
+        public ProblemTypes ProblemType { get; set; } = ProblemTypes.Truss_1D;
     }
 }

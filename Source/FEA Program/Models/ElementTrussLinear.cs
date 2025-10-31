@@ -3,11 +3,14 @@ using System.Reflection;
 
 namespace FEA_Program.Models
 {
-    internal class ElementBarLinear : Element, IElement
+    /// <summary>
+    /// A linear truss element which can be used with 1D, 2D, or 3D nodes
+    /// </summary>
+    internal class ElementTrussLinear : Element, IElement
     {
         private double _Area = 0; // x-section area in m^2
 
-        public ElementTypes ElementType => ElementTypes.BarLinear;
+        public ElementTypes ElementType => ElementTypes.TrussLinear;
         public override int NumOfNodes => 2;
 
         /// <summary>
@@ -31,7 +34,7 @@ namespace FEA_Program.Models
         public double[] ElementArgs { get => [_Area]; set => _Area = value[0]; }
 
 
-        public ElementBarLinear(double area, int id, List<INode> nodes, Material material, int nodeDOFs = 1) : base(id, nodes, material, nodeDOFs)
+        public ElementTrussLinear(double area, int id, List<INode> nodes, Material material, int nodeDOFs = 1) : base(id, nodes, material, nodeDOFs)
         {
             if (area <= 0)
                 throw new ArgumentException($"Cannot create {ElementType} element with non-positive area.");

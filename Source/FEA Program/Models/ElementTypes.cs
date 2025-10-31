@@ -9,7 +9,7 @@ namespace FEA_Program.Models
     [TypeConverter(typeof(EnumDescriptionTypeConverter))]
     public enum ElementTypes
     {
-        [Description("Linear Bar")]
-        BarLinear
+        [Description("Linear Truss")]
+        TrussLinear
     }
 }

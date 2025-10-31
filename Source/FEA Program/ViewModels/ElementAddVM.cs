@@ -260,8 +260,8 @@ namespace FEA_Program.ViewModels
 
                 switch (SelectedElementType)
                 {
-                    case ElementTypes.BarLinear:
-                        element = new ElementBarLinear(1, _NewID, [.. elementNodes.Select(n => n.Model).Cast<INode>()], elementMaterial.Model, elementNodes[0].Model.Dimension);
+                    case ElementTypes.TrussLinear:
+                        element = new ElementTrussLinear(1, _NewID, [.. elementNodes.Select(n => n.Model).Cast<INode>()], elementMaterial.Model, elementNodes[0].Model.Dimension);
                         break;
                 }
 

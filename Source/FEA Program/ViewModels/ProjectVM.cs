@@ -37,7 +37,7 @@ namespace FEA_Program.ViewModels
         public bool ThreeDimensional => Problem.ProblemType switch
         {
             // Combine cases that return false using the 'or' pattern
-            ProblemTypes.Bar_1D or ProblemTypes.Beam_1D => false,
+            ProblemTypes.Truss_1D or ProblemTypes.Beam_1D => false,
 
             // Case for true
             ProblemTypes.Truss_3D => true,
@@ -304,8 +304,8 @@ namespace FEA_Program.ViewModels
 
                 switch (item.ElementType)
                 {
-                    case ElementTypes.BarLinear:
-                        element = new ElementBarLinear(1, item.ID, elementNodes, elementMaterial, item.NodeDOFs)
+                    case ElementTypes.TrussLinear:
+                        element = new ElementTrussLinear(1, item.ID, elementNodes, elementMaterial, item.NodeDOFs)
                         {
                             ElementArgs = item.ElementArgs
                         };

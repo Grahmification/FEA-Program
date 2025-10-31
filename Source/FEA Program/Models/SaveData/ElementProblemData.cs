@@ -9,7 +9,7 @@
         public int MaterialID { get; set; } = IDClass.InvalidID;
         public int[] NodeIDs { get; set; } = [];
         public int NodeDOFs { get; set; } = 1;
-        public ElementTypes ElementType { get; set; } = ElementTypes.BarLinear;
+        public ElementTypes ElementType { get; set; } = ElementTypes.TrussLinear;
 
         public double[] BodyForce { get; set; } = [0, 0, 0];
         public double[] TractionForce { get; set; } = [0, 0, 0];

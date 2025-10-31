@@ -145,7 +145,7 @@ namespace FEA_Program.ViewModels
         public static List<ElementArgVM> ElementArgs(ElementTypes elementType) => elementType switch
         {
             // Case for ElementBarLinear
-            ElementTypes.BarLinear => new()
+            ElementTypes.TrussLinear => new()
             {
                 new ElementArgVM(0, "Area", App.Units.Area, validatorMethod: (x) => x > 0)
             },
@@ -162,7 +162,7 @@ namespace FEA_Program.ViewModels
         {
             return elementType switch
             {
-                ElementTypes.BarLinear => new ElementBarLinear(1, 0, [Node.DummyNode(), Node.DummyNode()], Models.Material.DummyMaterial()).NumOfNodes,
+                ElementTypes.TrussLinear => new ElementTrussLinear(1, 0, [Node.DummyNode(), Node.DummyNode()], Models.Material.DummyMaterial()).NumOfNodes,
                 _ => 0,
             };
         }

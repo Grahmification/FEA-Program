@@ -10,8 +10,8 @@ namespace FEA_Program.Models
     [TypeConverter(typeof(EnumDescriptionTypeConverter))]
     public enum ProblemTypes
     {
-        [Description("Bar 1D")]
-        Bar_1D,
+        [Description("Truss 1D")]
+        Truss_1D,
 
         [Description("Beam 1D")]
         Beam_1D,

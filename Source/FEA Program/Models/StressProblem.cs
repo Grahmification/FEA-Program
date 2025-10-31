@@ -26,8 +26,8 @@ namespace FEA_Program.Models
         /// </summary>
         public ElementTypes[] AvailableElements => ProblemType switch
         {
-            ProblemTypes.Bar_1D => [ElementTypes.BarLinear],
-            ProblemTypes.Truss_3D => [ElementTypes.BarLinear],
+            ProblemTypes.Truss_1D => [ElementTypes.TrussLinear],
+            ProblemTypes.Truss_3D => [ElementTypes.TrussLinear],
 
             // Default case: return empty
             _ => []
@@ -39,7 +39,7 @@ namespace FEA_Program.Models
         public int AvailableNodeDOFs => ProblemType switch
         {
             // Case for 1 DOFs
-            ProblemTypes.Bar_1D or ProblemTypes.Beam_1D => 1,
+            ProblemTypes.Truss_1D or ProblemTypes.Beam_1D => 1,
 
             // Case for 3 DOFs
             ProblemTypes.Truss_3D => 3,
@@ -49,7 +49,7 @@ namespace FEA_Program.Models
         };
 
         // ---------------------- Public Methods ----------------------------
-        public StressProblem(ProblemTypes problemType = ProblemTypes.Bar_1D)
+        public StressProblem(ProblemTypes problemType = ProblemTypes.Truss_1D)
         {
             ProblemType = problemType;
         }
