@@ -20,7 +20,7 @@
     </UserControl.Resources>
 
     <Grid>
-        <local:ViewPortControl Grid.Column="1" DataContext="{Binding ViewPort}">
+        <local:ViewPortControl Grid.Column="1" DataContext="{Binding ViewPort}" x:Name="problemViewport">
             <local:ViewPortControl.DrawItems>
                 <!-- Nodes -->
                 <h:ItemsModel3D ItemsSource="{Binding DataContext.Project.Draw.Nodes, RelativeSource={RelativeSource AncestorType={x:Type local:ProblemViewportControl}}}">
@@ -40,6 +40,12 @@
                                     </h:ItemsModel3D.ItemTemplate>
                                 </h:ItemsModel3D>
 
+                                <vhx:NodeVisual3D.ContextMenu>
+                                    <ContextMenu Focusable="False">
+                                        <MenuItem Header="Edit" Command="{Binding Node.EditCommand}" Focusable="False"/>
+                                        <MenuItem Header="Delete" Command="{Binding Node.DeleteCommand}" Focusable="False"/>
+                                    </ContextMenu>
+                                </vhx:NodeVisual3D.ContextMenu>
                             </vhx:NodeVisual3D>
                         </DataTemplate>
                     </h:ItemsModel3D.ItemTemplate>

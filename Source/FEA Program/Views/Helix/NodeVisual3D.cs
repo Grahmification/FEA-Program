@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Media;
 using TranslateTransform3D = System.Windows.Media.Media3D.TranslateTransform3D;
 using Color = System.Windows.Media.Color;
+using System.Windows.Controls;
 
 namespace FEA_Program.Views.Helix
 {
@@ -60,7 +61,7 @@ namespace FEA_Program.Views.Helix
 
             Children.Add(box);
 
-            Mouse3DDown += OnMouse3DDown;
+            //Mouse3DDown += OnMouse3DDown;
         }
 
         private static void OnColorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -97,6 +98,25 @@ namespace FEA_Program.Views.Helix
                 return;
 
             Selected = !Selected;
+
+            //ShowContextMenuTest();
+        }
+
+        private void ShowContextMenuTest()
+        {
+            // Show context menu at mouse position
+            var menu = new ContextMenu();
+
+            menu.Items.Add(new MenuItem
+            {
+                Header = "Edit"
+            });
+            menu.Items.Add(new MenuItem
+            {
+                Header = "Delete"
+            });
+
+            menu.IsOpen = true;
         }
     }
 }
