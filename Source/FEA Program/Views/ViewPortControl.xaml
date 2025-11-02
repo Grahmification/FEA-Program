@@ -47,6 +47,10 @@
                 <h:ViewBoxModel3D/>
             </h:GroupModel3D>
 
+            <!-- Background Context Menu. Requires back end code. See ViewPortControl.cs -->
+            <h:Viewport3DX.ContextMenu>
+                <Binding Path="BackgroundContextMenu" RelativeSource="{RelativeSource AncestorType={x:Type UserControl}}"/>
+            </h:Viewport3DX.ContextMenu>
         </h:Viewport3DX>
     </Grid>
 </UserControl>

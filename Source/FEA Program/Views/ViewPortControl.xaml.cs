@@ -3,6 +3,7 @@ using HelixToolkit.Wpf.SharpDX;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 
@@ -13,6 +14,23 @@ namespace FEA_Program.Views
     /// </summary>
     public partial class ViewPortControl : UserControl
     {
+        /// <summary>
+        /// Context menu that displays when the scene background is right clicked
+        /// </summary>
+        public static readonly DependencyProperty BackgroundContextMenuProperty = DependencyProperty.Register(
+            nameof(BackgroundContextMenu), typeof(ContextMenu), typeof(ViewPortControl),
+            new PropertyMetadata(null)); // Default value is null
+
+        /// <summary>
+        /// Context menu that displays when the scene background is right clicked
+        /// </summary>
+        public ContextMenu? BackgroundContextMenu
+        {
+            get { return (ContextMenu)GetValue(BackgroundContextMenuProperty); }
+            set { SetValue(BackgroundContextMenuProperty, value); }
+        }
+
+
         public ViewPortControl()
         {
             InitializeComponent();
@@ -22,6 +40,7 @@ namespace FEA_Program.Views
             DrawItems = [];
 
             Loaded += OnLoaded;
+            viewPort.MouseRightButtonDown += OnMouseRightButtonDown;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -67,6 +86,29 @@ namespace FEA_Program.Views
         private void ViewModel_ZoomRequested(object? sender, EventArgs e)
         {
             viewPort.ZoomExtents();
+        }
+
+        private void OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Viewport3DX viewport)
+            {
+                // Get the mouse position relative to the Viewport3DX
+                var position = Mouse.GetPosition(viewport);
+
+                // Perform a hit test at the mouse position
+                var hitResult = viewport.FindHits(position).FirstOrDefault();
+
+                // Nothing is selected (we're over the background)
+                if (hitResult == null)
+                {
+                    // The background is selected - display the context menu
+                    if (BackgroundContextMenu != null)
+                    {
+                        BackgroundContextMenu.Placement = PlacementMode.MousePoint;
+                        BackgroundContextMenu.IsOpen = true;
+                    }
+                }
+            }
         }
     }
 }
