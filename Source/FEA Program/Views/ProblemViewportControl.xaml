@@ -40,6 +40,7 @@
                                     </h:ItemsModel3D.ItemTemplate>
                                 </h:ItemsModel3D>
 
+                                <!-- Context menu - Requires background code to display - see NodeVisual3D.cs -->
                                 <vhx:NodeVisual3D.ContextMenu>
                                     <ContextMenu Focusable="False">
                                         <MenuItem Header="Edit" Command="{Binding Node.EditCommand}" Focusable="False"/>
@@ -61,6 +62,14 @@
                                         FillColor="{Binding ElementColor}"
                                         Selected="{Binding Element.Selected, Mode=OneWayToSource}">
                                 <vhx:TextVisual3D Text="{Binding ElementText}"/>
+
+                                <!-- Context menu - Requires background code to display - see TubeVisual3D.cs -->
+                                <vhx:TubeVisual3D.ContextMenu>
+                                    <ContextMenu Focusable="False">
+                                        <MenuItem Header="Edit" Command="{Binding Element.EditCommand}" IsEnabled="False" Focusable="False"/>
+                                        <MenuItem Header="Delete" Command="{Binding Element.DeleteCommand}" Focusable="False"/>
+                                    </ContextMenu>
+                                </vhx:TubeVisual3D.ContextMenu>
                             </vhx:TubeVisual3D>
                         </DataTemplate>
                     </h:ItemsModel3D.ItemTemplate>

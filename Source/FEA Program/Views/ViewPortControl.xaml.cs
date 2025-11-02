@@ -3,6 +3,7 @@ using HelixToolkit.Wpf.SharpDX;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 
 namespace FEA_Program.Views
@@ -15,6 +16,7 @@ namespace FEA_Program.Views
         public ViewPortControl()
         {
             InitializeComponent();
+            SetupInputBindings();
 
             // Ensure the collection exists by default
             DrawItems = [];
@@ -30,6 +32,23 @@ namespace FEA_Program.Views
             {
                 viewModel.ZoomExtentsRequested += ViewModel_ZoomRequested;
             }
+        }
+
+        /// <summary>
+        /// Setup key and mouse bindings for the view
+        /// </summary>
+        private void SetupInputBindings()
+        {
+            // Clear the default input bindings - this can't be done in .xaml code
+            viewPort.InputBindings.Clear();
+
+            // Mouse commands
+            viewPort.InputBindings.Add(new MouseBinding(ViewportCommands.Rotate, new MouseGesture(MouseAction.MiddleClick)));
+            viewPort.InputBindings.Add(new MouseBinding(ViewportCommands.Pan, new MouseGesture(MouseAction.MiddleClick, ModifierKeys.Shift)));
+            // Note - Zoom gets taken care of automatically
+
+            // Keyboard commands
+            viewPort.InputBindings.Add(new KeyBinding(ViewportCommands.ZoomExtents, new KeyGesture(Key.E, ModifierKeys.Control)));
         }
 
 

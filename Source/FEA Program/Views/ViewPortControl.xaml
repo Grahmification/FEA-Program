@@ -47,13 +47,6 @@
                 <h:ViewBoxModel3D/>
             </h:GroupModel3D>
 
-            <!-- Custom Input Bindings -->
-            <h:Viewport3DX.InputBindings>
-                <MouseBinding Command="h:ViewportCommands.Rotate" Gesture="MiddleClick" />
-                <MouseBinding Command="h:ViewportCommands.Pan" Gesture="RightClick" />
-                <MouseBinding Command="h:ViewportCommands.Pan" Gesture="Shift+MiddleClick" />
-                <KeyBinding Command="h:ViewportCommands.ZoomExtents" Gesture="Control+E"/>
-            </h:Viewport3DX.InputBindings>
         </h:Viewport3DX>
     </Grid>
 </UserControl>

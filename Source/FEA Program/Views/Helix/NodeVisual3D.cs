@@ -5,6 +5,8 @@ using System.Windows.Media;
 using TranslateTransform3D = System.Windows.Media.Media3D.TranslateTransform3D;
 using Color = System.Windows.Media.Color;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace FEA_Program.Views.Helix
 {
@@ -97,26 +99,37 @@ namespace FEA_Program.Views.Helix
             if (args.Viewport is null)
                 return;
 
-            Selected = !Selected;
+            // Filter different mouse buttons
+            if (args.OriginalInputEventArgs is MouseButtonEventArgs mouseArgs)
+            {
+                switch (mouseArgs.ChangedButton)
+                {
+                    case MouseButton.Left:
+                        // Left click - toggle selection
+                        Selected = !Selected;
+                        break;
 
-            //ShowContextMenuTest();
+                    case MouseButton.Right:
+                        // Right click - show context menu
+                        Selected = true;
+                        DisplayContextMenu();
+                        break;
+
+                    case MouseButton.Middle:
+                        // Middle click
+                        break;
+                }
+            }
         }
 
-        private void ShowContextMenuTest()
+        /// <summary>
+        /// Display the context menu - this can't be done purely from .xaml
+        /// </summary>
+        private void DisplayContextMenu()
         {
-            // Show context menu at mouse position
-            var menu = new ContextMenu();
-
-            menu.Items.Add(new MenuItem
-            {
-                Header = "Edit"
-            });
-            menu.Items.Add(new MenuItem
-            {
-                Header = "Delete"
-            });
-
-            menu.IsOpen = true;
+            ContextMenu.DataContext = DataContext;
+            ContextMenu.Placement = PlacementMode.MousePoint;
+            ContextMenu.IsOpen = true;
         }
     }
 }

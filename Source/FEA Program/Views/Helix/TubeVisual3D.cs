@@ -1,6 +1,8 @@
 ﻿using HelixToolkit.Wpf.SharpDX;
 using SharpDX;
 using System.Windows;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 using Color = System.Windows.Media.Color;
 using Matrix = SharpDX.Matrix;
@@ -162,7 +164,37 @@ namespace FEA_Program.Views.Helix
             if (args.Viewport is null)
                 return;
 
-            Selected = !Selected;
+            // Filter different mouse buttons
+            if (args.OriginalInputEventArgs is MouseButtonEventArgs mouseArgs)
+            {
+                switch (mouseArgs.ChangedButton)
+                {
+                    case MouseButton.Left:
+                        // Left click - toggle selection
+                        Selected = !Selected;
+                        break;
+
+                    case MouseButton.Right:
+                        // Right click - show context menu
+                        Selected = true;
+                        DisplayContextMenu();
+                        break;
+
+                    case MouseButton.Middle:
+                        // Middle click
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Display the context menu - this can't be done purely from .xaml
+        /// </summary>
+        private void DisplayContextMenu()
+        {
+            ContextMenu.DataContext = DataContext;
+            ContextMenu.Placement = PlacementMode.MousePoint;
+            ContextMenu.IsOpen = true;
         }
     }
 }
