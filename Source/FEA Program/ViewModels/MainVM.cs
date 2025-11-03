@@ -19,6 +19,7 @@ namespace FEA_Program.ViewModels
         public BaseVM Base { get; private set; } = new();
         public ProjectVM Project { get; private set; } = new();
         public ViewPortVM ViewPort { get; private set; } = new();
+        public SidebarVM SidebarManager { get; private set; } = new();
 
         // ---------------------- Commands ----------------------
         /// <summary>
@@ -39,6 +40,9 @@ namespace FEA_Program.ViewModels
                 Project.SetBase(Base);
                 Project.ProblemReset += OnProblemReset;
 
+                // Fire this manually - we won't get the first Reset when the ProjectVM is first created
+                OnProblemReset(Project, Project.Problem.ProblemType);
+
                 ViewPort.Base = Base;
                 ViewPort.ResetCamera();
             }
@@ -55,6 +59,13 @@ namespace FEA_Program.ViewModels
             {
                 ViewPort.Is3Dimensional = vm.ThreeDimensional;
             }
+
+            // Setup the sidebar
+            SidebarManager.Reset();
+            SidebarManager.AddEditor(Project.Nodes.Editor);
+            SidebarManager.AddEditor(Project.Nodes.ForceEditor);
+            SidebarManager.AddEditor(Project.Elements.AddEditor);
+            SidebarManager.AddEditor(Project.Materials.Editor);
         }
 
         // ------------------ Private Helpers ---------------------

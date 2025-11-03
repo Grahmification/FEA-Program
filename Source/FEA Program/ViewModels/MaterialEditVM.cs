@@ -4,16 +4,24 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
-    internal class MaterialEditVM: ObservableObject
+    internal class MaterialEditVM: ObservableObject, ISideBarEditor
     {
         private MaterialVM? _inputMaterial;
-        
-        //private Material? _startingParameters;
         
         // ---------------------- Events ----------------------
 
         public event EventHandler<MaterialVM>? AcceptEdits;
         public event EventHandler<MaterialVM>? CancelEdits;
+
+        /// <summary>
+        /// Fires when the sidebar control is opening
+        /// </summary>
+        public event EventHandler? Opening;
+
+        /// <summary>
+        /// Fires when the sidebar control has closed
+        /// </summary>
+        public event EventHandler? Closed;
 
         // ---------------------- Properties ----------------------
 
@@ -46,6 +54,7 @@ namespace FEA_Program.ViewModels
 
         public void DisplayEditor(MaterialVM material, bool editing)
         {
+            Opening?.Invoke(this, EventArgs.Empty);
             _inputMaterial = material;
 
             // Make this so we're editing a copy. The original is preserved in case we cancel
@@ -55,6 +64,7 @@ namespace FEA_Program.ViewModels
         public void HideEditor()
         {
             Material = null; // This hides the editor
+            Closed?.Invoke(this, EventArgs.Empty);
         }
 
         // ---------------------- Private Helpers ----------------------

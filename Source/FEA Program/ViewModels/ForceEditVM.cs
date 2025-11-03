@@ -45,10 +45,22 @@ namespace FEA_Program.ViewModels
     /// <summary>
     /// Viewmodel for editing node forces
     /// </summary>
-    internal class ForceEditVM: ObservableObject
+    internal class ForceEditVM: ObservableObject, ISideBarEditor
     {
         private NodeVM? _inputItem;
-            
+
+        // ---------------------- Events ----------------------
+
+        /// <summary>
+        /// Fires when the sidebar control is opening
+        /// </summary>
+        public event EventHandler? Opening;
+
+        /// <summary>
+        /// Fires when the sidebar control has closed
+        /// </summary>
+        public event EventHandler? Closed;
+
         // ---------------------- Properties ----------------------
 
         /// <summary>
@@ -106,6 +118,7 @@ namespace FEA_Program.ViewModels
         /// <param name="dimension"></param>
         public void DisplayEditorAdd(List<NodeVM> nodes, int dimension)
         {
+            Opening?.Invoke(this, EventArgs.Empty);
             SelectionManager.AllowMultiSelect = true;
             SelectionManager.DeselectAll();
             Base.ClearStatus();
@@ -131,6 +144,7 @@ namespace FEA_Program.ViewModels
         /// <param name="editItem"></param>
         public void DisplayEditor(NodeVM editItem)
         {
+            Opening?.Invoke(this, EventArgs.Empty);
             Base.ClearStatus();
             ResetItems();
 
@@ -156,6 +170,7 @@ namespace FEA_Program.ViewModels
             SelectionManager.DeselectAll();
             SelectionManager.AllowMultiSelect = false;
             ShowEditor = null;  // Do this instead of false because of how converter is setup
+            Closed?.Invoke(this, EventArgs.Empty);
         }
 
         // ---------------------- Event Handers ----------------------

@@ -63,7 +63,7 @@ namespace FEA_Program.ViewModels
     /// <summary>
     /// Viewmodel for an add element dialog
     /// </summary>
-    internal class ElementAddVM: ObservableObject
+    internal class ElementAddVM: ObservableObject, ISideBarEditor
     {
         private int _NewID = 0;
 
@@ -73,6 +73,16 @@ namespace FEA_Program.ViewModels
 
         // ---------------------- Events ----------------------
         public event EventHandler<ElementVM>? AcceptEdits;
+
+        /// <summary>
+        /// Fires when the sidebar control is opening
+        /// </summary>
+        public event EventHandler? Opening;
+
+        /// <summary>
+        /// Fires when the sidebar control has closed
+        /// </summary>
+        public event EventHandler? Closed;
 
         // ---------------------- Models ----------------------
         /// <summary>
@@ -113,6 +123,7 @@ namespace FEA_Program.ViewModels
 
         public void DisplayEditor(int newID, ObservableCollection<MaterialVM> materials, ObservableCollection<NodeVM> nodes)
         {
+            Opening?.Invoke(this, EventArgs.Empty);
             SelectionManager.AllowMultiSelect = true;
 
             foreach (var node in nodes)
@@ -144,6 +155,7 @@ namespace FEA_Program.ViewModels
                 node.PropertyChanged -= OnNodeSelectionChanged;
 
             ShowEditor = null;  // Do this instead of false because of how converter is setup
+            Closed?.Invoke(this, EventArgs.Empty);
         }
 
         // ---------------------- Events ----------------------

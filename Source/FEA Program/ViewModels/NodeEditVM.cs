@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
-    internal class NodeEditVM: ObservableObject
+    internal class NodeEditVM: ObservableObject, ISideBarEditor
     {
         private NodeVM? _inputItem;
             
@@ -13,6 +13,16 @@ namespace FEA_Program.ViewModels
 
         public event EventHandler<NodeVM>? AcceptEdits;
         public event EventHandler<NodeVM>? CancelEdits;
+
+        /// <summary>
+        /// Fires when the sidebar control is opening
+        /// </summary>
+        public event EventHandler? Opening;
+
+        /// <summary>
+        /// Fires when the sidebar control has closed
+        /// </summary>
+        public event EventHandler? Closed;
 
         // ---------------------- Properties ----------------------
 
@@ -55,6 +65,7 @@ namespace FEA_Program.ViewModels
 
         public void DisplayEditor(NodeVM item, bool editing)
         {
+            Opening?.Invoke(this, new EventArgs());
             _inputItem = item;
 
             // If we're editing, select the node being edited for clarity
@@ -83,6 +94,7 @@ namespace FEA_Program.ViewModels
 
             EditItem = null; // This hides the editor
             EditCoordinates.Clear();
+            Closed?.Invoke(this, EventArgs.Empty);
         }
 
         // ---------------------- Event Handers ----------------------
