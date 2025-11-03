@@ -30,7 +30,7 @@ namespace FEA_Program.Views.Helix
 
         public static readonly DependencyProperty ShowXProperty = DependencyProperty.Register(
             nameof(ShowX), typeof(bool), typeof(FixityVisual3D),
-            new PropertyMetadata(true, (d, e) => ((FixityVisual3D)d).UpdateVisibility()));
+            new PropertyMetadata(false, (d, e) => ((FixityVisual3D)d).UpdateVisibility()));
 
         public bool ShowX
         {
@@ -40,7 +40,7 @@ namespace FEA_Program.Views.Helix
 
         public static readonly DependencyProperty ShowYProperty = DependencyProperty.Register(
             nameof(ShowY), typeof(bool), typeof(FixityVisual3D),
-            new PropertyMetadata(true, (d, e) => ((FixityVisual3D)d).UpdateVisibility()));
+            new PropertyMetadata(false, (d, e) => ((FixityVisual3D)d).UpdateVisibility()));
 
         public bool ShowY
         {
@@ -50,7 +50,7 @@ namespace FEA_Program.Views.Helix
 
         public static readonly DependencyProperty ShowZProperty = DependencyProperty.Register(
             nameof(ShowZ), typeof(bool), typeof(FixityVisual3D),
-            new PropertyMetadata(true, (d, e) => ((FixityVisual3D)d).UpdateVisibility()));
+            new PropertyMetadata(false, (d, e) => ((FixityVisual3D)d).UpdateVisibility()));
 
         public bool ShowZ
         {
