@@ -88,7 +88,7 @@ namespace FEA_Program.ViewModels
         /// <summary>
         /// Whether to show the editor
         /// </summary>
-        public bool? ShowEditor { get; private set; } = null;
+        public bool ShowEditor { get; private set; } = false;
         public ObservableCollection<ElementTypes> AvailableElementTypes { get; set; } = [];
         public ElementTypes? SelectedElementType { get; set; } = null;
         public ObservableCollection<MaterialVM> Materials { get; private set; } = [];
@@ -302,7 +302,7 @@ namespace FEA_Program.ViewModels
             foreach (var node in _nodes)
                 node.PropertyChanged -= OnNodeSelectionChanged;
 
-            ShowEditor = null;  // Do this instead of false because of how converter is setup
+            ShowEditor = false;
             Closed?.Invoke(this, EventArgs.Empty);
         }
 

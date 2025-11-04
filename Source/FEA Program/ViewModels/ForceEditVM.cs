@@ -86,7 +86,7 @@ namespace FEA_Program.ViewModels
         /// <summary>
         /// Whether to show the editor
         /// </summary>
-        public bool? ShowEditor { get; private set; } = null;
+        public bool ShowEditor { get; private set; } = false;
 
         /// <summary>
         /// Base VM for handling errors and status
@@ -238,7 +238,7 @@ namespace FEA_Program.ViewModels
         {
             SelectionManager.DeselectAll();
             SelectionManager.AllowMultiSelect = false;
-            ShowEditor = null;  // Do this instead of false because of how converter is setup
+            ShowEditor = false;
             Closed?.Invoke(this, EventArgs.Empty);
         }
 

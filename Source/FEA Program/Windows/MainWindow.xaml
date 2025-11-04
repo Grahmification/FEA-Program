@@ -15,7 +15,8 @@
     </Window.DataContext>
 
     <Window.Resources>
-        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <conv:BoolToVisibilityConverter x:Key="SidebarVisibilityConverter"
+                                        HiddenState="Collapsed" />
 
         <!-- Simple ToolBar style that removes grip and overflow -->
         <Style x:Key="ToolBarNoGripNoOverflow" TargetType="ToolBar">
@@ -159,27 +160,27 @@
 
                     <!-- Edit material view -->
                     <v:EditMaterialControl DataContext="{Binding Project.Materials.Editor}" 
-                                           Visibility="{Binding DataContext.Project.Materials.Editor.Material,
+                                           Visibility="{Binding DataContext.Project.Materials.Editor.ShowEditor,
                                                 RelativeSource={RelativeSource AncestorType=Window},
-                                                Converter={StaticResource NullToVisibilityConverter}}"/>
+                                                Converter={StaticResource SidebarVisibilityConverter}}"/>
 
                     <!-- Edit node view -->
                     <v:EditNodeControl DataContext="{Binding Project.Nodes.Editor}" 
                                        Visibility="{Binding DataContext.Project.Nodes.Editor.ShowEditor,
                                                   RelativeSource={RelativeSource AncestorType=Window},
-                                                  Converter={StaticResource NullToVisibilityConverter}}"/>
+                                                  Converter={StaticResource SidebarVisibilityConverter}}"/>
 
                     <!-- Edit force view -->
                     <v:EditForceControl DataContext="{Binding Project.Nodes.ForceEditor}" 
                                        Visibility="{Binding DataContext.Project.Nodes.ForceEditor.ShowEditor,
                                                   RelativeSource={RelativeSource AncestorType=Window},
-                                                  Converter={StaticResource NullToVisibilityConverter}}"/>
+                                                  Converter={StaticResource SidebarVisibilityConverter}}"/>
 
                     <!-- Add element view -->
                     <v:AddElementControl DataContext="{Binding Project.Elements.AddEditor}" 
                                          Visibility="{Binding DataContext.Project.Elements.AddEditor.ShowEditor,
                                                   RelativeSource={RelativeSource AncestorType=Window},
-                                                  Converter={StaticResource NullToVisibilityConverter}}"/>
+                                                  Converter={StaticResource SidebarVisibilityConverter}}"/>
                 </Grid>
 
                 

@@ -34,7 +34,7 @@ namespace FEA_Program.ViewModels
         /// <summary>
         /// Whether to show the editor
         /// </summary>
-        public bool? ShowEditor { get; private set; } = null;
+        public bool ShowEditor { get; private set; } = false;
 
         /// <summary>
         /// Node being edited
@@ -174,8 +174,7 @@ namespace FEA_Program.ViewModels
             if (EditItem != null)
                 EditItem.Selected = false;
 
-            ShowEditor = null;  // Do this instead of false because of how converter is setup
-            EditCoordinates.Clear();
+            ShowEditor = false;
             Closed?.Invoke(this, EventArgs.Empty);
         }
 

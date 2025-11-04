@@ -26,6 +26,11 @@ namespace FEA_Program.ViewModels
         // ---------------------- Properties ----------------------
 
         /// <summary>
+        /// Whether to show the editor
+        /// </summary>
+        public bool ShowEditor { get; private set; } = false;
+
+        /// <summary>
         /// Material being edited
         /// </summary>
         public MaterialVM? Material { get; private set; } = null;
@@ -60,6 +65,7 @@ namespace FEA_Program.ViewModels
             // Make this so we're editing a copy. The original is preserved in case we cancel
             Material = new MaterialVM((Material)material.Model.Clone());
             Editing = editing;
+            ShowEditor = true;
         }
 
         /// <summary>
@@ -102,7 +108,7 @@ namespace FEA_Program.ViewModels
         }
         private void HideEditor()
         {
-            Material = null; // This hides the editor
+            ShowEditor = false;
             Closed?.Invoke(this, EventArgs.Empty);
         }
 
