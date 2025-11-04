@@ -13,6 +13,7 @@ namespace FEA_Program.ViewModels
         public static Color SelectedColor = Colors.Yellow;
         public static Color DefaultNodeColor = Colors.LightGreen;
         public static Color DefaultFixityColor = Colors.Blue;
+        public static Color PendingColor = Color.FromArgb(128, 255, 192, 203);
 
         // ---------------------- Properties ----------------------
         public NodeVM Node { get; private set; } = new();
@@ -22,8 +23,8 @@ namespace FEA_Program.ViewModels
         public double ForceLength => ScaleForceMagnitude(Force.Length());
 
         public Color? ColorOverride { get; set; } = null;
-        public Color NodeColor => Node.Selected ? SelectedColor : (ColorOverride ?? DefaultNodeColor);
-        public Color FixityColor => Node.Selected ? SelectedColor : (ColorOverride ?? DefaultFixityColor);
+        public Color NodeColor => Node.Selected ? SelectedColor : Node.Pending ? PendingColor : (ColorOverride ?? DefaultNodeColor);
+        public Color FixityColor => Node.Selected ? SelectedColor : Node.Pending ? PendingColor : (ColorOverride ?? DefaultFixityColor);
         public ObservableCollection<Vector3> ReactionForces { get; private set; } = [];
 
         /// <summary>
@@ -60,6 +61,11 @@ namespace FEA_Program.ViewModels
                     OnPropertyChanged(nameof(NodeColor));
                     OnPropertyChanged(nameof(FixityColor));
                     SetTextForSelection();
+                }
+                else if (e.PropertyName == (nameof(NodeVM.Pending)))
+                {
+                    OnPropertyChanged(nameof(NodeColor));
+                    OnPropertyChanged(nameof(FixityColor));
                 }
             }
         }

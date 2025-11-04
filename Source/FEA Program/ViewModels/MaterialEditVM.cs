@@ -61,10 +61,24 @@ namespace FEA_Program.ViewModels
             Material = new MaterialVM((Material)material.Model.Clone());
             Editing = editing;
         }
-        public void HideEditor()
+
+        /// <summary>
+        /// Cancels editing, hiding the editor
+        /// </summary>
+        public void CancelEdit()
         {
-            Material = null; // This hides the editor
-            Closed?.Invoke(this, EventArgs.Empty);
+            try
+            {
+                HideEditor();
+                if (_inputMaterial != null)
+                {
+                    CancelEdits?.Invoke(this, _inputMaterial);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
 
         // ---------------------- Private Helpers ----------------------
@@ -86,20 +100,11 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
-        private void CancelEdit()
+        private void HideEditor()
         {
-            try
-            {
-                HideEditor();
-                if (_inputMaterial != null)
-                {
-                    CancelEdits?.Invoke(this, _inputMaterial);
-                }
-            }
-            catch (Exception ex)
-            {
-                Base.LogAndDisplayException(ex);
-            }
+            Material = null; // This hides the editor
+            Closed?.Invoke(this, EventArgs.Empty);
         }
+
     }
 }

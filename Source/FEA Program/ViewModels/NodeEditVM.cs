@@ -27,6 +27,11 @@ namespace FEA_Program.ViewModels
         // ---------------------- Properties ----------------------
 
         /// <summary>
+        /// Whether to show the editor
+        /// </summary>
+        public bool? ShowEditor { get; private set; } = null;
+
+        /// <summary>
         /// Node being edited
         /// </summary>
         public NodeVM? EditItem { get; private set; } = null;
@@ -66,15 +71,16 @@ namespace FEA_Program.ViewModels
         public void DisplayEditor(NodeVM item, bool editing)
         {
             Opening?.Invoke(this, new EventArgs());
-            _inputItem = item;
+
+            // Make a copy of the input item so we can restore parameters if editing is cancelled
+            _inputItem = new NodeVM((Node)item.Model.Clone());
+
+            EditItem = item;
+            Editing = editing;
 
             // If we're editing, select the node being edited for clarity
             if (editing)
-                _inputItem.Selected = true;
-
-            // Make this so we're editing a copy. The original is preserved in case we cancel
-            EditItem = new NodeVM((Node)item.Model.Clone());
-            Editing = editing;
+                EditItem.Selected = true;
 
             EditCoordinates.Clear();
 
@@ -85,16 +91,35 @@ namespace FEA_Program.ViewModels
                 coordVM.ValueChanged += OnCoordinateValueChanged;
                 EditCoordinates.Add(coordVM);
             }
-        }
-        public void HideEditor()
-        {
-            // Deselect the item when edits finish
-            if (_inputItem != null)
-                _inputItem.Selected = false;
 
-            EditItem = null; // This hides the editor
-            EditCoordinates.Clear();
-            Closed?.Invoke(this, EventArgs.Empty);
+            ShowEditor = true;
+        }
+
+        /// <summary>
+        /// Cancels editing, hiding the editor
+        /// </summary>
+        public void CancelEdit()
+        {
+            try
+            {
+                // Do this first in case something else throws an error - we always want to close the editor
+                HideEditor();
+
+                if (_inputItem != null && EditItem != null)
+                {
+                    // Restore parameters we started with
+                    EditItem.Model.ImportParameters(_inputItem.Model);
+                }
+
+                if (EditItem != null)
+                {
+                    CancelEdits?.Invoke(this, EditItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
 
         // ---------------------- Event Handers ----------------------
@@ -111,9 +136,10 @@ namespace FEA_Program.ViewModels
                 EditItem.Model.Coordinates[e] = App.Units.Length.FromUser(vm.Value);  // Convert from user units
                 EditItem.Model.Fixity[e] = vm.Fixed ? 1 : 0;
 
-                // This will invalidate the solution
-                var coords = EditItem.Model.Coordinates.ToList();
-                EditItem.Model.Coordinates = [.. coords];
+                // Set the whole array to itself to make sure PropertyChanged event gets raised.
+                // This will also invalidate the solution
+                EditItem.Model.Fixity = [.. EditItem.Model.Fixity.ToList()];
+                EditItem.Model.Coordinates = [.. EditItem.Model.Coordinates.ToList()];
             }
         }
 
@@ -123,11 +149,9 @@ namespace FEA_Program.ViewModels
         {
             try
             {
-                if (_inputItem != null && EditItem != null)
+                if (EditItem != null)
                 {
-                    // Copy edited parameters
-                    _inputItem.Model.ImportParameters(EditItem.Model);
-                    AcceptEdits?.Invoke(this, _inputItem);
+                    AcceptEdits?.Invoke(this, EditItem);
                 }
 
                 HideEditor(); // Do this after the event in case an error occurs
@@ -137,21 +161,18 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
-        private void CancelEdit()
+
+        private void HideEditor()
         {
-            try
-            {
-                HideEditor();
-                if (_inputItem != null)
-                {
-                    CancelEdits?.Invoke(this, _inputItem);
-                }
-            }
-            catch (Exception ex)
-            {
-                Base.LogAndDisplayException(ex);
-            }
+            // Deselect the item when edits finish
+            if (EditItem != null)
+                EditItem.Selected = false;
+
+            ShowEditor = null;  // Do this instead of false because of how converter is setup
+            EditCoordinates.Clear();
+            Closed?.Invoke(this, EventArgs.Empty);
         }
+
         private void SetFixity(bool fix)
         {
             try

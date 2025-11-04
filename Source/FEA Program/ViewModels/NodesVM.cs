@@ -43,6 +43,7 @@ namespace FEA_Program.ViewModels
             AddForceCommand = new RelayCommand(() => ForceEditor.DisplayEditorAdd([.. Items], _problemDOFs));
             AddCommand = new RelayCommand(AddNodeWithEditor);
             Editor.AcceptEdits += OnAcceptEdits;
+            Editor.CancelEdits += OnCancelEdits;
 
             // Filter items without a force
             _nonZeroForceCollection = new CollectionViewSource { Source = Items };
@@ -127,10 +128,22 @@ namespace FEA_Program.ViewModels
                 // Todo - validate the node
 
                 // This is a new node
-                if (!vm.Editing)
+                if (e.Pending)
                 {
+                    // Remove the pending node and re-add it as a regular one
+                    // This will allow event subscribing classes to update properly
+                    DeleteVM(e);
+                    e.Pending = false;
                     AddVM(e);
                 }
+            }
+        }
+        private void OnCancelEdits(object? sender, NodeVM e)
+        {
+            if (e.Pending)
+            {
+                // We have a pending element, remove it
+                DeleteVM(e);
             }
         }
 
@@ -176,6 +189,11 @@ namespace FEA_Program.ViewModels
                 var node = new Node(ID, _problemDOFs);
 
                 var vm = new NodeVM(node);
+
+                // Add the element as pending - it will be removed if cancelled
+                vm.Pending = true;
+                AddVM(vm);
+
                 Editor.DisplayEditor(vm, false);
             }
             catch (Exception ex)

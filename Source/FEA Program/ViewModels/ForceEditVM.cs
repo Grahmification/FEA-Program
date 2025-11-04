@@ -165,12 +165,20 @@ namespace FEA_Program.ViewModels
 
             ShowEditor = true;
         }
-        public void HideEditor()
+
+        /// <summary>
+        /// Cancels editing, hiding the editor
+        /// </summary>
+        public void CancelEdit()
         {
-            SelectionManager.DeselectAll();
-            SelectionManager.AllowMultiSelect = false;
-            ShowEditor = null;  // Do this instead of false because of how converter is setup
-            Closed?.Invoke(this, EventArgs.Empty);
+            try
+            {
+                HideEditor();
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
 
         // ---------------------- Event Handers ----------------------
@@ -226,16 +234,12 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
-        private void CancelEdit()
+        private void HideEditor()
         {
-            try
-            {
-                HideEditor();
-            }
-            catch (Exception ex)
-            {
-                Base.LogAndDisplayException(ex);
-            }
+            SelectionManager.DeselectAll();
+            SelectionManager.AllowMultiSelect = false;
+            ShowEditor = null;  // Do this instead of false because of how converter is setup
+            Closed?.Invoke(this, EventArgs.Empty);
         }
 
     }

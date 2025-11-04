@@ -117,7 +117,7 @@ namespace FEA_Program.ViewModels
         public ElementAddVM()
         {
             AcceptCommand = new RelayCommand(AcceptEdit, () => CanCreateElement);
-            CancelCommand = new RelayCommand(HideEditor);
+            CancelCommand = new RelayCommand(CancelEdit);
             PropertyChanged += OnThisPropertyChanged;
         }
 
@@ -145,17 +145,20 @@ namespace FEA_Program.ViewModels
 
             ShowEditor = true;
         }
-        public void HideEditor()
+
+        /// <summary>
+        /// Cancels editing, hiding the editor
+        /// </summary>
+        public void CancelEdit()
         {
-            // We're closing, deselect all nodes
-            SelectionManager.AllowMultiSelect = false;
-            SelectionManager.DeselectAll();
-
-            foreach (var node in _nodes)
-                node.PropertyChanged -= OnNodeSelectionChanged;
-
-            ShowEditor = null;  // Do this instead of false because of how converter is setup
-            Closed?.Invoke(this, EventArgs.Empty);
+            try
+            {
+                HideEditor();
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
         }
 
         // ---------------------- Events ----------------------
@@ -289,6 +292,18 @@ namespace FEA_Program.ViewModels
             {
                 Base.LogAndDisplayException(ex);
             }
+        }
+        private void HideEditor()
+        {
+            // We're closing, deselect all nodes
+            SelectionManager.AllowMultiSelect = false;
+            SelectionManager.DeselectAll();
+
+            foreach (var node in _nodes)
+                node.PropertyChanged -= OnNodeSelectionChanged;
+
+            ShowEditor = null;  // Do this instead of false because of how converter is setup
+            Closed?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>

@@ -62,6 +62,7 @@ namespace FEA_Program.ViewModels
         public bool DisplacementIsValid => ArrayHasValidValues(Model.Displacement);
 
         public bool Selected { get; set; } = false;
+        public bool Pending { get; set; } = false;
 
         public bool FixedX => Model.Fixity[0] == 1;
         public bool FixedY => Model.Fixity.Length > 1 && Model.Fixity[1] == 1;

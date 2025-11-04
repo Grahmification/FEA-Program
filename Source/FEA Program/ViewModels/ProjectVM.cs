@@ -173,20 +173,30 @@ namespace FEA_Program.ViewModels
         // ---------------------- Event Methods ----------------------
         private void OnNodeAdding(object? sender, NodeVM e)
         {
-            Problem.AddNode(e.Model);
+            // We only draw the node if it's pending
+            if (!e.Pending)
+            {
+                Problem.AddNode(e.Model);
+                SelectionManager.AddItem(e);
+            }
+
             Draw.AddNode(e);
-            SelectionManager.AddItem(e);
         }
         private void OnNodeRemoving(object? sender, NodeVM e)
         {
-            SelectionManager.RemoveItem(e);
-
-            // Get the list of hanging element IDs
-            List<int> elementIds = [.. Problem.RemoveNode(e.Model.ID)];
             Draw.RemoveNode(e.Model.ID);
 
-            // Also delete hanging elements
-            Elements.Delete(elementIds);
+            // We only draw the node if it's pending
+            if (!e.Pending)
+            {
+                SelectionManager.RemoveItem(e);
+
+                // Get the list of hanging element IDs
+                List<int> elementIds = [.. Problem.RemoveNode(e.Model.ID)];
+
+                // Also delete hanging elements
+                Elements.Delete(elementIds);
+            }
         }
         private void OnElementAdding(object? sender, ElementVM e)
         {

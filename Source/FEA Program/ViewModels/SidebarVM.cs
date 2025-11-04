@@ -16,9 +16,9 @@
         public event EventHandler Closed;
 
         /// <summary>
-        /// Hides the sidebar control
+        /// Cancels editing on the sidebar control, hiding it
         /// </summary>
-        public void HideEditor();
+        public void CancelEdit();
     }
     
     /// <summary>
@@ -70,7 +70,7 @@
             if(sender is ISideBarEditor editor)
             {
                 // Hide the currently displayed editor prior to showing the other one
-                ActiveEditor?.HideEditor();
+                ActiveEditor?.CancelEdit();
                 ActiveEditor = editor;
             }
         }

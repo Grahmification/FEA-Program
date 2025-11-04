@@ -24,6 +24,9 @@ namespace FEA_Program.Views.Helix
         public static readonly DependencyProperty SelectedProperty = DependencyProperty.Register(
             nameof(Selected), typeof(bool), typeof(NodeVisual3D), new PropertyMetadata(false));
 
+        public static readonly DependencyProperty BlockInteractionProperty = DependencyProperty.Register(
+            nameof(BlockInteraction), typeof(bool), typeof(NodeVisual3D), new PropertyMetadata(false));
+
         public Color Color
         {
             get => (Color)GetValue(ColorProperty);
@@ -40,6 +43,12 @@ namespace FEA_Program.Views.Helix
         {
             get => (bool)GetValue(SelectedProperty);
             set => SetValue(SelectedProperty, value);
+        }
+
+        public bool BlockInteraction
+        {
+            get => (bool)GetValue(BlockInteractionProperty);
+            set => SetValue(BlockInteractionProperty, value);
         }
 
         public double Size { get; set; } = 1;
@@ -97,6 +106,9 @@ namespace FEA_Program.Views.Helix
                 return;
 
             if (args.Viewport is null)
+                return;
+
+            if (BlockInteraction)
                 return;
 
             // Filter different mouse buttons

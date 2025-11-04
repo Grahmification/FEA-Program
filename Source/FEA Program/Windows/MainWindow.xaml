@@ -165,7 +165,7 @@
 
                     <!-- Edit node view -->
                     <v:EditNodeControl DataContext="{Binding Project.Nodes.Editor}" 
-                                       Visibility="{Binding DataContext.Project.Nodes.Editor.EditItem,
+                                       Visibility="{Binding DataContext.Project.Nodes.Editor.ShowEditor,
                                                   RelativeSource={RelativeSource AncestorType=Window},
                                                   Converter={StaticResource NullToVisibilityConverter}}"/>
 
