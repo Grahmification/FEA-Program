@@ -49,6 +49,12 @@
                     <Slider Margin="10, 0" Value="{Binding Draw.DisplacePercentage}" Minimum="0" Maximum="100"/>
                 </StackPanel>
 
+                <StackPanel Margin="10">
+                    <Label Content="Node Coloring:"/>
+                    <ComboBox Margin="10, 0" SelectedItem="{Binding Draw.NodeColorScheme}" ItemsSource="{Binding Source={conv:EnumBindingSource {x:Type vm:NodeColorSchemes}}}"/>
+                </StackPanel>
+
+
                 <Separator Margin="10,15"/>
             </StackPanel>
 

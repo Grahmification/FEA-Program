@@ -79,13 +79,10 @@ namespace FEA_Program.ViewModels
                 // Calculate stress fraction (0.0 to 1.0)
                 double stressRatio = Math.Abs((element.Element.Model?.MaxStress ?? 0)) / globalMaxStress;
 
-                // Safety check to ensure ratio doesn't exceed 1.0 due to floating point inaccuracies
-                stressRatio = Math.Min(1.0, Math.Max(0.0, stressRatio));
-
                 // Apply the gradient color (only is the solution is valid)
                 if (element.Element.Model?.SolutionValid ?? false)
                 {
-                    element.ColorOverride = GetGradientColor(stressRatio);
+                    element.ColorOverride = GetRedGreenGradientColor(stressRatio);
                 }
             }
         }
@@ -117,7 +114,7 @@ namespace FEA_Program.ViewModels
                 // Apply the gradient color (only is the solution is valid)
                 if (element.Element.Model?.SolutionValid ?? false)
                 {
-                    element.ColorOverride = GetGradientColor(colorRatio);
+                    element.ColorOverride = GetRedGreenGradientColor(colorRatio);
                 }
             }
         }
@@ -129,8 +126,11 @@ namespace FEA_Program.ViewModels
         /// </summary>
         /// <param name="ratio">The fraction of maximum stress (0.0 to 1.0).</param>
         /// <returns>A Windows.Media.Color instance.</returns>
-        private static Color GetGradientColor(double ratio)
+        public static Color GetRedGreenGradientColor(double ratio)
         {
+            // Safety check to ensure ratio doesn't exceed 1.0 due to floating point inaccuracies
+            ratio = Math.Min(1.0, Math.Max(0.0, ratio));
+
             // R component: increases from 0 (green) to 255 (red) as ratio increases.
             byte red = (byte)Math.Round(255 * ratio);
 

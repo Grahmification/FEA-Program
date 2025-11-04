@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Media;
 using Color = System.Windows.Media.Color;
+using Geometry = FEA_Program.Models.Geometry;
 
 namespace FEA_Program.ViewModels
 {
@@ -20,8 +21,9 @@ namespace FEA_Program.ViewModels
         public Vector3 Force => ArrayToVector(Node.Model.Force); // Use underlying model force so arrow length doesn't change when units change
         public double ForceLength => ScaleForceMagnitude(Force.Length());
 
-        public Color NodeColor => Node.Selected ? SelectedColor : DefaultNodeColor;
-        public Color FixityColor => Node.Selected ? SelectedColor : DefaultFixityColor;
+        public Color? ColorOverride { get; set; } = null;
+        public Color NodeColor => Node.Selected ? SelectedColor : (ColorOverride ?? DefaultNodeColor);
+        public Color FixityColor => Node.Selected ? SelectedColor : (ColorOverride ?? DefaultFixityColor);
         public ObservableCollection<Vector3> ReactionForces { get; private set; } = [];
 
         /// <summary>
@@ -199,6 +201,30 @@ namespace FEA_Program.ViewModels
                         vector[i] = (float)(sign * normalizedMag);
                         node.ReactionForces.Add(vector);
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Colors nodes from red to green based on their overall displacement relative to the maximum value
+        /// </summary>
+        /// <param name="nodes">The list of nodes to process.</param>
+        public static void ApplyDisplacementColors(IEnumerable<NodeDrawVM> nodes)
+        {
+            if (nodes == null || !nodes.Any()) return;
+
+            double globalMaxDisplacement = nodes.Max(e => Geometry.Magnitude(e.Node.UserDisplacement));
+
+            // Apply colors to all items iteratively
+            foreach (var item in nodes)
+            {
+                // Calculate relative fraction (0.0 to 1.0)
+                double displacementRatio = Geometry.Magnitude(item.Node.UserDisplacement) / globalMaxDisplacement;
+
+                // Apply the gradient color (only is the solution is valid)
+                if (item.Node.Model.SolutionValid)
+                {
+                    item.ColorOverride = ElementDrawVM.GetRedGreenGradientColor(displacementRatio);
                 }
             }
         }

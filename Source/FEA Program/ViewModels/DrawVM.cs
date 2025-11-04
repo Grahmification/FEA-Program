@@ -20,9 +20,18 @@ namespace FEA_Program.ViewModels
         [Description("Ultimate Safety Factor")]
         SafetyFactorUltimate,
     }
-    
-    
-    
+
+    [TypeConverter(typeof(EnumDescriptionTypeConverter))]
+    internal enum NodeColorSchemes
+    {
+        [Description("Default")]
+        None,
+
+        [Description("Max Displacement")]
+        MaxDisplacement,
+    }
+
+
     internal class DrawVM: ObservableObject
     {
         // Reference by ID for easy lookup
@@ -56,6 +65,9 @@ namespace FEA_Program.ViewModels
 
         private ElementColorSchemes _ElementColorScheme = ElementColorSchemes.None;
         public ElementColorSchemes ElementColorScheme { get => _ElementColorScheme; set { _ElementColorScheme = value; UpdateElementColors(); } }
+
+        private NodeColorSchemes _NodeColorScheme = NodeColorSchemes.None;
+        public NodeColorSchemes NodeColorScheme { get => _NodeColorScheme; set { _NodeColorScheme = value; UpdateNodeColors(); } }
 
 
         // ---------------------- Public Methods ----------------------
@@ -113,6 +125,7 @@ namespace FEA_Program.ViewModels
             UpdateNodeScaling();
             UpdateNodeReactions();
             UpdateElementColors();
+            UpdateNodeColors();
         }
 
         // ---------------------- Private Helpers ----------------------
@@ -150,6 +163,32 @@ namespace FEA_Program.ViewModels
                 {
                     foreach (NodeDrawVM N in Nodes)
                         N.ReactionForces.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.LogAndDisplayException(ex);
+            }
+        }
+
+        /// <summary>
+        /// Update the coloring scheme for all nodes
+        /// </summary>
+        private void UpdateNodeColors()
+        {
+            try
+            {
+                if (NodeColorScheme == NodeColorSchemes.MaxDisplacement)
+                {
+                    NodeDrawVM.ApplyDisplacementColors(Nodes);
+                }
+                else
+                {
+                    foreach (var e in Nodes)
+                    {
+                        // Set to default color
+                        e.ColorOverride = null;
+                    }
                 }
             }
             catch (Exception ex)
