@@ -95,21 +95,31 @@ namespace FEA_Program.ViewModels
                     .ToArray();
 
                 var vm = new ElementDrawVM(element, nodes);
-                _Elements.Add(element.Model.ID, vm);
+                int elementId = element.Model.ID;
+
+                // This item already exists. Replace it
+                if (_Elements.TryGetValue(elementId, out var existing))
+                    Elements.Remove(existing);
+
+                _Elements.Add(elementId, vm);
                 Elements.Add(vm);
             }
         }
         public void RemoveNode(int id)
         {
-            var vm = _Nodes[id];
-            Nodes.Remove(vm);
-            _Nodes.Remove(id);
+            if (_Nodes.TryGetValue(id, out var vm))
+            {
+                Nodes.Remove(vm);
+                _Nodes.Remove(id);
+            }
         }
         public void RemoveElement(int id)
         {
-            var vm = _Elements[id];
-            Elements.Remove(vm);
-            _Elements.Remove(id);
+            if (_Elements.TryGetValue(id, out var vm))
+            {
+                Elements.Remove(vm);
+                _Elements.Remove(id);
+            }
         }
 
         /// <summary>
