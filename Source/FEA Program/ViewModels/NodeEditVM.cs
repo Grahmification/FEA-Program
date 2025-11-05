@@ -20,6 +20,11 @@ namespace FEA_Program.ViewModels
         public event EventHandler? Opening;
 
         /// <summary>
+        /// Fires when the sidebar control has opened
+        /// </summary>
+        public event EventHandler? Opened;
+
+        /// <summary>
         /// Fires when the sidebar control has closed
         /// </summary>
         public event EventHandler? Closed;
@@ -93,6 +98,7 @@ namespace FEA_Program.ViewModels
             }
 
             ShowEditor = true;
+            Opened?.Invoke(this, new EventArgs());
         }
 
         /// <summary>

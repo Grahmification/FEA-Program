@@ -173,30 +173,20 @@ namespace FEA_Program.ViewModels
         // ---------------------- Event Methods ----------------------
         private void OnNodeAdding(object? sender, NodeVM e)
         {
-            // We only draw the node if it's pending
-            if (!e.Pending)
-            {
-                Problem.AddNode(e.Model);
-                SelectionManager.AddItem(e);
-            }
-
+            Problem.AddNode(e.Model);
+            SelectionManager.AddItem(e);
             Draw.AddNode(e);
         }
         private void OnNodeRemoving(object? sender, NodeVM e)
         {
             Draw.RemoveNode(e.Model.ID);
+            SelectionManager.RemoveItem(e);
 
-            // We only draw the node if it's pending
-            if (!e.Pending)
-            {
-                SelectionManager.RemoveItem(e);
+            // Get the list of hanging element IDs
+            List<int> elementIds = [.. Problem.RemoveNode(e.Model.ID)];
 
-                // Get the list of hanging element IDs
-                List<int> elementIds = [.. Problem.RemoveNode(e.Model.ID)];
-
-                // Also delete hanging elements
-                Elements.Delete(elementIds);
-            }
+            // Also delete hanging elements
+            Elements.Delete(elementIds);
         }
         private void OnElementAdding(object? sender, ElementVM e)
         {
@@ -217,6 +207,32 @@ namespace FEA_Program.ViewModels
                 Draw.RemoveElement(e.Model.ID);
             }
         }
+
+        private void OnNodeEditorOpened(object? sender, EventArgs e)
+        {
+            if(sender is NodeEditVM editor)
+            {
+                // We have a new node being created
+                if (!editor.Editing && editor.EditItem != null)
+                {
+                    // This item will be overwritten when the final node is added to the problem
+                    Draw.AddNode(editor.EditItem, true);
+                }
+            }
+        }
+        private void OnNodeEditorCanceled(object? sender, NodeVM e)
+        {
+            if (sender is NodeEditVM editor)
+            {
+                // We have a new node being created
+                if (!editor.Editing && editor.EditItem != null)
+                {
+                    // Remove the pending mode
+                    Draw.RemoveNode(editor.EditItem.Model.ID);
+                }
+            }
+        }
+
 
         private void OnNewProblemAccepted(object? sender, ProblemTypes e)
         {
@@ -257,6 +273,8 @@ namespace FEA_Program.ViewModels
             Nodes.ItemAdding += OnNodeAdding;
             Nodes.ItemRemoving += OnNodeRemoving;
             Nodes.ForceEditor.SelectionManager = SelectionManager;
+            Nodes.Editor.Opened += OnNodeEditorOpened;
+            Nodes.Editor.CancelEdits += OnNodeEditorCanceled;
 
             Elements = new ElementsVM();
             Elements.SetBase(Base);

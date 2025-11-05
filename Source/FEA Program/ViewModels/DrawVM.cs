@@ -73,10 +73,16 @@ namespace FEA_Program.ViewModels
         // ---------------------- Public Methods ----------------------
         public DrawVM() { }
 
-        public void AddNode(NodeVM node) 
+        public void AddNode(NodeVM node, bool pending = false) 
         {
-            var vm = new NodeDrawVM(node);
-            _Nodes.Add(node.Model.ID, vm);
+            var vm = new NodeDrawVM(node, pending);
+            int id = node.Model.ID;
+
+            // This node already exists. Replace it
+            if (_Nodes.TryGetValue(id, out var existing))
+                Nodes.Remove(existing);
+
+            _Nodes[id] = vm;
             Nodes.Add(vm);
         }
         public void AddElement(ElementVM element)
