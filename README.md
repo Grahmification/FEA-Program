@@ -22,6 +22,7 @@ This software also features Uicons by <a href="https://www.flaticon.com/uicons">
 1. Open `FEA Program.sln` in Visual Studio.
 2. Compile the code in Visual Studio.
 3. Run the executable file (FEA Program.exe).
+4. Example problem files can be found at [Examples](Examples/).
 
 Todo: Make detailed usage instructions.
 

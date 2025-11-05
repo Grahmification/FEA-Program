@@ -1,0 +1,186 @@
+{
+  "nodes": [
+    {
+      "dimension": 3,
+      "id": 1,
+      "coords": [
+        0,
+        0,
+        0
+      ],
+      "fixity": [
+        1,
+        1,
+        1
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 2,
+      "coords": [
+        0.01,
+        0,
+        0
+      ],
+      "fixity": [
+        1,
+        1,
+        1
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 3,
+      "coords": [
+        0,
+        0.01,
+        0
+      ],
+      "fixity": [
+        1,
+        1,
+        1
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 4,
+      "coords": [
+        0.005,
+        0.007,
+        0.013000000000000001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "elements": [
+    {
+      "id": 1,
+      "materialID": 1,
+      "nodeIDs": [
+        1,
+        4
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 2,
+      "materialID": 1,
+      "nodeIDs": [
+        4,
+        2
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 3,
+      "materialID": 1,
+      "nodeIDs": [
+        3,
+        4
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "id": 1,
+      "name": "Aluminum 6061-T6",
+      "subtype": 1,
+      "e": 69000000000,
+      "v": 0.3,
+      "sy": 276000000,
+      "sut": 210000000
+    },
+    {
+      "id": 2,
+      "name": "1045 Steel",
+      "subtype": 0,
+      "e": 200000000000,
+      "v": 0.29,
+      "sy": 565000000,
+      "sut": 310000000
+    }
+  ],
+  "connectivityMatrix": {
+    "1": [
+      1,
+      4
+    ],
+    "2": [
+      4,
+      2
+    ],
+    "3": [
+      3,
+      4
+    ]
+  },
+  "problemType": 2
+}
