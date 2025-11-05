@@ -6,6 +6,12 @@
              DispatcherUnhandledException="Application_DispatcherUnhandledException"
              StartupUri="Windows/MainWindow.xaml">
     <Application.Resources>
-        <vm:UnitsVM x:Key="Units" />
+        <ResourceDictionary>
+            <vm:UnitsVM x:Key="Units" />
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Order matters here -->
+                <ResourceDictionary Source="Styles/TreeViews.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
