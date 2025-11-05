@@ -5,13 +5,26 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
+    /// <summary>
+    /// Viewmodel for a control to edit or add a node
+    /// </summary>
     internal class NodeEditVM: ObservableObject, ISideBarEditor
     {
+        /// <summary>
+        /// The original item input when the editor was opened
+        /// </summary>
         private NodeVM? _inputItem;
-            
+
         // ---------------------- Events ----------------------
 
+        /// <summary>
+        /// Fires when edits are accepted, with the item being edited as the argument
+        /// </summary>
         public event EventHandler<NodeVM>? AcceptEdits;
+
+        /// <summary>
+        /// Fires when edits are canceled, with the item being edited as the argument
+        /// </summary>
         public event EventHandler<NodeVM>? CancelEdits;
 
         /// <summary>
@@ -57,14 +70,32 @@ namespace FEA_Program.ViewModels
         public BaseVM Base { get; set; } = new();
 
         // ---------------------- Commands ----------------------
+
+        /// <summary>
+        /// Relay command to accept edits
+        /// </summary>
         public ICommand AcceptCommand { get; }
+
+        /// <summary>
+        /// Relay command to cancel edits
+        /// </summary>
         public ICommand CancelCommand { get; }
 
+        /// <summary>
+        /// Relay command to fix all coordinates of the node
+        /// </summary>
         public ICommand FixAllCommand { get; }
+
+        /// <summary>
+        /// Relay command to free all coordinates of the node
+        /// </summary>
         public ICommand UnfixAllCommand { get; }
 
         // ---------------------- Public Methods ----------------------
 
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
         public NodeEditVM() 
         {
             AcceptCommand = new RelayCommand(AcceptEdit);
@@ -73,6 +104,11 @@ namespace FEA_Program.ViewModels
             UnfixAllCommand = new RelayCommand(() => SetFixity(false));
         }
 
+        /// <summary>
+        /// Displays the control for editing a node
+        /// </summary>
+        /// <param name="item">The node to edit or add</param>
+        /// <param name="editing">True if we're editing an existing node</param>
         public void DisplayEditor(NodeVM item, bool editing)
         {
             Opening?.Invoke(this, new EventArgs());
@@ -149,8 +185,11 @@ namespace FEA_Program.ViewModels
             }
         }
 
-
         // ---------------------- Private Helpers ----------------------
+
+        /// <summary>
+        /// Accepts edits, hiding the editor
+        /// </summary>
         private void AcceptEdit()
         {
             try
@@ -168,6 +207,9 @@ namespace FEA_Program.ViewModels
             }
         }
 
+        /// <summary>
+        /// Hide the attached control
+        /// </summary>
         private void HideEditor()
         {
             // Deselect the item when edits finish
@@ -178,6 +220,10 @@ namespace FEA_Program.ViewModels
             Closed?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// Sets the fixity for all coordinates of the node
+        /// </summary>
+        /// <param name="fix">True to fix all coordinates, false to free</param>
         private void SetFixity(bool fix)
         {
             try

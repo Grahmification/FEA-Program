@@ -6,6 +6,9 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
+    /// <summary>
+    /// Viewmodel for a node in the FEA program
+    /// </summary>
     internal class NodeVM: ObservableObject, ISelectable
     {
         /// <summary>
@@ -15,11 +18,26 @@ namespace FEA_Program.ViewModels
 
         // ---------------------- Events ----------------------
 
+        /// <summary>
+        /// Fires when the node requests that it be edited
+        /// </summary>
         public event EventHandler? EditRequest;
+
+        /// <summary>
+        /// Fires when the node requests that it be deleted
+        /// </summary>
         public event EventHandler? DeleteRequest;
+
+        /// <summary>
+        /// Fires when the node requests that its force be edited
+        /// </summary>
         public event EventHandler? EditForceRequest;
 
         // ---------------------- Properties ----------------------
+
+        /// <summary>
+        /// The node's underlying model
+        /// </summary>
         public Node Model { get; private set; } = Node.DummyNode();
 
         /// <summary>
@@ -41,7 +59,15 @@ namespace FEA_Program.ViewModels
         /// Get the node coordinates in user units
         /// </summary>
         public double[] UserCoordinates => Model.Coordinates.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
+
+        /// <summary>
+        /// Get the node displacement in user units
+        /// </summary>
         public double[] UserDisplacement => Model.Displacement.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
+
+        /// <summary>
+        /// Get the final displaced position in user units
+        /// </summary>
         public double[] UserFinalPos => UserCoordinates.Zip(UserDisplacement, (coord, disp) => coord + disp).ToArray();
 
         /// <summary>
@@ -54,19 +80,39 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public double[] ReactionForce => Model.ReactionForce.Select(f => App.Units.Force.ToUser(f)).ToArray();
 
-
         /// <summary>
         /// The node force magnitude in user units
         /// </summary>
         public double ForceMagnitude => Geometry.Magnitude(Force);
+
+        /// <summary>
+        /// True if the displacement is a valid number
+        /// </summary>
         public bool DisplacementIsValid => ArrayHasValidValues(Model.Displacement);
 
+        /// <summary>
+        /// Whether the item is selected
+        /// </summary>
         public bool Selected { get; set; } = false;
 
+        /// <summary>
+        /// True if the node X coordinate is fixed
+        /// </summary>
         public bool FixedX => Model.Fixity[0] == 1;
+
+        /// <summary>
+        /// True if the node Y coordinate is fixed
+        /// </summary>
         public bool FixedY => Model.Fixity.Length > 1 && Model.Fixity[1] == 1;
+
+        /// <summary>
+        /// True if the node Z coordinate is fixed
+        /// </summary>
         public bool FixedZ => Model.Fixity.Length > 2 && Model.Fixity[2] == 1;
 
+        /// <summary>
+        /// True if the node has a non-zero force
+        /// </summary>
         public bool HasForce => ForceMagnitude > 0;
 
         /// <summary>
@@ -74,15 +120,39 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public string IDCoordsDisplayText => $"{Model.ID} - ({string.Join(", ", UserCoordinates.Select(c => c.ToString("F1")).ToArray() ?? [])})";
 
-
         // ---------------------- Commands ----------------------
+
+        /// <summary>
+        /// Relay command for editing the node
+        /// </summary>
         public ICommand? EditCommand { get; }
+
+        /// <summary>
+        /// Relay command for deleting the node
+        /// </summary>
         public ICommand? DeleteCommand { get; }
+
+        /// <summary>
+        /// Relay command for editing the node's force
+        /// </summary>
         public ICommand? EditForceCommand { get; }
+
+        /// <summary>
+        /// Relay command for deleting the node's force
+        /// </summary>
         public ICommand? DeleteForceCommand { get; }
 
+        // ---------------------- Methods ----------------------
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public NodeVM() { }
 
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
+        /// <param name="model">The node's underlying model</param>
         public NodeVM(Node model)
         {
             Model = model;
@@ -132,6 +202,13 @@ namespace FEA_Program.ViewModels
                 vm.PropertyChanged += OnTreePropertyPropertyChanged;
         }
 
+        // ---------------------- Event Handlers ----------------------
+
+        /// <summary>
+        /// Called then a property in the model has changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is Node node)
@@ -165,6 +242,12 @@ namespace FEA_Program.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// Called when a property in <see cref="Properties"/> changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnTreePropertyPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is TreePropertyVM vm)
@@ -178,11 +261,17 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Private Helpers ----------------------
+
+        /// <summary>
+        /// Deletes the force attached to the node
+        /// </summary>
         private void DeleteForce()
         {
             // Set all force components to zero
             Model.Force = new double[Model.Dimension];
         }
+
+        // ---------------------- Static Methods ----------------------
 
         /// <summary>
         /// Check an array for invalid values

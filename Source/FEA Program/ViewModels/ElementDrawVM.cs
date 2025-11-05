@@ -1,28 +1,54 @@
-﻿using FEA_Program.Models;
-using FEA_Program.ViewModels.Base;
+﻿using FEA_Program.ViewModels.Base;
 using System.ComponentModel;
 using System.Windows.Media;
 using Color = System.Windows.Media.Color;
 
 namespace FEA_Program.ViewModels
 {
+    /// <summary>
+    /// Viewmodel for displaying an element in the 3D viewer
+    /// </summary>
     internal class ElementDrawVM: ObservableObject
     {
         public static Color SelectedColor = Colors.Yellow;
         public static Color DefaultElementColor = Colors.LightGray;
         
         // ---------------------- Properties ----------------------
+        
+        /// <summary>
+        /// All nodes in the element
+        /// </summary>
         public NodeDrawVM[] Nodes { get; private set; } = [];
+
+        /// <summary>
+        /// The element to draw
+        /// </summary>
         public ElementVM Element { get; private set; } = new();
 
+        /// <summary>
+        /// Optional override to set the draw color, or null to use default
+        /// </summary>
         public Color ? ColorOverride { get; set; } = null;
+
+        /// <summary>
+        /// Gets the element draw color for the 3D view
+        /// </summary>
         public Color ElementColor => Element.Selected ? SelectedColor : (ColorOverride ?? DefaultElementColor);
+
+        /// <summary>
+        /// Element text to display for a popup in the 3D view
+        /// </summary>
         public string ElementText { get; set; } = "";
 
-        // ---------------------- Commands ----------------------
+        // ---------------------- Methods ----------------------
 
         public ElementDrawVM() { }
 
+        /// <summary>
+        /// Create the viewmodel
+        /// </summary>
+        /// <param name="element">The element to draw</param>
+        /// <param name="nodes">All nodes in the element</param>
         public ElementDrawVM(ElementVM element, NodeDrawVM[] nodes)
         {
             Nodes = nodes;
@@ -30,6 +56,12 @@ namespace FEA_Program.ViewModels
             Element.PropertyChanged += OnElementPropertyChanged;
         }
 
+
+        /// <summary>
+        /// Called when a propery of <see cref="Element"/> changes value
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnElementPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is ElementVM element)
@@ -42,9 +74,8 @@ namespace FEA_Program.ViewModels
             }
         }
 
-
         /// <summary>
-        /// Sets the display text based on it being selected
+        /// Sets the display text based on the element being selected
         /// </summary>
         private void SetTextForSelection()
         {
@@ -57,8 +88,6 @@ namespace FEA_Program.ViewModels
                 ElementText = "";
             }
         }
-
-
 
         // ---------------------- Static Methods ----------------------
 

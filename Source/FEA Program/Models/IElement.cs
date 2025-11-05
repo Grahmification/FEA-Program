@@ -3,16 +3,44 @@ using System.ComponentModel;
 
 namespace FEA_Program.Models
 {
+    /// <summary>
+    /// Generic definition for an element
+    /// </summary>
     internal interface IElement: IHasID, INotifyPropertyChanged
     {
+        /// <summary>
+        /// Fires when the solve state changes from true to false
+        /// </summary>
         public event EventHandler<int>? SolutionInvalidated;
-        
+
+        /// <summary>
+        /// The element's material
+        /// </summary>
         public Material Material { get; set; }
 
+        /// <summary>
+        /// The number of nodes in the element
+        /// </summary>
         public int NumOfNodes { get; }
+
+        /// <summary>
+        /// The DOFs in each nodes of the element
+        /// </summary>
         public int NodeDOFs { get; }
+
+        /// <summary>
+        /// The total DOFs in the element
+        /// </summary>
         public int ElementDOFs { get; }
+
+        /// <summary>
+        /// Type identifier for the element
+        /// </summary>
         public ElementTypes ElementType { get; }
+
+        /// <summary>
+        /// All nodes contained in the element
+        /// </summary>
         public IReadOnlyList<INode> Nodes { get; }
 
         /// <summary>
@@ -25,7 +53,14 @@ namespace FEA_Program.Models
         /// </summary>
         public DenseVector TractionForce { get; }
 
+        /// <summary>
+        /// True if the solution for the element is current
+        /// </summary>
         public bool SolutionValid { get; }
+
+        /// <summary>
+        /// Get the max stress in the element
+        /// </summary>
         public double MaxStress { get; }
 
         /// <summary>
@@ -37,7 +72,6 @@ namespace FEA_Program.Models
         /// Gets the safety factor for failure
         /// </summary>
         public double SafetyFactorUltimate { get; }
-
 
         /// <summary>
         /// Get arguments that may vary between different element types

@@ -1,5 +1,4 @@
 using System.Reflection;
-using MathNet.Numerics.LinearAlgebra.Double;
 
 
 namespace FEA_Program.Models
@@ -14,18 +13,43 @@ namespace FEA_Program.Models
         /// </summary>
         public static int[] ValidDimensions = [1, 2, 3, 6];
 
-        private double[] _Coordinates; // coordinates in m
-        private int[] _Fixity; // 0 = floating, 1 = fixed
-        private double[] _Force; // first 3 items  = force [N], last 3 = moments [Nm]
-
-        public event EventHandler<int>? SolutionInvalidated;
+        /// <summary>
+        /// Coordinates of the node center in program units (m). Length depends on DOFs.
+        /// </summary>
+        private double[] _Coordinates;
 
         /// <summary>
-        /// The node dimension 1 = 1D, 2 = 2D, 3 = 3D, 6 = 6D
+        /// Whether each dimension of the node is fixed. 0 = floating, 1 = fixed. Length depends on DOFs.
+        /// </summary>
+        private int[] _Fixity;
+
+        /// <summary>
+        /// The node force + moment in program units. First 3 items  = force [N], last 3 = moments [Nm]. Length depends on DOFs.
+        /// </summary>
+        private double[] _Force;
+
+        // ---------------------- Events ----------------------
+
+        /// <summary>
+        /// Fires when the solve state changes from true to false
+        /// </summary>
+        public event EventHandler<int>? SolutionInvalidated;
+
+        // ---------------------- Properties ----------------------
+
+        /// <summary>
+        /// Number of DOFs in the node. 1 = 1D, 2 = 2D, 3 = 3D, 6 = 6D
         /// </summary>
         public int Dimension { get; private set; }
+
+        /// <summary>
+        /// True if the solution for the node is current
+        /// </summary>
         public bool SolutionValid { get; private set; } = false;
 
+        /// <summary>
+        /// Coordinates of the node center in program units (m). Length depends on DOFs.
+        /// </summary>
         public double[] Coordinates
         {
             get { return _Coordinates; }
@@ -36,6 +60,10 @@ namespace FEA_Program.Models
                 InvalidateSolution();
             }
         }
+
+        /// <summary>
+        /// Whether each dimension of the node is fixed. 0 = floating, 1 = fixed. Length depends on DOFs.
+        /// </summary>
         public int[] Fixity
         {
             get { return _Fixity; }
@@ -46,6 +74,10 @@ namespace FEA_Program.Models
                 InvalidateSolution();
             }
         }
+
+        /// <summary>
+        /// The node force + moment in program units. First 3 items  = force [N], last 3 = moments [Nm]. Length depends on DOFs.
+        /// </summary>
         public double[] Force
         {
             get { return _Force; }
@@ -55,11 +87,25 @@ namespace FEA_Program.Models
                 _Force = value;
                 InvalidateSolution();
             }
-        } // First 3 items  = force [N], last 3 = moments [Nm]
+        }
 
-        public double[] Displacement { get; private set; } 
-        public double[] ReactionForce { get; private set; } // reaction force in [N], reaction moments in [Nm]
+        /// <summary>
+        /// Displacement of the node center in program units (m). Length depends on DOFs.
+        /// </summary>
+        public double[] Displacement { get; private set; }
 
+        /// <summary>
+        /// The node reaction force + moment in program units. First 3 items  = force [N], last 3 = moments [Nm]. Length depends on DOFs.
+        /// </summary>
+        public double[] ReactionForce { get; private set; }
+
+        // ---------------------- Public Methods ----------------------
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="id">The idenfier for the class</param>
+        /// <param name="dimension">Number of DOFs in the node</param>
         public Node(int id, int dimension) : base(id)
         {
             Dimension = dimension;
@@ -70,6 +116,15 @@ namespace FEA_Program.Models
             Displacement = new double[dimension];
             ReactionForce = new double[dimension];
         }
+
+        /// <summary>
+        /// Constructor with more parameters
+        /// </summary>
+        /// <param name="coords">Coordinates of the node center in program units (m). Length depends on DOFs.</param>
+        /// <param name="fixity">Whether each dimension of the node is fixed. 0 = floating, 1 = fixed. Length depends on DOFs.</param>
+        /// <param name="id">The idenfier for the class</param>
+        /// <param name="dimension">Number of DOFs in the node</param>
+        /// <exception cref="Exception">A parameter was incorrect</exception>
         public Node(double[] coords, int[] fixity, int id, int dimension) : base(id)
         {
             Dimension = dimension;
@@ -88,6 +143,12 @@ namespace FEA_Program.Models
             Displacement = new double[dimension];
             ReactionForce = new double[dimension];
         }
+
+        /// <summary>
+        /// Sets the node result fields and marks it as solved
+        /// </summary>
+        /// <param name="displacement">Displacement of the node center in program units (m). Length depends on DOFs.</param>
+        /// <param name="reactionForce">The node reaction force + moment in program units. First 3 items  = force [N], last 3 = moments [Nm]. Length depends on DOFs.</param>
         public void Solve(double[] displacement, double[] reactionForce)
         {
             ValidateDimension(displacement, MethodBase.GetCurrentMethod()?.Name ?? "");
@@ -144,7 +205,11 @@ namespace FEA_Program.Models
             ReactionForce = (double[])other.ReactionForce.Clone();
         }
 
+        // ---------------------- Private Helpers ----------------------
 
+        /// <summary>
+        /// Changes the solved state from true to false, indicating the result is no longer valid
+        /// </summary>
         private void InvalidateSolution()
         {
             // Only raise the event if we're switching from true to false
@@ -154,6 +219,14 @@ namespace FEA_Program.Models
             if (solutionWasvalid)
                 SolutionInvalidated?.Invoke(this, ID);
         }
+
+        /// <summary>
+        /// Checks the length of a collection is correct for the number of DOFs in the node
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection">The collection to check</param>
+        /// <param name="methodName">Name of the calling method</param>
+        /// <exception cref="ArgumentOutOfRangeException">The length was incorrect</exception>
         private void ValidateDimension<T>(IReadOnlyCollection<T> collection, string methodName)
         {
             if (collection.Count != Dimension)
@@ -161,6 +234,8 @@ namespace FEA_Program.Models
                 throw new ArgumentOutOfRangeException($"Attempted to execute operation <{methodName}> for node ID <{ID}> with input params having different dimensions than specified node dimension.");
             }
         }
+
+        // ---------------------- Static Methods ----------------------
 
         /// <summary>
         /// Gets an empty node for reference use

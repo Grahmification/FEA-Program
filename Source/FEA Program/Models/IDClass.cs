@@ -44,6 +44,11 @@ namespace FEA_Program.Models
             return ID.CompareTo(other.ID);
         }
 
+        /// <summary>
+        /// Creates a unique ID that is not contained in the existing list
+        /// </summary>
+        /// <param name="existingItems">The existing list of items with IDs</param>
+        /// <returns>The new unique ID</returns>
         public static int CreateUniqueId(List<IHasID> existingItems)
         {
             var existingIDs = existingItems.Select(i => i.ID);
@@ -55,6 +60,4 @@ namespace FEA_Program.Models
             return newID;
         }
     }
-
-
 }

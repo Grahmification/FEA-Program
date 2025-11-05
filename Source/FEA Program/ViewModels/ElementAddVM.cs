@@ -7,17 +7,35 @@ using System.Windows.Input;
 namespace FEA_Program.ViewModels
 {
     /// <summary>
-    /// Helper ViewModel for a single Node selection
+    /// Helper ViewModel for selecting a node from a dropdown menu
     /// </summary>
     internal class NodeSelectionVM : ObservableObject
     {
         private NodeVM? _SelectedNode;
 
-        public event EventHandler? SelectionChanged;
+        /// <summary>
+        /// Fires when the selection has changed, but before the value has been updated
+        /// </summary>
         public event EventHandler? SelectionChanging;
 
+        /// <summary>
+        /// Fires after the selection and value has changed
+        /// </summary>
+        public event EventHandler? SelectionChanged;
+        
+        /// <summary>
+        /// The node number in the element
+        /// </summary>
         public int NodeNumber { get; }
+
+        /// <summary>
+        /// The list of nodes to select from
+        /// </summary>
         public ObservableCollection<NodeVM> AvailableNodes { get; }
+
+        /// <summary>
+        /// The currently selected node, or null for nothing
+        /// </summary>
         public NodeVM? SelectedNode {
             get => _SelectedNode;
             set
@@ -30,8 +48,13 @@ namespace FEA_Program.ViewModels
                     SelectionChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
-        } 
+        }
 
+        /// <summary>
+        /// Create the VM
+        /// </summary>
+        /// <param name="nodeNumber">The node number in the element</param>
+        /// <param name="availableNodes">The list of nodes to select from</param>
         public NodeSelectionVM(int nodeNumber, ObservableCollection<NodeVM> availableNodes)
         {
             NodeNumber = nodeNumber;
@@ -65,13 +88,26 @@ namespace FEA_Program.ViewModels
     /// </summary>
     internal class ElementAddVM: ObservableObject, ISideBarEditor
     {
+        /// <summary>
+        /// ID of the element to be created
+        /// </summary>
         private int _NewID = 0;
 
+        /// <summary>
+        /// List of nodes in the problem
+        /// </summary>
         private ObservableCollection<NodeVM> _nodes = [];
 
+        /// <summary>
+        /// The number of nodes required for the given type of element
+        /// </summary>
         private int NumberOfNodes => SelectedElementType == null ? 0 : ElementVM.NumOfNodes(SelectedElementType.Value);
 
         // ---------------------- Events ----------------------
+
+        /// <summary>
+        /// Fires when edits are accepted, with the new element as the argument
+        /// </summary>
         public event EventHandler<ElementVM>? AcceptEdits;
 
         /// <summary>
@@ -84,33 +120,84 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public event EventHandler? Closed;
 
-        // ---------------------- Models ----------------------
+        // ---------------------- Public Properties ----------------------
+
         /// <summary>
         /// Whether to show the editor
         /// </summary>
         public bool ShowEditor { get; private set; } = false;
+
+        /// <summary>
+        /// The list of element types which can be selected from for the given type of problem
+        /// </summary>
         public ObservableCollection<ElementTypes> AvailableElementTypes { get; set; } = [];
+
+        /// <summary>
+        /// The currently selected element type
+        /// </summary>
         public ElementTypes? SelectedElementType { get; set; } = null;
+
+        /// <summary>
+        /// The list of materials which can be selected for the element
+        /// </summary>
         public ObservableCollection<MaterialVM> Materials { get; private set; } = [];
+
+        /// <summary>
+        /// The currently selected material
+        /// </summary>
         public MaterialVM? SelectedMaterial { get; set; } = new();
 
         // Properties that depend on element type selection
+
+        /// <summary>
+        /// The list of node selection boxes for the given element type
+        /// </summary>
         public ObservableCollection<NodeSelectionVM> NodeSelectors { get; private set; } = [];
+
+        /// <summary>
+        /// The list of arguments for the given element type
+        /// </summary>
         public ObservableCollection<ElementArgVM> ElementArguments { get; private set; } = [];
 
-
         // Validation properties
+
+        /// <summary>
+        /// True if an element can be created (all fields are valid)
+        /// </summary>
         public bool CanCreateElement => NodeSelectionValid & SelectedMaterial != null & ArgumentsValid;
+
+        /// <summary>
+        /// True if the node selections are valid for the given element type
+        /// </summary>
         public bool NodeSelectionValid { get; private set; } = false;
+
+        /// <summary>
+        /// True if all element arguments are valid
+        /// </summary>
         public bool ArgumentsValid => ElementArguments.Count == 0 || ElementArguments.All(arg => arg.ValueValid);
 
         // ---------------------- Sub VMs ----------------------
+
+        /// <summary>
+        /// Base VM for handling errors and status
+        /// </summary>
         public BaseVM Base { get; set; } = new();
 
+        /// <summary>
+        /// Manages selecting elements and nodes from various sources
+        /// </summary>
         public SelectionVM SelectionManager { get; set; } = new();
 
         // ---------------------- Commands ----------------------
+
+        /// <summary>
+        /// Relay command to accept edits
+        /// </summary>
         public ICommand AcceptCommand { get; }
+
+        /// <summary>
+        /// Relay command to cancel edits
+        /// </summary>
         public ICommand CancelCommand { get; }
 
         // ---------------------- Public Methods ----------------------
@@ -121,6 +208,12 @@ namespace FEA_Program.ViewModels
             PropertyChanged += OnThisPropertyChanged;
         }
 
+        /// <summary>
+        /// Displays the editor
+        /// </summary>
+        /// <param name="newID">ID of the element to be created</param>
+        /// <param name="materials">Available materials for the element</param>
+        /// <param name="nodes">Available nodes for the element</param>
         public void DisplayEditor(int newID, ObservableCollection<MaterialVM> materials, ObservableCollection<NodeVM> nodes)
         {
             Opening?.Invoke(this, EventArgs.Empty);
@@ -162,6 +255,12 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Events ----------------------
+
+        /// <summary>
+        /// Called when a property in this class changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnThisPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if(sender is ElementAddVM)
@@ -172,6 +271,12 @@ namespace FEA_Program.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// Called when <see cref="SelectedElementType"/> changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnElementTypeChanged(object? sender, EventArgs e)
         {
             // Update list of nodes
@@ -190,6 +295,11 @@ namespace FEA_Program.ViewModels
             ElementArguments = SelectedElementType == null ? [] : new(ElementVM.ElementArgs(SelectedElementType.Value));
         }
 
+        /// <summary>
+        /// Called when a node selector selection is changing, but before the value has updated
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnNodeSelectorValueChanging(object? sender, EventArgs e)
         {
             if (sender is NodeSelectionVM vm)
@@ -198,6 +308,12 @@ namespace FEA_Program.ViewModels
                 SelectNodeWithoutEvent(vm.SelectedNode, false);
             }
         }
+
+        /// <summary>
+        /// Called when a node selector selection has changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnNodeSelectorValueChanged(object? sender, EventArgs e)
         {
             if (sender is NodeSelectionVM vm)
@@ -209,7 +325,7 @@ namespace FEA_Program.ViewModels
         }
 
         /// <summary>
-        /// Fires when a NodeVM's selected property was changed
+        /// Called when a NodeVM's selected property was changed, typically from the 3D view
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -250,6 +366,11 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Private Helpers ----------------------
+
+        /// <summary>
+        /// Accepts edits, creating the element and closing the editor
+        /// </summary>
+        /// <exception cref="ArgumentException">No material was selected</exception>
         private void AcceptEdit()
         {
             try
@@ -293,6 +414,10 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
+
+        /// <summary>
+        /// Hides the associated control
+        /// </summary>
         private void HideEditor()
         {
             // We're closing, deselect all nodes

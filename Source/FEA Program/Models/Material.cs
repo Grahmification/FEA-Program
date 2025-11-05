@@ -2,6 +2,13 @@
 
 namespace FEA_Program.Models
 {
+    /// <summary>
+    /// A material in the FEA problem
+    /// </summary>
+    /// <param name="name">The material's name</param>
+    /// <param name="e">Young's modulus in Pa</param>
+    /// <param name="id">Unique identifier for the class</param>
+    /// <param name="subtype">Optional material's subtype</param>
     internal class Material(string name, double e, int id = IDClass.InvalidID, MaterialType subtype = MaterialType.Other) : IDClass(id), ICloneable
     {
         public string Name { get; set; } = name;
@@ -26,23 +33,10 @@ namespace FEA_Program.Models
         /// Ultimate strength in Pa
         /// </summary>
         public double Sut { get; set; } = 0;
-
-
+        
         /// <summary>
-        /// Youngs modulus in GPa
+        /// Gets the material constutive matrix for a 2D material in program units
         /// </summary>
-        public double E_GPa => E / Math.Pow(1000.0, 3);
-
-        /// <summary>
-        /// Yield strength in MPa
-        /// </summary>
-        public double Sy_MPa => Sy / Math.Pow(1000.0, 2);
-
-        /// <summary>
-        /// Ultimate strength in Pa
-        /// </summary>
-        public double Sut_MPa => Sut / Math.Pow(1000.0, 2);
-
         public DenseMatrix D_Matrix_2D
         {
             get
@@ -60,6 +54,12 @@ namespace FEA_Program.Models
             }
         }
 
+        // ---------------------- Public Methods ----------------------
+
+        /// <summary>
+        /// Creates a material with generic parameters for a alternative null placeholder
+        /// </summary>
+        /// <returns></returns>
         public static Material DummyMaterial() => new("Dummy material", 0);
 
         /// <summary>

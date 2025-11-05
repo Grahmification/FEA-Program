@@ -11,6 +11,9 @@ namespace FEA_Program.ViewModels
     {
         private bool _AllowMultiSelect = false;
 
+        /// <summary>
+        /// True if multiple items can be selected simultaneously
+        /// </summary>
         public bool AllowMultiSelect { 
             get => _AllowMultiSelect; 
             set { 
@@ -38,14 +41,22 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public ObservableCollection<ISelectable> AllItems { get; private set; } = [];
 
-
         // ---------------- Public Methods ------------------------
 
+        /// <summary>
+        /// Adds an item to the selection manager
+        /// </summary>
+        /// <param name="item">The item to be managed</param>
         public void AddItem(ISelectable item)
         {
             AllItems.Add(item);
             item.PropertyChanged += OnItemSelectionChanged;
         }
+
+        /// <summary>
+        /// Removes an item to the selection manager
+        /// </summary>
+        /// <param name="item">The item being managed</param>
         public void RemoveItem(ISelectable item)
         {
             item.Selected = false; // This will remove it from the selected list
@@ -54,6 +65,10 @@ namespace FEA_Program.ViewModels
             
             
         }
+
+        /// <summary>
+        /// Deselects all items being manages
+        /// </summary>
         public void DeselectAll()
         {
             foreach (var item in AllItems)
@@ -63,6 +78,12 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------- Event Methods ------------------------
+
+        /// <summary>
+        /// Called when the <see cref="ISelectable.Selected"/> property changes for an item being managed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnItemSelectionChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is ISelectable item && e.PropertyName == nameof(ISelectable.Selected))
@@ -85,6 +106,5 @@ namespace FEA_Program.ViewModels
                 }
             }
         }
-
     }
 }

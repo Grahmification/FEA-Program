@@ -2,6 +2,9 @@
 
 namespace FEA_Program.Models
 {
+    /// <summary>
+    /// Various helper methods for working with geometry
+    /// </summary>
     internal static class Geometry
     {
         /// <summary>

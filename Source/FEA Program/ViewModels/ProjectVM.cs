@@ -10,23 +10,63 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
+    /// <summary>
+    /// Primary viewmodel to manage the FEA problem
+    /// </summary>
     internal class ProjectVM: ObservableObject
     {
+        /// <summary>
+        /// Fires when the problem is reset, with the problem type as the argument
+        /// </summary>
         public event EventHandler<ProblemTypes>? ProblemReset;
         
         // ---------------------- Models ----------------------
+
+        /// <summary>
+        /// The FEA problem
+        /// </summary>
         public StressProblem Problem { get; private set; } = new();
 
         // ---------------------- Sub VMs ----------------------
+
+        /// <summary>
+        /// Base VM for handling errors and status
+        /// </summary>
         public BaseVM Base { get; private set; } = new();
+
+        /// <summary>
+        /// Manages all materials in the program
+        /// </summary>
         public MaterialsVM Materials { get; private set; } = new();
+
+        /// <summary>
+        /// Manages all nodes in the program
+        /// </summary>
         public NodesVM Nodes { get; private set; } = new();
+
+        /// <summary>
+        /// Manages all elements in the program
+        /// </summary>
         public ElementsVM Elements { get; private set; } = new();
+
+        /// <summary>
+        /// Manages drawing items in the 3D viewer
+        /// </summary>
         public DrawVM Draw { get; private set; } = new();
 
+        /// <summary>
+        /// Manages control for creating a new problem
+        /// </summary>
         public NewProblemVM NewProblem { get; private set; } = new();
+
+        /// <summary>
+        /// Manages display of problem matricies
+        /// </summary>
         public DebugMatrixVM DebugMatrix { get; private set; } = new();
 
+        /// <summary>
+        /// Manages item selection within the program
+        /// </summary>
         public SelectionVM SelectionManager { get; private set; } = new();
 
         // ---------------------- Properties ----------------------
@@ -47,6 +87,7 @@ namespace FEA_Program.ViewModels
         };
 
         // ---------------------- Commands ----------------------
+
         /// <summary>
         /// RelayCommand for <see cref="LoadFile"/>
         /// </summary>
@@ -62,8 +103,11 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public ICommand SolveCommand { get; private set; }
 
-
         // ---------------------- Public Methods ----------------------
+        
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
         public ProjectVM()
         {
             LoadFileCommand = new AsyncRelayCommand(LoadFile);
@@ -75,6 +119,11 @@ namespace FEA_Program.ViewModels
             Materials.AddDefaultMaterials();
             ResetProblem(ProblemTypes.Truss_3D);
         }
+
+        /// <summary>
+        /// Sets the base, also assigning it to any sub-classes
+        /// </summary>
+        /// <param name="baseVM"></param>
         public void SetBase(BaseVM baseVM)
         {
             Base = baseVM;
@@ -85,6 +134,10 @@ namespace FEA_Program.ViewModels
             Elements.SetBase(baseVM);
         }
 
+        /// <summary>
+        /// Load an FEA project from a file
+        /// </summary>
+        /// <returns></returns>
         public async Task LoadFile()
         {
             try
@@ -123,6 +176,11 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
+
+        /// <summary>
+        /// Save an FEA project to a file
+        /// </summary>
+        /// <returns></returns>
         public async Task SaveFile()
         {
             try
@@ -143,6 +201,11 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
+
+        /// <summary>
+        /// Solve the FEA problem
+        /// </summary>
+        /// <returns></returns>
         public async Task Solve()
         {
             try
@@ -169,14 +232,25 @@ namespace FEA_Program.ViewModels
             }
         }
 
-
         // ---------------------- Event Methods ----------------------
+
+        /// <summary>
+        /// Called when a node is being added to the program
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">The node being added</param>
         private void OnNodeAdding(object? sender, NodeVM e)
         {
             Problem.AddNode(e.Model);
             SelectionManager.AddItem(e);
             Draw.AddNode(e);
         }
+
+        /// <summary>
+        /// Called when a node is being removed from the program
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">The node being removed</param>
         private void OnNodeRemoving(object? sender, NodeVM e)
         {
             Draw.RemoveNode(e.Model.ID);
@@ -188,6 +262,12 @@ namespace FEA_Program.ViewModels
             // Also delete hanging elements
             Elements.Delete(elementIds);
         }
+
+        /// <summary>
+        /// Called when an element is being added to the program
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">The element being added</param>
         private void OnElementAdding(object? sender, ElementVM e)
         {
             if(e.Model != null)
@@ -197,6 +277,12 @@ namespace FEA_Program.ViewModels
                 SelectionManager.AddItem(e);
             }
         }
+
+        /// <summary>
+        /// Called when an element is being removed from the program
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">The element being removed</param>
         private void OnElementRemoving(object? sender, ElementVM e)
         {
             SelectionManager.RemoveItem(e);
@@ -208,6 +294,12 @@ namespace FEA_Program.ViewModels
             }
         }
 
+
+        /// <summary>
+        /// Called when the node editor has opened
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnNodeEditorOpened(object? sender, EventArgs e)
         {
             if(sender is NodeEditVM editor)
@@ -220,6 +312,12 @@ namespace FEA_Program.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// Called when the node editor has been canceled
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">The node being edited</param>
         private void OnNodeEditorCanceled(object? sender, NodeVM e)
         {
             if (sender is NodeEditVM editor)
@@ -234,6 +332,11 @@ namespace FEA_Program.ViewModels
         }
 
 
+        /// <summary>
+        /// Called when a new problem has been accepted for creation
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">The new problem type</param>
         private void OnNewProblemAccepted(object? sender, ProblemTypes e)
         {
             QueryUserAboutReset();
@@ -241,17 +344,34 @@ namespace FEA_Program.ViewModels
         }
 
 
+        /// <summary>
+        /// Called when the solver indicates problem matricies have been computed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">The matricies</param>
         private void OnMatriciesCalculated(object? sender, (Matrix, Matrix, Matrix) e)
         {
             DebugMatrix.K_Matrix = e.Item1;
             DebugMatrix.Q_Matrix = e.Item2;
             DebugMatrix.F_Matrix = e.Item3;
         }
+
+        /// <summary>
+        /// Called when the solver indicates problem matricies with fixed displacements removed have been calculated
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">The matricies</param>
         private void OnPartiallyReducedMatriciesCalculated(object? sender, (Matrix, Matrix) e)
         {
             DebugMatrix.K_Matrix_Reduced = e.Item1;
             DebugMatrix.F_Matrix_Reduced = e.Item2;
         }
+
+        /// <summary>
+        /// Called when the solver indicates problem matricies in their final solving form have been calculated
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">The matricies</param>
         private void OnFullyReducedMatriciesCalculated(object? sender, (Matrix, Matrix) e)
         {
             DebugMatrix.K_Matrix_Fully_Reduced = e.Item1;
@@ -259,6 +379,11 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Private Helpers ----------------------
+
+        /// <summary>
+        /// Resets the FEA problem
+        /// </summary>
+        /// <param name="problemType">The new problem type for the blank problem</param>
         private void ResetProblem(ProblemTypes problemType)
         {
             Problem = new StressProblem(problemType);
@@ -288,6 +413,11 @@ namespace FEA_Program.ViewModels
 
             Base.SetStatus("Ready");
         }
+
+        /// <summary>
+        /// Loads project save data into the program
+        /// </summary>
+        /// <param name="data">The data to load</param>
         private void LoadData(ProblemData data)
         {
             ResetProblem(data.ProblemType);
@@ -348,6 +478,11 @@ namespace FEA_Program.ViewModels
 
             Elements.ImportElements(elements);
         }
+
+        /// <summary>
+        /// Gets project save data from the program
+        /// </summary>
+        /// <returns>Save dat for the current problem</returns>
         private ProblemData GetSaveData()
         {
             var output = new ProblemData();

@@ -9,15 +9,40 @@ namespace FEA_Program.ViewModels
     /// </summary>
     internal class UnitVM: ObservableObject
     {
+        /// <summary>
+        /// The unit being displayed
+        /// </summary>
         private Unit _Unit;
 
+        /// <summary>
+        /// Fires when the Unit's value has changed
+        /// </summary>
         public event EventHandler? UnitChanged;
-        
+
+        // ---------------------- Properties ----------------------
+
+        /// <summary>
+        /// The high level type of unit
+        /// </summary>
         public UnitType UnitType { get; private set; }
+
+        /// <summary>
+        /// The actual unit
+        /// </summary>
         public Unit Unit { get => _Unit; set { _Unit = value; UnitChanged?.Invoke(this, EventArgs.Empty); } }
+
+        /// <summary>
+        /// String prefix for the unit
+        /// </summary>
         public string UnitString => Units.UnitStrings(Unit)[0];
 
- 
+        // ---------------------- Methods ----------------------
+
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
+        /// <param name="unitType">The high level type of unit</param>
+        /// <param name="unit">The actual unit</param>
         public UnitVM(UnitType? unitType = null, Unit? unit = null) 
         {
             UnitType = unitType ?? UnitType.Unitless;

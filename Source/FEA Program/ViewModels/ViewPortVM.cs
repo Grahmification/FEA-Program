@@ -8,16 +8,43 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
+    /// <summary>
+    /// Viewmodel for the 3D viewer
+    /// </summary>
     internal class ViewPortVM: ObservableObject
     {
+        /// <summary>
+        /// True to draw the view in 3D, false for 2D
+        /// </summary>
         private bool _is3Dimensional = true;
 
+        // ---------------------- Events ----------------------
+
+        /// <summary>
+        /// Fires when a command for zooming to extents has occurred
+        /// </summary>
         public event EventHandler? ZoomExtentsRequested;
 
+        // ---------------------- Properties ----------------------
+
+        /// <summary>
+        /// The effects manager for lighting
+        /// </summary>
         public EffectsManager? EffectsManager { get; }
+
+        /// <summary>
+        /// Camera controlling the view perspective
+        /// </summary>
         public Camera Camera { get; private set; }
+
+        /// <summary>
+        /// Background display texture
+        /// </summary>
         public Stream? BackgroundTexture { get; }
 
+        /// <summary>
+        /// True to draw the view in 3D, false for 2D
+        /// </summary>
         public bool Is3Dimensional 
         { get => _is3Dimensional;
             set 
@@ -26,20 +53,36 @@ namespace FEA_Program.ViewModels
                 ResetCamera();
             }
         }
+
+        /// <summary>
+        /// Text for the coordinate system Z axis
+        /// </summary>
         public string CoordZText => Is3Dimensional ? "Z" : "";
 
         // ---------------------- Sub VMs ----------------------
-        
+
         /// <summary>
         /// Base VM for handling errors and status
         /// </summary>
         public BaseVM Base { get; set; } = new();
 
         // ----------------------- Commands -----------------------------
+
+        /// <summary>
+        /// Command for resetting the camera to default
+        /// </summary>
         public ICommand ResetCameraCommand { get; }
+
+        /// <summary>
+        /// Command for zooming the camera to extents of the model
+        /// </summary>
         public ICommand ZoomToExtentsCommand { get; }
 
         // ----------------------- Public Methods -----------------------------
+
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
         public ViewPortVM()
         {
             EffectsManager = new DefaultEffectsManager();
@@ -56,6 +99,10 @@ namespace FEA_Program.ViewModels
             ResetCameraCommand = new RelayCommand(ResetCamera);
             ZoomToExtentsCommand = new RelayCommand(ZoomToExtents);
         }
+
+        /// <summary>
+        /// Resets the camera to default view
+        /// </summary>
         public void ResetCamera()
         {
             try
@@ -67,11 +114,19 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
+
+        /// <summary>
+        /// Zooms the camera to extents of the model
+        /// </summary>
         public void ZoomToExtents()
         {
             ZoomExtentsRequested?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// Gets the default camera for 2D views
+        /// </summary>
+        /// <returns></returns>
         public static OrthographicCamera DefaultOrthographicCamera() => new()
         {
             Position = new Media3D.Point3D(0, 0, 60),
@@ -81,6 +136,11 @@ namespace FEA_Program.ViewModels
             NearPlaneDistance = 1,
             FarPlaneDistance = 1500,
         };
+
+        /// <summary>
+        /// Gets the default camera for 3D views
+        /// </summary>
+        /// <returns></returns>
         public static PerspectiveCamera DefaultPerspectiveCamera() => new()
         {
             Position = new Media3D.Point3D(0, 15, 60),

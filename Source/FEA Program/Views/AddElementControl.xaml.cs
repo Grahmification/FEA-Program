@@ -14,7 +14,11 @@ namespace FEA_Program.Views
             InitializeComponent();
         }
 
-
+        /// <summary>
+        /// Called when a key is pressed on one of the entry textboxes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)

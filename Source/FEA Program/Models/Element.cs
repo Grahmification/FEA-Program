@@ -7,21 +7,57 @@ namespace FEA_Program.Models
     /// </summary>
     internal abstract class Element: IDClass
     {
+        /// <summary>
+        /// All nodes contained in the element
+        /// </summary>
         private readonly INode[] _nodes;
+
+        /// <summary>
+        /// The element's material
+        /// </summary>
         private Material _Material;
-        private bool _ReadyToSolve = false; // is true if the nodes of the element are set up properly
-        
+
+        // ---------------------- Events ----------------------
+
+        /// <summary>
+        /// Fires when the solve state changes from true to false
+        /// </summary>
         public event EventHandler<int>? SolutionInvalidated;
 
+        // ---------------------- Properties ----------------------
+
+        /// <summary>
+        /// The element's material
+        /// </summary>
         public Material Material
         {
             get { return _Material; }
             set { _Material = value; InvalidateSolution(); }
         } // flags the solution invalid if set
+
+        /// <summary>
+        /// All nodes contained in the element
+        /// </summary>
         public IReadOnlyList<INode> Nodes => _nodes;
-        public bool SolutionValid { get; protected set; } = false; // is true if the solution for the element is correct
+
+        /// <summary>
+        /// True if the solution for the element is current
+        /// </summary>
+        public bool SolutionValid { get; protected set; } = false;
+
+        /// <summary>
+        /// The number of nodes in the element
+        /// </summary>
         public abstract int NumOfNodes { get; }
+
+        /// <summary>
+        /// The DOFs in each nodes of the element
+        /// </summary>
         public int NodeDOFs { get; private set; }
+
+        /// <summary>
+        /// The total DOFs in the element
+        /// </summary>
         public int ElementDOFs => NumOfNodes * NodeDOFs;
 
         /// <summary>
@@ -38,6 +74,8 @@ namespace FEA_Program.Models
         /// Gets the safety factor for failure
         /// </summary>
         public virtual double SafetyFactorUltimate { get { return MaxStress == 0 ? 0 : Math.Abs(Material.Sut / MaxStress); } }
+
+        // ---------------------- Public Methods ----------------------
 
         public Element(int id, List<INode> nodes, Material material, int nodeDOFs) : base(id)
         {
@@ -142,6 +180,11 @@ namespace FEA_Program.Models
 
         // ---------------- Helper methods ----------------
 
+        /// <summary>
+        /// Checks that the nodes are correct for this type of element
+        /// </summary>
+        /// <param name="nodes">The nodes to check</param>
+        /// <exception cref="ArgumentException">A node was invalid</exception>
         private void ValidateNodes(List<INode> nodes)
         {
             if (nodes.Count != NumOfNodes)
@@ -152,6 +195,9 @@ namespace FEA_Program.Models
                     throw new ArgumentException($"Cannot create element. Node {node.ID} has {node.Dimension} DOFs, but element requires {NodeDOFs}.");
         }
 
+        /// <summary>
+        /// Changes the solved state from true to false, indicating the result is no longer valid
+        /// </summary>
         protected void InvalidateSolution()
         {
             // Only raise the event if we're switching from true to false
@@ -162,6 +208,14 @@ namespace FEA_Program.Models
                 SolutionInvalidated?.Invoke(this, ID);
         }
 
+        /// <summary>
+        /// Checks that the length of certain parameters is correct for this element
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="coordinates">The collection to check</param>
+        /// <param name="targetLength">The correct length of the collection</param>
+        /// <param name="methodName">The calling method name</param>
+        /// <exception cref="ArgumentOutOfRangeException">The length was invalid</exception>
         protected void ValidateLength<T>(IReadOnlyCollection<T> coordinates, int targetLength, string? methodName)
         {
             methodName ??= "Unknown";

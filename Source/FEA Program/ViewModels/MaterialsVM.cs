@@ -6,19 +6,35 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
+    /// <summary>
+    /// Viewmodel for managing the materials list in the program
+    /// </summary>
     internal class MaterialsVM: ObservableObject
     {
         // ---------------------- Models ----------------------
-        private readonly Dictionary<int, MaterialVM> _Materials = []; // reference by ID
-        
+
+        /// <summary>
+        /// All materials in the program
+        /// </summary>
         public ObservableCollection<MaterialVM> Items { get; private set; } = [];
 
         // ---------------------- Sub VMs ----------------------
+
+        /// <summary>
+        /// Base VM for handling errors and status
+        /// </summary>
         public BaseVM Base { get; private set; } = new();
+
+        /// <summary>
+        /// Viewmodel for adding or editing materials
+        /// </summary>
         public MaterialEditVM Editor { get; private set; } = new();
 
         // ---------------------- Commands ----------------------
 
+        /// <summary>
+        /// Relay command for <see cref="AddMaterialWithEditor"/>
+        /// </summary>
         public ICommand? AddCommand { get; }
 
         // ---------------------- Public Methods ----------------------
@@ -27,15 +43,29 @@ namespace FEA_Program.ViewModels
             AddCommand = new RelayCommand(AddMaterialWithEditor);
             Editor.AcceptEdits += OnAcceptEdits;
         }
+
+        /// <summary>
+        /// Sets the base, also assigning it to any sub-classes
+        /// </summary>
+        /// <param name="baseVM"></param>
         public void SetBase(BaseVM baseVM)
         {
             Base = baseVM;
             Editor.Base = baseVM;
         }
 
+        /// <summary>
+        /// Adds a material with the given parameters to the program
+        /// </summary>
+        /// <param name="Name">Material Name</param>
+        /// <param name="E_GPa">Young's modulus in GPa</param>
+        /// <param name="V">Poison's Ratio</param>
+        /// <param name="Sy_MPa">Yield strength in MPa</param>
+        /// <param name="Sut_MPa">Ultimate strength in MPa</param>
+        /// <param name="subtype">Material subtype</param>
         public void Add(string Name, double E_GPa, double V, double Sy_MPa, double Sut_MPa, MaterialType subtype)
         {
-            int ID = IDClass.CreateUniqueId(_Materials.Values.Select(m => m.Model).Cast<IHasID>().ToList());
+            int ID = IDClass.CreateUniqueId(Items.Select(m => m.Model).Cast<IHasID>().ToList());
             var material = new Material(Name, E_GPa, ID, subtype)
             {
                 V = V,
@@ -46,6 +76,10 @@ namespace FEA_Program.ViewModels
 
             AddVM(new MaterialVM(material));
         }
+
+        /// <summary>
+        /// Adds default materials to the program
+        /// </summary>
         public void AddDefaultMaterials()
         {
             Add("Aluminum 6061-T6", 69, 0.3, 210, 276, MaterialType.Aluminum_Alloy);
@@ -58,7 +92,6 @@ namespace FEA_Program.ViewModels
         /// <param name="materials"></param>
         public void ImportMaterials(List<Material> materials)
         {
-            _Materials.Clear();
             Items.Clear();
             foreach (var material in materials)
             {
@@ -67,6 +100,12 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Event Methods ----------------------
+
+        /// <summary>
+        /// Called when a material requests that it should be edited
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnEditRequest(object? sender, EventArgs e)
         {
             try
@@ -81,13 +120,18 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
+
+        /// <summary>
+        /// Called when a material requests that it should be deleted
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnDeleteRequest(object? sender, EventArgs e)
         {
             try
             {
                 if (sender is MaterialVM vm)
                 {
-                    _Materials.Remove(vm.Model.ID);
                     Items.Remove(vm);
 
                     vm.DeleteRequest -= OnDeleteRequest;
@@ -100,6 +144,11 @@ namespace FEA_Program.ViewModels
             }
         }
 
+        /// <summary>
+        /// Called when edits are accepted from <see cref="Editor"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnAcceptEdits(object? sender, MaterialVM e)
         {
             if (sender is MaterialEditVM vm)
@@ -115,31 +164,43 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Private Helpers ----------------------
+
+        /// <summary>
+        /// Adds a material to the program
+        /// </summary>
+        /// <param name="vm">The material to add</param>
         private void AddVM(MaterialVM vm)
         {
-            _Materials[vm.Model.ID] = vm;
             Items.Add(vm);
             vm.DeleteRequest += OnDeleteRequest;
             vm.EditRequest += OnEditRequest;
 
             Base.SetStatus($"Added {vm.Model.Name}");
         }
+
+        /// <summary>
+        /// Deletes a material to the program
+        /// </summary>
+        /// <param name="vm">The material to delete</param>
         private void DeleteVM(MaterialVM vm)
         {
-            _Materials.Remove(vm.Model.ID);
             Items.Remove(vm);
             vm.DeleteRequest -= OnDeleteRequest;
             vm.EditRequest -= OnEditRequest;
 
             Base.SetStatus($"Deleted {vm.Model.Name}");
         }
+
+        /// <summary>
+        /// Opens the <see cref="Editor"/> to add a new material
+        /// </summary>
         private void AddMaterialWithEditor()
         {
             try
             {
                 Base.ClearStatus();
 
-                int ID = IDClass.CreateUniqueId(_Materials.Values.Select(m => m.Model).Cast<IHasID>().ToList());
+                int ID = IDClass.CreateUniqueId(Items.Select(m => m.Model).Cast<IHasID>().ToList());
                 var material = new Material($"Material {Items.Count + 1}", 70 * 1e9, ID, MaterialType.Other);
 
                 var vm = new MaterialVM(material);

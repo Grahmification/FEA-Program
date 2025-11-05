@@ -1,8 +1,17 @@
 ﻿namespace FEA_Program.Models
 {
+    /// <summary>
+    /// Functions for working with various types of user units
+    /// </summary>
     internal class Units
     {
         // ----------------- UPDATE THESE IF NEW UNITS ARE ADDED -------------------
+        
+        /// <summary>
+        /// Gets the conversion factor from the specified unit to native program units
+        /// </summary>
+        /// <param name="unit">The unit to get the ratio for</param>
+        /// <returns>The conversion ratio to native units</returns>
         private static double ConversionFactor(Unit unit) => unit switch
         {
             // ---------------- Unitless ------------------
@@ -33,6 +42,11 @@
             _ => 1.0
         };
 
+        /// <summary>
+        /// Gets string descriptors for the given unit
+        /// </summary>
+        /// <param name="unit">The unit to evaluate</param>
+        /// <returns>An array of string descriptors</returns>
         public static string[] UnitStrings(Unit unit) => unit switch
         {
             // ---------------- Unitless ------------------
@@ -63,6 +77,11 @@
             _ => ["-"]
         };
 
+        /// <summary>
+        /// Gets the default native unit for the specified unit type
+        /// </summary>
+        /// <param name="unitType">The category of unit</param>
+        /// <returns>The default native unit</returns>
         public static Unit DefaultUnit(UnitType unitType) => unitType switch
         {
             UnitType.Length => Unit.m,
@@ -73,6 +92,11 @@
             _ => Unit.Unitless
         };
 
+        /// <summary>
+        /// Gets the range of unit enum IDs for the specified unit type
+        /// </summary>
+        /// <param name="unitType">The category of unit</param>
+        /// <returns>The range of IDs [min, max] in the enum list of types</returns>
         public static int[] UnitTypeRange(UnitType unitType) => unitType switch
         {
             UnitType.Length => [0, 4],
@@ -84,6 +108,12 @@
         };
 
         // ----------------------------------------------------------------------------
+
+        /// <summary>
+        /// Gets a list of string descriptors for the given type category
+        /// </summary>
+        /// <param name="unitType">The category of unit</param>
+        /// <returns></returns>
         public static List<string> TypeUnitStrings(UnitType unitType)
         {
             // Get the range of enum values (e.g., [start_index, end_index])
@@ -99,6 +129,13 @@
                 .ToList();
         }
 
+        /// <summary>
+        /// Converts a value from one unit to another
+        /// </summary>
+        /// <param name="inputUnit">Units of the input data</param>
+        /// <param name="data">The input value</param>
+        /// <param name="outputUnit">The output unit</param>
+        /// <returns>The input value in output units</returns>
         public static double Convert(Unit inputUnit, double data, Unit outputUnit)
         {
             return data * ConversionFactor(inputUnit) / ConversionFactor(outputUnit);

@@ -4,13 +4,26 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
+    /// <summary>
+    /// Viewmodel for a GUI that allows editing material properties
+    /// </summary>
     internal class MaterialEditVM: ObservableObject, ISideBarEditor
     {
+        /// <summary>
+        /// The original item input when the editor was opened
+        /// </summary>
         private MaterialVM? _inputMaterial;
-        
+
         // ---------------------- Events ----------------------
 
+        /// <summary>
+        /// Fires when edits are accepted, with the item being edited as the argument
+        /// </summary>
         public event EventHandler<MaterialVM>? AcceptEdits;
+
+        /// <summary>
+        /// Fires when edits are canceled, with the item being edited as the argument
+        /// </summary>
         public event EventHandler<MaterialVM>? CancelEdits;
 
         /// <summary>
@@ -46,17 +59,33 @@ namespace FEA_Program.ViewModels
         public BaseVM Base { get; set; } = new();
 
         // ---------------------- Commands ----------------------
+
+        /// <summary>
+        /// Relay command to accept edits
+        /// </summary>
         public ICommand AcceptCommand { get; }
+
+        /// <summary>
+        /// Relay command to cancel edits
+        /// </summary>
         public ICommand CancelCommand { get; }
 
         // ---------------------- Public Methods ----------------------
 
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
         public MaterialEditVM() 
         {
             AcceptCommand = new RelayCommand(AcceptEdit);
             CancelCommand = new RelayCommand(CancelEdit);
         }
 
+        /// <summary>
+        /// Displays the editor when editing a material
+        /// </summary>
+        /// <param name="material">The material to edit or add</param>
+        /// <param name="editing">True if we're editing an existing material</param>
         public void DisplayEditor(MaterialVM material, bool editing)
         {
             Opening?.Invoke(this, EventArgs.Empty);
@@ -88,6 +117,10 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Private Helpers ----------------------
+
+        /// <summary>
+        /// Accepts edits, hiding the editor
+        /// </summary>
         private void AcceptEdit()
         {
             try
@@ -106,6 +139,10 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
+
+        /// <summary>
+        /// Hide the attached control
+        /// </summary>
         private void HideEditor()
         {
             ShowEditor = false;

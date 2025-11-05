@@ -9,18 +9,34 @@ namespace FEA_Program.ViewModels
     /// <summary>
     /// Used for displaying a list of nodes with checkboxes
     /// </summary>
-    /// <param name="node">The node to diplay</param>
     internal class NodeSelectVM : ObservableObject
     {
+        /// <summary>
+        /// The node to display
+        /// </summary>
         public NodeVM Node { get; private set; }
+
+        /// <summary>
+        /// Whether the checkbox is selected
+        /// </summary>
         public bool IsSelected { get; set; } = false;
 
+        /// <summary>
+        /// Initialize the class
+        /// </summary>
+        /// <param name="node">The node to display</param>
         public NodeSelectVM(NodeVM node)
         {
             Node = node;
             PropertyChanged += OnThisPropertyChanged;
             Node.PropertyChanged += OnNodePropertyChanged;
         }
+
+        /// <summary>
+        /// Called when a property in this class changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnThisPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IsSelected))
@@ -29,6 +45,12 @@ namespace FEA_Program.ViewModels
                 Node.Selected = IsSelected;
             }
         }
+
+        /// <summary>
+        /// Called when a property in the node changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is NodeVM vm)
@@ -47,6 +69,9 @@ namespace FEA_Program.ViewModels
     /// </summary>
     internal class ForceEditVM: ObservableObject, ISideBarEditor
     {
+        /// <summary>
+        /// The original item input when the editor was opened
+        /// </summary>
         private NodeVM? _inputItem;
 
         // ---------------------- Events ----------------------
@@ -98,9 +123,16 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public SelectionVM SelectionManager { get; set; } = new();
 
-
         // ---------------------- Commands ----------------------
+
+        /// <summary>
+        /// Relay command to accept edits
+        /// </summary>
         public ICommand AcceptCommand { get; }
+
+        /// <summary>
+        /// Relay command to cancel edits
+        /// </summary>
         public ICommand CancelCommand { get; }
 
         // ---------------------- Public Methods ----------------------
@@ -197,6 +229,10 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Private Helpers ----------------------
+        
+        /// <summary>
+        /// Reset all items in the editor
+        /// </summary>
         private void ResetItems()
         {
             Nodes.Clear();
@@ -204,6 +240,10 @@ namespace FEA_Program.ViewModels
             _inputItem = null;
             EditItem = null;
         }
+
+        /// <summary>
+        /// Accept force edits
+        /// </summary>
         private void AcceptEdit()
         {
             try
@@ -234,6 +274,10 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
+
+        /// <summary>
+        /// Hide the attached control
+        /// </summary>
         private void HideEditor()
         {
             SelectionManager.DeselectAll();
@@ -241,6 +285,5 @@ namespace FEA_Program.ViewModels
             ShowEditor = false;
             Closed?.Invoke(this, EventArgs.Empty);
         }
-
     }
 }

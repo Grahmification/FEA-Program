@@ -7,7 +7,6 @@ namespace FEA_Program.ViewModels.Base
     /// <summary>
     /// A base VM that fires property changed events as needed
     /// </summary>
-
     [AddINotifyPropertyChangedInterface]
     internal class ObservableObject : INotifyPropertyChanged
     {

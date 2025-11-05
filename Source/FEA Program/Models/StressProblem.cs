@@ -2,6 +2,9 @@
 
 namespace FEA_Program.Models
 {
+    /// <summary>
+    /// Primary class for an FEA problem
+    /// </summary>
     internal class StressProblem
     {
         /// <summary>
@@ -16,9 +19,24 @@ namespace FEA_Program.Models
 
         // ---------------------- Public Properties ----------------------------
 
+        /// <summary>
+        /// Indicates the classification of problem
+        /// </summary>
         public ProblemTypes ProblemType { get; private set; }
+
+        /// <summary>
+        /// Manages solving the solution
+        /// </summary>
         public Solver Solver { get; private set; } = new Solver();
+
+        /// <summary>
+        /// All elements in the problem
+        /// </summary>
         public List<IElement> Elements => _Elements.Values.ToList();
+
+        /// <summary>
+        /// All nodes in the problem
+        /// </summary>
         public List<Node> Nodes => _Nodes.Values.ToList();
 
         /// <summary>
@@ -49,10 +67,22 @@ namespace FEA_Program.Models
         };
 
         // ---------------------- Public Methods ----------------------------
+
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
+        /// <param name="problemType">Indicates the classification of problem</param>
         public StressProblem(ProblemTypes problemType = ProblemTypes.Truss_1D)
         {
             ProblemType = problemType;
         }
+
+        /// <summary>
+        /// Adds a node to the problem
+        /// </summary>
+        /// <param name="node">The node to add</param>
+        /// <exception cref="ArgumentException">A node parameter was invalid</exception>
+        /// <exception cref="Exception">A node exists at this position</exception>
         public void AddNode(Node node)
         {
             if (_Nodes.ContainsKey(node.ID))
@@ -67,6 +97,12 @@ namespace FEA_Program.Models
 
             _Nodes[node.ID] = node;
         }
+
+        /// <summary>
+        /// Removes a node from the problem
+        /// </summary>
+        /// <param name="nodeID">ID of the node to remove</param>
+        /// <returns></returns>
         public int[] RemoveNode(int nodeID)
         {
             // If we removed a node successfully
@@ -77,6 +113,12 @@ namespace FEA_Program.Models
             }
             return []; // We didn't remove any elements
         }
+
+        /// <summary>
+        /// Adds an element to the problem
+        /// </summary>
+        /// <param name="element">The element to add</param>
+        /// <exception cref="ArgumentException">An element parameter was invalid</exception>
         public void AddElement(IElement element)
         {
             if (_Elements.ContainsKey(element.ID))
@@ -97,11 +139,15 @@ namespace FEA_Program.Models
                     AddNode((Node)node);
             }
         }
+
+        /// <summary>
+        /// Removes an element from the program
+        /// </summary>
+        /// <param name="elementID">ID of the element to remove</param>
         public void RemoveElement(int elementID)
         {
             _Elements.Remove(elementID);
         }
-
 
         /// <summary>
         /// Solve the stress problem

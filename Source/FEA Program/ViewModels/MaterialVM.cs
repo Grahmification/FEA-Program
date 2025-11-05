@@ -6,14 +6,28 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
+    /// <summary>
+    /// Viewmodel for a material in the FEA program
+    /// </summary>
     internal class MaterialVM: ObservableObject
     {
         // ---------------------- Events ----------------------
 
+        /// <summary>
+        /// Fires when the material requests that it be edited
+        /// </summary>
         public event EventHandler? EditRequest;
+
+        /// <summary>
+        /// Fires when the material requests that it be deleted
+        /// </summary>
         public event EventHandler? DeleteRequest;
 
         // ---------------------- Properties ----------------------
+
+        /// <summary>
+        /// The material's underlying model
+        /// </summary>
         public Material Model { get; private set; } = Material.DummyMaterial();
 
         /// <summary>
@@ -37,11 +51,28 @@ namespace FEA_Program.ViewModels
         public double Sut { get => App.Units.Stress.ToUser(Model.Sut); set => Model.Sut = App.Units.Stress.FromUser(value); }
 
         // ---------------------- Commands ----------------------
+
+        /// <summary>
+        /// Relay command for editing the material
+        /// </summary>
         public ICommand? EditCommand { get; }
+
+        /// <summary>
+        /// Relay command for deleting the material
+        /// </summary>
         public ICommand? DeleteCommand { get; }
 
+        // ---------------------- Methods ----------------------
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public MaterialVM() { }
 
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
+        /// <param name="model">The material's underlying model</param>
         public MaterialVM(Material model)
         {
             Model = model;
@@ -57,6 +88,13 @@ namespace FEA_Program.ViewModels
             Properties.Add(new TreePropertyVM(Model, nameof(Material.Subtype), () => Attributes.GetDescription(Model.Subtype)) { Name = "Type" });
         }
 
+        // ---------------------- Event Handlers ----------------------
+
+        /// <summary>
+        /// Called when a property in the model has changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if(sender is Material m)

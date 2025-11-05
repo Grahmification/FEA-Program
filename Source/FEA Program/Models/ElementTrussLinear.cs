@@ -8,18 +8,28 @@ namespace FEA_Program.Models
     /// </summary>
     internal class ElementTrussLinear : Element, IElement
     {
-        private double _Area = 0; // x-section area in m^2
+        /// <summary>
+        /// The element x-section area in program units (m^2)
+        /// </summary>
+        private double _Area = 0;
 
+        /// <summary>
+        /// Type identifier for the element
+        /// </summary>
         public ElementTypes ElementType => ElementTypes.TrussLinear;
+
+        /// <summary>
+        /// The number of nodes in the element
+        /// </summary>
         public override int NumOfNodes => 2;
 
         /// <summary>
-        /// Element body force in N/m^3 [X, Y, Z]^T
+        /// Element body force in program units N/m^3 [X, Y, Z]^T
         /// </summary>
         public DenseVector BodyForce { get; private set; }
 
         /// <summary>
-        /// Element traction force in N/m [X, Y, Z]^T
+        /// Element traction force in program units N/m [X, Y, Z]^T
         /// </summary>
         public DenseVector TractionForce { get; private set; }
 
@@ -33,7 +43,17 @@ namespace FEA_Program.Models
         /// </summary>
         public double[] ElementArgs { get => [_Area]; set => _Area = value[0]; }
 
+        // ---------------- Public methods ----------------
 
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
+        /// <param name="area">The element x-section area in program units (m^2)</param>
+        /// <param name="id">Element ID</param>
+        /// <param name="nodes">All nodes in the element</param>
+        /// <param name="material">The element's material</param>
+        /// <param name="nodeDOFs">The number of DOFs for nodes in the element</param>
+        /// <exception cref="ArgumentException">Raised if a parameter is invalid</exception>
         public ElementTrussLinear(double area, int id, List<INode> nodes, Material material, int nodeDOFs = 1) : base(id, nodes, material, nodeDOFs)
         {
             if (area <= 0)
@@ -46,8 +66,6 @@ namespace FEA_Program.Models
             BodyForce = new DenseVector(NodeDOFs);
             TractionForce = new DenseVector(NodeDOFs);
         }
-
-        // ---------------- Public methods ----------------
 
         /// <summary>
         /// Sets the element body force

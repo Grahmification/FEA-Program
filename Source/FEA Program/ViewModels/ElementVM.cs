@@ -7,18 +7,48 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
+    /// <summary>
+    /// Viewmodel for an element in the FEA problem
+    /// </summary>
     internal class ElementVM: ObservableObject, ISelectable
     {
         // ---------------------- Events ----------------------
 
+        /// <summary>
+        /// Fires when the element requests that it be edited
+        /// </summary>
         public event EventHandler? EditRequest;
+
+        /// <summary>
+        /// Fires when the element requests that it be deleted
+        /// </summary>
         public event EventHandler? DeleteRequest;
 
         // ---------------------- Properties ----------------------
+
+        /// <summary>
+        /// The element's material
+        /// </summary>
         public MaterialVM Material { get; private set; } = new();
+
+        /// <summary>
+        /// The nodes contained in the element
+        /// </summary>
         public NodeVM[] Nodes { get; private set; } = [];
+        
+        /// <summary>
+        /// The element's underlying model
+        /// </summary>
         public IElement? Model { get; private set; } = null;
+
+        /// <summary>
+        /// The list of IDs for nodes contained in the element
+        /// </summary>
         public int[] NodeIds => Nodes.Select(n => n.Model.ID).ToArray();
+
+        /// <summary>
+        /// The arguments that depend on the type of element
+        /// </summary>
         public ElementArgVM[] Arguments { get; private set; } = [];
 
         /// <summary>
@@ -31,18 +61,56 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public ObservableCollection<TreePropertyVM> ResultProperties { get; private set; } = [];
 
+        /// <summary>
+        /// Whether the item is selected
+        /// </summary>
         public bool Selected { get; set; } = false;
+
+        /// <summary>
+        /// The element's max stress in user units
+        /// </summary>
         public double MaxStress => App.Units.Stress.ToUser(Model?.MaxStress ?? 0);
+
+        /// <summary>
+        /// The element's yield strength safety factor
+        /// </summary>
         public double SafetyFactorYield => Model?.SafetyFactorYield ?? 0;
+
+        /// <summary>
+        /// The element's ultimate strength safety factor
+        /// </summary>
         public double SafetyFactorUltimate => Model?.SafetyFactorUltimate ?? 0;
+
+        /// <summary>
+        /// True if the element stress is a valid number
+        /// </summary>
         public bool StressIsValid => !double.IsNaN(MaxStress) && !double.IsInfinity(MaxStress);
 
         // ---------------------- Commands ----------------------
+        
+        /// <summary>
+        /// Relay command for editing the element
+        /// </summary>
         public ICommand? EditCommand { get; }
+
+        /// <summary>
+        /// Relay command for deleting the element
+        /// </summary>
         public ICommand? DeleteCommand { get; }
 
+        // ---------------------- Methods ----------------------
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public ElementVM() { }
 
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
+        /// <param name="model">The element model</param>
+        /// <param name="nodes">All nodes contained in the element</param>
+        /// <param name="material">The element's material</param>
         public ElementVM(IElement model, NodeVM[] nodes, MaterialVM material)
         {
             Model = model;
@@ -88,13 +156,26 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Event Handlers ----------------------
+        
+        /// <summary>
+        /// Called when one of the element argument's value has changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnArgumentValueUpdated(object? sender, EventArgs e)
         {
             if (sender is ElementArgVM vm && Model is not null)
             {
+                // Propagate changes to the model
                 Model.ElementArgs[vm.Index] = vm.Value;
             }
         }
+
+        /// <summary>
+        /// Called when a property in <see cref="ResultProperties"/> or <see cref="Properties"/> changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnTreePropertyPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is TreePropertyVM vm)
@@ -107,6 +188,11 @@ namespace FEA_Program.ViewModels
             }
         }
 
+        /// <summary>
+        /// Called then a property in the model has changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is IElement)

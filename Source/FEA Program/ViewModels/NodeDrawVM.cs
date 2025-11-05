@@ -8,6 +8,9 @@ using Geometry = FEA_Program.Models.Geometry;
 
 namespace FEA_Program.ViewModels
 {
+    /// <summary>
+    /// Viewmodel for displaying a node in the 3D viewer
+    /// </summary>
     internal class NodeDrawVM: ObservableObject
     {
         public static Color SelectedColor = Colors.Yellow;
@@ -16,15 +19,45 @@ namespace FEA_Program.ViewModels
         public static Color PendingColor = Color.FromArgb(128, 255, 192, 203);
 
         // ---------------------- Properties ----------------------
+
+        /// <summary>
+        /// The node to draw
+        /// </summary>
         public NodeVM Node { get; private set; } = new();
 
+        /// <summary>
+        /// The position in the 3D viewer for the node center
+        /// </summary>
         public Vector3 DrawPosition => ArrayToVector(GetDrawPosition());
+
+        /// <summary>
+        /// The force to draw attached to the node
+        /// </summary>
         public Vector3 Force => ArrayToVector(Node.Model.Force); // Use underlying model force so arrow length doesn't change when units change
+
+        /// <summary>
+        /// The length to draw the force attached to the node
+        /// </summary>
         public double ForceLength => ScaleForceMagnitude(Force.Length());
 
+        /// <summary>
+        /// Optional override to set the draw color, or null to use default
+        /// </summary>
         public Color? ColorOverride { get; set; } = null;
+
+        /// <summary>
+        /// The node draw color for the 3D view
+        /// </summary>
         public Color NodeColor => Node.Selected ? SelectedColor : Pending ? PendingColor : (ColorOverride ?? DefaultNodeColor);
+
+        /// <summary>
+        /// The node fixity draw color for the 3D view
+        /// </summary>
         public Color FixityColor => Node.Selected ? SelectedColor : Pending ? PendingColor : (ColorOverride ?? DefaultFixityColor);
+
+        /// <summary>
+        /// Reaction forces to draw attached to the node
+        /// </summary>
         public ObservableCollection<Vector3> ReactionForces { get; private set; } = [];
 
         /// <summary>
@@ -32,11 +65,28 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public double DisplacementScalingFactor { get; set; } = 0;
 
+        /// <summary>
+        /// Node text to display for a popup in the 3D view
+        /// </summary>
         public string NodeText { get; set; } = "";
+
+        /// <summary>
+        /// True if the node is pending (its in the process of being added to the problem)
+        /// </summary>
         public bool Pending { get; private set; } = false;
 
+        // ---------------------- Methods ----------------------
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public NodeDrawVM() { }
 
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
+        /// <param name="node">The node to draw</param>
+        /// <param name="pending">True if the node is pending (its in the process of being added to the problem)</param>
         public NodeDrawVM(NodeVM node, bool pending = false)
         {
             Node = node;
@@ -45,6 +95,11 @@ namespace FEA_Program.ViewModels
             PropertyChanged += OnThisPropertyChanged;
         }
 
+        /// <summary>
+        /// Called when a propery of <see cref="Node"/> changes value
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is NodeVM node)
@@ -66,6 +121,12 @@ namespace FEA_Program.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// Called when a property in this class changes value
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnThisPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is NodeDrawVM)
@@ -76,6 +137,11 @@ namespace FEA_Program.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// Calculates the position to draw the center of the node at based on scaling parameters
+        /// </summary>
+        /// <returns>The [x, y, z] 3D viewer coordinates to draw the node at</returns>
         private double[] GetDrawPosition()
         {
             var scaleFactor = DisplacementScalingFactor;
@@ -115,6 +181,7 @@ namespace FEA_Program.ViewModels
             }
         }
 
+        // ---------------------- Static Methods ----------------------
 
         /// <summary>
         /// Convert an XYZ array to vector, with non-supplied values being zero

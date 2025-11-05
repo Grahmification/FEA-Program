@@ -30,6 +30,25 @@ namespace FEA_Program.Views
             set { SetValue(BackgroundContextMenuProperty, value); }
         }
 
+        /// <summary>
+        /// Additional items to be drawn in the 3D viewer window
+        /// </summary>
+        public static readonly DependencyProperty DrawItemsProperty =
+            DependencyProperty.Register(nameof(DrawItems),
+                typeof(ObservableCollection<Element3D>),
+                typeof(ViewPortControl),
+                new PropertyMetadata(null));
+
+        /// <summary>
+        /// Additional items to be drawn in the 3D viewer window
+        /// </summary>
+        public ObservableCollection<Element3D> DrawItems
+        {
+            get => (ObservableCollection<Element3D>)GetValue(DrawItemsProperty);
+            set => SetValue(DrawItemsProperty, value);
+        }
+
+        // ----------------------- Methods -----------------------------
 
         public ViewPortControl()
         {
@@ -41,16 +60,6 @@ namespace FEA_Program.Views
 
             Loaded += OnLoaded;
             viewPort.MouseRightButtonDown += OnMouseRightButtonDown;
-        }
-
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            Loaded -= OnLoaded;
-
-            if (DataContext is ViewPortVM viewModel)
-            {
-                viewModel.ZoomExtentsRequested += ViewModel_ZoomRequested;
-            }
         }
 
         /// <summary>
@@ -70,24 +79,38 @@ namespace FEA_Program.Views
             viewPort.InputBindings.Add(new KeyBinding(ViewportCommands.ZoomExtents, new KeyGesture(Key.E, ModifierKeys.Control)));
         }
 
+        // ----------------------- Event Handlers -----------------------------
 
-        public static readonly DependencyProperty DrawItemsProperty =
-            DependencyProperty.Register(nameof(DrawItems),
-                typeof(ObservableCollection<Element3D>),
-                typeof(ViewPortControl),
-                new PropertyMetadata(null));
-
-        public ObservableCollection<Element3D> DrawItems
+        /// <summary>
+        /// Called when the view loads
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            get => (ObservableCollection<Element3D>)GetValue(DrawItemsProperty);
-            set => SetValue(DrawItemsProperty, value);
+            Loaded -= OnLoaded;
+
+            if (DataContext is ViewPortVM viewModel)
+            {
+                viewModel.ZoomExtentsRequested += ViewModel_ZoomRequested;
+            }
         }
 
+        /// <summary>
+        /// Called when the viewmodel requests zooming the view to extents (can't be handled outside the view)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ViewModel_ZoomRequested(object? sender, EventArgs e)
         {
             viewPort.ZoomExtents();
         }
 
+        /// <summary>
+        /// Called when the mouse right clicks in the 3D viewer
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is Viewport3DX viewport)

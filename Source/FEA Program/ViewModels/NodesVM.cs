@@ -7,36 +7,80 @@ using System.Windows.Input;
 
 namespace FEA_Program.ViewModels
 {
+    /// <summary>
+    /// Viewmodel for managing the nodes list in the program
+    /// </summary>
     internal class NodesVM: ObservableObject
     {
+        /// <summary>
+        /// The collection of nodes that have non-zero forces
+        /// </summary>
         private readonly CollectionViewSource _nonZeroForceCollection;
 
         /// <summary>
         /// Number of DOFs used for creating new nodes
         /// </summary>
-        private int _problemDOFs = -1;
+        private readonly int _problemDOFs = -1;
 
         // ---------------------- Events ----------------------
 
+        /// <summary>
+        /// Fires when a new node is being added to the collection
+        /// </summary>
         public event EventHandler<NodeVM>? ItemAdding;
+
+        /// <summary>
+        /// Fires when a node is being removed from the collection
+        /// </summary>
         public event EventHandler<NodeVM>? ItemRemoving;
 
         // ---------------------- Models ----------------------
-        //private readonly Dictionary<int, MaterialVM> _Materials = []; // reference by ID
 
+        /// <summary>
+        /// All nodes in the program
+        /// </summary>
         public ObservableCollection<NodeVM> Items { get; private set; } = [];
+
+        /// <summary>
+        /// Collection of nodes that have non-zero forces
+        /// </summary>
         public ICollectionView NonZeroForceItems { get; }
 
         // ---------------------- Sub VMs ----------------------
+
+        /// <summary>
+        /// Base VM for handling errors and status
+        /// </summary>
         public BaseVM Base { get; private set; } = new();
+
+        /// <summary>
+        /// Viewmodel for adding or editing nodes
+        /// </summary>
         public NodeEditVM Editor { get; private set; } = new();
+
+        /// <summary>
+        /// Viewmodel for adding or editing forces on a node
+        /// </summary>
         public ForceEditVM ForceEditor { get; private set; } = new();
 
         // ---------------------- Commands ----------------------
+
+        /// <summary>
+        /// Relay command for <see cref="AddNodeWithEditor"/>
+        /// </summary>
         public ICommand? AddCommand { get; }
+
+        /// <summary>
+        /// Relay command for displaying the <see cref="ForceEditor"/>
+        /// </summary>
         public ICommand? AddForceCommand { get; }
 
         // ---------------------- Public Methods ----------------------
+
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
+        /// <param name="problemDOFs">Number of DOFs used for creating new nodes</param>
         public NodesVM(int problemDOFs = -1)
         {
             _problemDOFs = problemDOFs;
@@ -56,6 +100,11 @@ namespace FEA_Program.ViewModels
 
             NonZeroForceItems = _nonZeroForceCollection.View;
         }
+
+        /// <summary>
+        /// Sets the base, also assigning it to any sub-classes
+        /// </summary>
+        /// <param name="baseVM"></param>
         public void SetBase(BaseVM baseVM)
         {
             Base = baseVM;
@@ -77,6 +126,12 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Event Methods ----------------------
+
+        /// <summary>
+        /// Called when a node requests that its forces should be edited
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnEditForceRequest(object? sender, EventArgs e)
         {
             try
@@ -91,6 +146,12 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
+
+        /// <summary>
+        /// Called when a node requests that it should be edited
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnEditRequest(object? sender, EventArgs e)
         {
             try
@@ -105,6 +166,12 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
+
+        /// <summary>
+        /// Called when a node requests that it should be deleted
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnDeleteRequest(object? sender, EventArgs e)
         {
             try
@@ -120,6 +187,11 @@ namespace FEA_Program.ViewModels
             }
         }
 
+        /// <summary>
+        /// Called when edits are accepted from <see cref="Editor"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnAcceptEdits(object? sender, NodeVM e)
         {
             if (sender is NodeEditVM vm)
@@ -135,6 +207,11 @@ namespace FEA_Program.ViewModels
         }
 
         // ---------------------- Private Helpers ----------------------
+
+        /// <summary>
+        /// Adds a node to the program
+        /// </summary>
+        /// <param name="vm">The node to add</param>
         private void AddVM(NodeVM vm)
         {
             // Call first so others can validate the prior
@@ -154,6 +231,11 @@ namespace FEA_Program.ViewModels
 
             Base.SetStatus($"Added Node {vm.Model.ID}");
         }
+
+        /// <summary>
+        /// Removes a node to the program
+        /// </summary>
+        /// <param name="vm">The node to remove</param>
         private void DeleteVM(NodeVM vm)
         {
             // Call first so others can validate the prior
@@ -166,6 +248,10 @@ namespace FEA_Program.ViewModels
 
             Base.SetStatus($"Deleted Node {vm.Model.ID}");
         }
+
+        /// <summary>
+        /// Opens the <see cref="Editor"/> to add a new node
+        /// </summary>
         private void AddNodeWithEditor()
         {
             try
@@ -183,6 +269,5 @@ namespace FEA_Program.ViewModels
                 Base.LogAndDisplayException(ex);
             }
         }
-
     }
 }

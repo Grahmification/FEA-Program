@@ -65,6 +65,12 @@
         }
 
         // ---------------------- Event Handlers ----------------------
+
+        /// <summary>
+        /// Called when an sidebar editor is starting to open
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnEditorOpening(object? sender, EventArgs e)
         {
             if(sender is ISideBarEditor editor)
@@ -74,10 +80,15 @@
                 ActiveEditor = editor;
             }
         }
+
+        /// <summary>
+        /// Called after a sidebar editor has closed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnEditorClosed(object? sender, EventArgs e)
         {
             ActiveEditor = null;
         }
-
     }
 }

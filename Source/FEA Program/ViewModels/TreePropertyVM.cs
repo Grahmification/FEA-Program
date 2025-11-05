@@ -23,18 +23,53 @@ namespace FEA_Program.ViewModels
         /// </summary>
         private readonly Func<string> _valueGetter = () => "";
 
+        /// <summary>
+        /// The value to display in string format
+        /// </summary>
         private string _value = "";
 
         // ------------------ Modifiable properties ----------------------
+
+        /// <summary>
+        /// The display name
+        /// </summary>
         public string Name { get; set; } = "";
+
+        /// <summary>
+        /// The display unit
+        /// </summary>
         public UnitVM? Unit { get; set; } = null;
+
+        /// <summary>
+        /// True if the unit name should be displayed after the value
+        /// </summary>
         public bool UnitsAfterValue { get; set; } = true;
+
+        /// <summary>
+        /// Whether the item is selected
+        /// </summary>
         public bool Selected { get; set; } = false;
 
         // ------------------ View specific properties ----------------------
+
+        /// <summary>
+        /// The name text to display in the treeview
+        /// </summary>
         public string DisplayName => !UnitsAfterValue && Unit != null ? $"{Name} [{Unit.UnitString}]" : Name;
+
+        /// <summary>
+        /// The value text to display in the treeview
+        /// </summary>
         public string DisplayValue => UnitsAfterValue && Unit != null ? $"{_value} {Unit.UnitString}" : _value;
 
+        // ------------------ Methods ----------------------
+
+        /// <summary>
+        /// Primary constructor
+        /// </summary>
+        /// <param name="parent">The parent item who's value the VM is displaying</param>
+        /// <param name="propertyName">The parent item's property name</param>
+        /// <param name="valueGetter">Function to get the value from the value</param>
         public TreePropertyVM(INotifyPropertyChanged parent, string propertyName, Func<string> valueGetter)
         {
             _propertyName = propertyName;
@@ -45,6 +80,11 @@ namespace FEA_Program.ViewModels
             UpdateValue(); // Get the starting value
         }
 
+        /// <summary>
+        /// Called when one of the parent's properties has changed value
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnParentPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is not null)
@@ -55,6 +95,10 @@ namespace FEA_Program.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// Updates the value internally
+        /// </summary>
         private void UpdateValue()
         {
             _value = _valueGetter();
