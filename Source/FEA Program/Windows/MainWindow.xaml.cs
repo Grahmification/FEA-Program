@@ -10,6 +10,7 @@ namespace FEA_Program.Windows
         public MainWindow()
         {
             InitializeComponent();
+            WindowState = WindowState.Maximized;
         }
     }
 }
