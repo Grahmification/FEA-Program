@@ -68,7 +68,7 @@ namespace FEA_Program.ViewModels
         /// <summary>
         /// Get the final displaced position in user units
         /// </summary>
-        public double[] UserFinalPos => UserCoordinates.Zip(UserDisplacement, (coord, disp) => coord + disp).ToArray();
+        public DependentProperty<double[]> UserFinalPos = new(() => [0]);
 
         /// <summary>
         /// The node force in user units
@@ -162,6 +162,10 @@ namespace FEA_Program.ViewModels
             EditForceCommand = new RelayCommand(() => EditForceRequest?.Invoke(this, EventArgs.Empty));
             DeleteForceCommand = new RelayCommand(DeleteForce);
 
+            UserFinalPos = new(() => UserCoordinates.Zip(UserDisplacement, (coord, disp) => coord + disp).ToArray());
+            UserFinalPos.AddDependency(Model, nameof(Node.Coordinates));
+            UserFinalPos.AddDependency(Model, nameof(Node.Displacement));
+
             // Create tree properties
 
             // Need to hardcode indexes or can end up with undefined functionality
@@ -192,7 +196,7 @@ namespace FEA_Program.ViewModels
                 vm.PropertyChanged += OnTreePropertyPropertyChanged;
 
             // Create result tree properties
-            ResultProperties.Add(new TreePropertyVM(this, nameof(UserFinalPos), () => string.Join(", ", UserFinalPos.Select(f => f.ToString("G2")))) { Name = "Position", Unit = App.Units.Length, UnitsAfterValue = false });
+            ResultProperties.Add(new TreePropertyVM(UserFinalPos, nameof(DependentProperty<int>.Value), () => string.Join(", ", UserFinalPos.Value.Select(f => f.ToString("G2")))) { Name = "Position", Unit = App.Units.Length, UnitsAfterValue = false });
             ResultProperties.Add(new TreePropertyVM(this, nameof(UserDisplacement), () => Geometry.Magnitude(UserDisplacement).ToString("G3")) { Name = "Displacement", Unit = App.Units.Length, UnitsAfterValue = true });
             ResultProperties.Add(new TreePropertyVM(this, nameof(UserDisplacement), () => string.Join(", ", UserDisplacement.Select(f => f.ToString("G3")))) { Name = "Components", Unit = App.Units.Length, UnitsAfterValue = false });
             ResultProperties.Add(new TreePropertyVM(this, nameof(ReactionForce), () => Geometry.Magnitude(ReactionForce).ToString("G2")) { Name = "Reaction Force", Unit = App.Units.Force, UnitsAfterValue = true });
@@ -216,12 +220,10 @@ namespace FEA_Program.ViewModels
                 if (e.PropertyName == nameof(Node.Coordinates))
                 {
                     OnPropertyChanged(nameof(UserCoordinates));
-                    OnPropertyChanged(nameof(UserFinalPos));
                 }
                 else if (e.PropertyName == nameof(Node.Displacement))
                 {
                     OnPropertyChanged(nameof(UserDisplacement));
-                    OnPropertyChanged(nameof(UserFinalPos));
                     OnPropertyChanged(nameof(DisplacementIsValid));
                 }
                 else if (e.PropertyName == nameof(Node.ReactionForce))
