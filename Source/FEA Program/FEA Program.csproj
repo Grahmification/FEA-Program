@@ -6,6 +6,7 @@
     <RootNamespace>FEA_Program</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>Resources\dna_icon_256px.ico</ApplicationIcon>
     <FileVersion>2.0.0.0</FileVersion>
