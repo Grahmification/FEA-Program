@@ -99,7 +99,7 @@ namespace FEA_Program.ViewModels
         {
             try
             {
-                DislayWindow([ProblemTypes.Beam_1D, ProblemTypes.Truss_3D]);
+                DislayWindow([ProblemTypes.Truss_3D]);
             }
             catch(Exception ex)
             {
