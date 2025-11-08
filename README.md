@@ -4,6 +4,10 @@ FEA Program is a piece of software for solving simple finite element analysis (F
 
 This software is written in C# and uses WPF for the GUI.
 
+<p align="center">
+  <img src="./Docs/images/gui-overview-animation.gif" alt="FEA Program GUI Overview" width="750">
+</p>
+
 ### License
 
 ![GitHub](https://img.shields.io/github/license/Grahmification/FEA-Program) FEA Program is available for free under the MIT license.
@@ -22,7 +26,7 @@ This software also features Uicons by <a href="https://www.flaticon.com/uicons">
 1. Open `FEA Program.sln` in Visual Studio.
 2. Compile the code in Visual Studio.
 3. Run the executable file (FEA Program.exe).
-4. Example problem files can be found at [Examples](Examples/).
+4. Example problem files can be found at [Examples](Examples/). These can be opened directly in the software.
 
 Todo: Make detailed usage instructions.
 
@@ -36,3 +40,7 @@ The following external references are useful for learning about FEA theory:
 - [Introduction to Finite Element Analysis](https://www.engr.uvic.ca/~mech410/lectures/FEA_Theory.pdf) - Derivation of 2D truss elements (linear, quadratic) and beam elements, University of Victoria
 - [FEA For Plane Solids](https://web.mae.ufl.edu/nkim/IntroFEA/Chapter6.pdf) - Derivation for 2D triangular and rectangular elements, University of Florida
 - [Two Dimensional CST Elements](https://www.meil.pw.edu.pl/content/download/56403/294647/file/2D%20cases%20and%20CST%20triangle%20(lecture_3_part_3).pdf) - Derivation for 2D triangular CST element, Warsaw University of Technology
+
+### Changes
+
+See the [changelog](CHANGELOG.md) for changes.
