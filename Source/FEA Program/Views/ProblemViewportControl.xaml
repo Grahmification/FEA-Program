@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="FEA_Program.Views.ProblemViewportControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:h="clr-namespace:HelixToolkit.Wpf.SharpDX;assembly=HelixToolkit.Wpf.SharpDX"
+             xmlns:vm="clr-namespace:FEA_Program.ViewModels"
+             xmlns:conv="clr-namespace:FEA_Program.Converters"
+             xmlns:vhx="clr-namespace:FEA_Program.Views.Helix"
+             xmlns:local="clr-namespace:FEA_Program.Views"
+             mc:Ignorable="d"
+             x:Name="ProblemViewPortHost"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.DataContext>
+        <vm:MainVM/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <conv:VectorToLengthConverter x:Key="VectorToLengthConverter"/>
+
+        <!-- Context Menu for the 3D viewer background -->
+        <ContextMenu x:Key="backgroundContextMenu" DataContext="{Binding DataContext, Source={x:Reference ProblemViewPortHost}}">
+            <MenuItem Header="Add Node" Command="{Binding Project.Nodes.AddCommand}"/>
+            <MenuItem Header="Add Element" Command="{Binding Project.Elements.AddCommand}"/>
+            <MenuItem Header="Add Force" Command="{Binding Project.Nodes.AddForceCommand}"/>
+            <Separator/>
+            <MenuItem Header="Reset View" Command="{Binding ViewPort.ResetCameraCommand}"/>
+        </ContextMenu>
+    </UserControl.Resources>
+
+    <Grid>
+        <local:ViewPortControl Grid.Column="1" x:Name="problemViewport" 
+                               DataContext="{Binding ViewPort}"
+                               BackgroundContextMenu="{StaticResource backgroundContextMenu}">
+        <local:ViewPortControl.DrawItems>
+                <!-- Nodes -->
+                <h:ItemsModel3D ItemsSource="{Binding DataContext.Project.Draw.Nodes, RelativeSource={RelativeSource AncestorType={x:Type local:ProblemViewportControl}}}">
+                    <h:ItemsModel3D.ItemTemplate>
+                        <DataTemplate>
+                            <vhx:NodeVisual3D Position="{Binding DrawPosition}" Color="{Binding NodeColor}" Selected="{Binding Node.Selected, Mode=OneWayToSource}" BlockInteraction="{Binding Pending, Mode=OneWay}">
+                                <vhx:FixityVisual3D ShowX="{Binding Node.FixedX}" ShowY="{Binding Node.FixedY}" ShowZ="{Binding Node.FixedZ}" Color="{Binding FixityColor}"/>
+                                <vhx:ArrowVisual3D Direction="{Binding Force}" Length="{Binding ForceLength}"/>
+                                <vhx:TextVisual3D Text="{Binding NodeText}"/>
+
+                                <!-- Reaction Forces -->
+                                <h:ItemsModel3D ItemsSource="{Binding ReactionForces}">
+                                    <h:ItemsModel3D.ItemTemplate>
+                                        <DataTemplate>
+                                            <vhx:ArrowVisual3D Direction="{Binding}" Length="{Binding Converter={StaticResource VectorToLengthConverter}}" Color="MediumPurple"/>
+                                        </DataTemplate>
+                                    </h:ItemsModel3D.ItemTemplate>
+                                </h:ItemsModel3D>
+
+                                <!-- Context menu - Requires background code to display - see NodeVisual3D.cs -->
+                                <vhx:NodeVisual3D.ContextMenu>
+                                    <ContextMenu Focusable="False">
+                                        <MenuItem Header="Edit" Command="{Binding Node.EditCommand}" Focusable="False"/>
+                                        <MenuItem Header="Delete" Command="{Binding Node.DeleteCommand}" Focusable="False"/>
+                                    </ContextMenu>
+                                </vhx:NodeVisual3D.ContextMenu>
+                            </vhx:NodeVisual3D>
+                        </DataTemplate>
+                    </h:ItemsModel3D.ItemTemplate>
+                </h:ItemsModel3D>
+
+                <!-- Elements -->
+                <h:ItemsModel3D ItemsSource="{Binding DataContext.Project.Draw.Elements, RelativeSource={RelativeSource AncestorType={x:Type local:ProblemViewportControl}}}">
+                    <h:ItemsModel3D.ItemTemplate>
+                        <DataTemplate>
+                            <vhx:TubeVisual3D 
+                                        StartPoint="{Binding Nodes[0].DrawPosition}" 
+                                        EndPoint="{Binding Nodes[1].DrawPosition}"
+                                        FillColor="{Binding ElementColor}"
+                                        Selected="{Binding Element.Selected, Mode=OneWayToSource}">
+                                <vhx:TextVisual3D Text="{Binding ElementText}"/>
+
+                                <!-- Context menu - Requires background code to display - see TubeVisual3D.cs -->
+                                <vhx:TubeVisual3D.ContextMenu>
+                                    <ContextMenu Focusable="False">
+                                        <MenuItem Header="Edit" Command="{Binding Element.EditCommand}" IsEnabled="False" Focusable="False"/>
+                                        <MenuItem Header="Delete" Command="{Binding Element.DeleteCommand}" Focusable="False"/>
+                                    </ContextMenu>
+                                </vhx:TubeVisual3D.ContextMenu>
+                            </vhx:TubeVisual3D>
+                        </DataTemplate>
+                    </h:ItemsModel3D.ItemTemplate>
+                </h:ItemsModel3D>
+
+            </local:ViewPortControl.DrawItems>
+        </local:ViewPortControl>
+    </Grid>
+</UserControl>

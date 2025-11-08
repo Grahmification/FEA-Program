@@ -110,5 +110,41 @@ namespace FEA_Program.Models
             return output;
         }
 
+
+        /// <summary>
+        /// Checks if a list of elements contains an element whose NodeIDs array is structurally
+        /// equivalent to the input element's NodeIDs, regardless of the order of IDs.
+        /// </summary>
+        /// <param name="elements">The list of elements to search through (the haystack).</param>
+        /// <param name="inputElement">The element to compare against (the needle).</param>
+        /// <returns>True if a match is found, otherwise false.</returns>
+        public static bool ContainsElementWithSameNodeIDs(List<IElement> elements, IElement inputElement)
+        {
+            if (elements == null || inputElement == null)
+            {
+                return false;
+            }
+
+            // 1. Get the canonical (sorted) representation of the input element's NodeIDs.
+            //    Using ToList() is often necessary for SequenceEqual to work reliably against another list/array.
+            List<int> sortedInputIDs = inputElement.Nodes.Select(n => n.ID).OrderBy(id => id).ToList();
+
+            // 2. Use LINQ's Any() method to iterate and perform the comparison efficiently.
+            return elements.Any(elementInList =>
+            {
+                // First, quickly check if the counts are different. If so, they cannot match.
+                if (elementInList.Nodes.Count != sortedInputIDs.Count)
+                {
+                    return false;
+                }
+
+                // 3. For the element in the list, get its own canonical (sorted) representation.
+                List<int> sortedListIDs = elementInList.Nodes.Select(n => n.ID).OrderBy(id => id).ToList();
+
+                // 4. Use LINQ's SequenceEqual() to check if the two sorted sequences are identical.
+                // This is the core logic for order-agnostic array comparison.
+                return sortedInputIDs.SequenceEqual(sortedListIDs);
+            });
+        }
     }
 }

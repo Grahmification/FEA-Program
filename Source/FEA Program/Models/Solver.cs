@@ -9,12 +9,22 @@ namespace FEA_Program.Models
     /// </summary>
     internal class Solver
     {
+        /// <summary>
+        /// Fires when the solver indicates problem matricies have been computed
+        /// </summary>
         public event EventHandler<(Matrix, Matrix, Matrix)>? SolutionStarted;
 
+        /// <summary>
+        /// Called when the solver indicates problem matricies with fixed displacements removed have been calculated
+        /// </summary>
         public event EventHandler<(Matrix, Matrix)>? PartiallyReducedCalculated;
 
+        /// <summary>
+        /// Called when the solver indicates problem matricies in their final solving form have been calculated
+        /// </summary>
         public event EventHandler<(Matrix, Matrix)>? FullyReducedCalculated;
 
+        // ---------------------- Methods ----------------------
 
         /// <summary>
         /// Solves the FEA Problem

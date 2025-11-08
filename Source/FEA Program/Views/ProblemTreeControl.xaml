@@ -1,0 +1,170 @@
+﻿<UserControl x:Class="FEA_Program.Views.ProblemTreeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FEA_Program.Views"
+             xmlns:vm="clr-namespace:FEA_Program.ViewModels"
+             xmlns:conv="clr-namespace:FEA_Program.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="275">
+    <UserControl.DataContext>
+        <vm:ProjectVM/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <conv:NumberArrayToStringConverter x:Key="NumberArrayToStringConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <TreeView>
+            <!-- Materials Sub Tree -->
+            <TreeViewItem x:Name="MaterialsTree" IsExpanded="True" ItemsSource="{Binding Materials.Items}">
+                <TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Materials" />
+                    </StackPanel>
+                </TreeViewItem.Header>
+
+                <TreeViewItem.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type vm:MaterialVM}" ItemsSource="{Binding Properties}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Model.Name}" />
+
+                            <StackPanel.ContextMenu>
+                                <ContextMenu Focusable="False">
+                                    <MenuItem Header="Edit" Command="{Binding EditCommand}" Focusable="False"/>
+                                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}" Focusable="False"/>
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type vm:TreePropertyVM}">
+                        <TextBlock>
+                                <Run Text="{Binding DisplayName, StringFormat={}{0}:, Mode=OneWay}" FontWeight="Bold"/>
+                                <Run Text="{Binding DisplayValue, Mode=OneWay}"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </TreeViewItem.Resources>
+            </TreeViewItem>
+
+            <!-- Nodes Sub Tree -->
+            <TreeViewItem x:Name="NodesTree" IsExpanded="True" ItemsSource="{Binding Nodes.Items}">
+                <TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Nodes" />
+                    </StackPanel>
+                </TreeViewItem.Header>
+
+                <!-- Handle Node Selection -->
+                <TreeViewItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsSelected" Value="{Binding Selected, Mode=TwoWay}" />
+                    </Style>
+                </TreeViewItem.ItemContainerStyle>
+
+                <TreeViewItem.Resources>
+                    <!-- Header -->
+                    <HierarchicalDataTemplate DataType="{x:Type vm:NodeVM}" ItemsSource="{Binding Properties}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Model.ID, StringFormat={}Node {0}, Mode=OneWay}" />
+
+                            <StackPanel.ContextMenu>
+                                <ContextMenu Focusable="False">
+                                    <MenuItem Header="Edit" Command="{Binding EditCommand}" Focusable="False"/>
+                                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}" Focusable="False"/>
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <!-- Sub-items -->
+                    <DataTemplate DataType="{x:Type vm:TreePropertyVM}">
+                        <TextBlock>
+                                <Run Text="{Binding DisplayName, StringFormat={}{0}:, Mode=OneWay}" FontWeight="Bold"/>
+                                <Run Text="{Binding DisplayValue, Mode=OneWay}"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </TreeViewItem.Resources>
+            </TreeViewItem>
+
+            <!-- Elements Sub Tree -->
+            <TreeViewItem x:Name="ElementsTree" IsExpanded="True" ItemsSource="{Binding Elements.Items}">
+                <TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Elements" />
+                    </StackPanel>
+                </TreeViewItem.Header>
+
+                <!-- Handle Selection -->
+                <TreeViewItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsSelected" Value="{Binding Selected, Mode=TwoWay}" />
+                    </Style>
+                </TreeViewItem.ItemContainerStyle>
+
+                <TreeViewItem.Resources>
+                    <!-- Header -->
+                    <HierarchicalDataTemplate DataType="{x:Type vm:ElementVM}" ItemsSource="{Binding Properties}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Model.ID, StringFormat={}Element {0}, Mode=OneWay}" />
+
+                            <StackPanel.ContextMenu>
+                                <ContextMenu Focusable="False">
+                                    <MenuItem Header="Edit" Command="{Binding EditCommand}" IsEnabled="False" Focusable="False"/>
+                                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}" Focusable="False"/>
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <!-- Sub-items -->
+                    <DataTemplate DataType="{x:Type vm:TreePropertyVM}">
+                        <TextBlock>
+                                <Run Text="{Binding DisplayName, StringFormat={}{0}:, Mode=OneWay}" FontWeight="Bold"/>
+                                <Run Text="{Binding DisplayValue, Mode=OneWay}"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </TreeViewItem.Resources>
+            </TreeViewItem>
+
+            <!-- Forces Sub Tree -->
+            <TreeViewItem x:Name="ForcesTree" IsExpanded="True" ItemsSource="{Binding Nodes.NonZeroForceItems}">
+                <TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Forces" />
+                    </StackPanel>
+                </TreeViewItem.Header>
+
+                <!-- Handle Selection -->
+                <TreeViewItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsSelected" Value="{Binding Selected, Mode=OneWayToSource}" />
+                    </Style>
+                </TreeViewItem.ItemContainerStyle>
+
+                <TreeViewItem.Resources>
+                    <!-- Header -->
+                    <HierarchicalDataTemplate DataType="{x:Type vm:NodeVM}" ItemsSource="{Binding ForceProperties}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Model.ID, StringFormat={}Force (Node {0}), Mode=OneWay}" />
+
+                            <StackPanel.ContextMenu>
+                                <ContextMenu Focusable="False">
+                                    <MenuItem Header="Edit" Command="{Binding EditForceCommand}" Focusable="False"/>
+                                    <MenuItem Header="Delete" Command="{Binding DeleteForceCommand}" Focusable="False"/>
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <!-- Sub-items -->
+                    <DataTemplate DataType="{x:Type vm:TreePropertyVM}">
+                        <TextBlock>
+                                <Run Text="{Binding DisplayName, StringFormat={}{0}:, Mode=OneWay}" FontWeight="Bold"/>
+                                <Run Text="{Binding DisplayValue, Mode=OneWay}"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </TreeViewItem.Resources>
+            </TreeViewItem>
+
+        </TreeView>
+    </Grid>
+</UserControl>

@@ -1,4 +1,6 @@
-﻿namespace FEA_Program.Models
+﻿using FEA_Program.ViewModels.Base;
+
+namespace FEA_Program.Models
 {
     /// <summary>
     /// Generic definition for a class that has an ID
@@ -14,8 +16,13 @@
     /// <summary>
     /// Base definition for a class that has an ID
     /// </summary>
-    internal abstract class IDClass(int ID = Constants.InvalidID) : IHasID, IComparable<IHasID>
+    internal abstract class IDClass(int ID = IDClass.InvalidID) : ObservableObject, IHasID, IComparable<IHasID>
     {
+        /// <summary>
+        /// Number used to indicate an invalid ID
+        /// </summary>
+        public const int InvalidID = -1;
+
         /// <summary>
         /// The idenfier for the class
         /// </summary>
@@ -37,6 +44,11 @@
             return ID.CompareTo(other.ID);
         }
 
+        /// <summary>
+        /// Creates a unique ID that is not contained in the existing list
+        /// </summary>
+        /// <param name="existingItems">The existing list of items with IDs</param>
+        /// <returns>The new unique ID</returns>
         public static int CreateUniqueId(List<IHasID> existingItems)
         {
             var existingIDs = existingItems.Select(i => i.ID);
@@ -48,6 +60,4 @@
             return newID;
         }
     }
-
-
 }

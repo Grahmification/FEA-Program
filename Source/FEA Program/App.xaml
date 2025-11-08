@@ -1,0 +1,17 @@
+﻿<Application x:Class="FEA_Program.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:FEA_Program.ViewModels"
+             xmlns:local="clr-namespace:FEA_Program"
+             DispatcherUnhandledException="Application_DispatcherUnhandledException"
+             StartupUri="Windows/MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <vm:UnitsVM x:Key="Units" />
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Order matters here -->
+                <ResourceDictionary Source="Styles/TreeViews.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

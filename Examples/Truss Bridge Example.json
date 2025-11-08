@@ -1,0 +1,1252 @@
+{
+  "nodes": [
+    {
+      "dimension": 3,
+      "id": 1,
+      "coords": [
+        0,
+        0,
+        0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 2,
+      "coords": [
+        0,
+        0,
+        -0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 3,
+      "coords": [
+        0.003,
+        0,
+        0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 4,
+      "coords": [
+        0.006,
+        0,
+        0.001
+      ],
+      "fixity": [
+        1,
+        1,
+        1
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 5,
+      "coords": [
+        -0.003,
+        0,
+        -0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 6,
+      "coords": [
+        -0.003,
+        0,
+        0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 7,
+      "coords": [
+        -0.006,
+        0,
+        -0.001
+      ],
+      "fixity": [
+        1,
+        1,
+        1
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 8,
+      "coords": [
+        0.003,
+        0,
+        -0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 9,
+      "coords": [
+        -0.006,
+        0,
+        0.001
+      ],
+      "fixity": [
+        1,
+        1,
+        1
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 10,
+      "coords": [
+        0.006,
+        0,
+        -0.001
+      ],
+      "fixity": [
+        1,
+        1,
+        1
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 11,
+      "coords": [
+        0,
+        0.003,
+        0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 12,
+      "coords": [
+        0,
+        0.003,
+        -0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        -1,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 13,
+      "coords": [
+        0.003,
+        0.003,
+        0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 14,
+      "coords": [
+        0.003,
+        0.003,
+        -0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 15,
+      "coords": [
+        -0.003,
+        0.003,
+        0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "dimension": 3,
+      "id": 16,
+      "coords": [
+        -0.003,
+        0.003,
+        -0.001
+      ],
+      "fixity": [
+        0,
+        0,
+        0
+      ],
+      "force": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "elements": [
+    {
+      "id": 1,
+      "materialID": 1,
+      "nodeIDs": [
+        5,
+        2
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 2,
+      "materialID": 1,
+      "nodeIDs": [
+        6,
+        1
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 3,
+      "materialID": 1,
+      "nodeIDs": [
+        1,
+        3
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 4,
+      "materialID": 1,
+      "nodeIDs": [
+        2,
+        8
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 5,
+      "materialID": 1,
+      "nodeIDs": [
+        8,
+        10
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 6,
+      "materialID": 1,
+      "nodeIDs": [
+        3,
+        4
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 7,
+      "materialID": 1,
+      "nodeIDs": [
+        7,
+        5
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 8,
+      "materialID": 1,
+      "nodeIDs": [
+        9,
+        6
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 9,
+      "materialID": 1,
+      "nodeIDs": [
+        5,
+        6
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 10,
+      "materialID": 1,
+      "nodeIDs": [
+        2,
+        1
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 11,
+      "materialID": 1,
+      "nodeIDs": [
+        8,
+        3
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 12,
+      "materialID": 1,
+      "nodeIDs": [
+        1,
+        13
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 13,
+      "materialID": 1,
+      "nodeIDs": [
+        13,
+        4
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 14,
+      "materialID": 1,
+      "nodeIDs": [
+        15,
+        1
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 15,
+      "materialID": 1,
+      "nodeIDs": [
+        9,
+        15
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 16,
+      "materialID": 1,
+      "nodeIDs": [
+        7,
+        16
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 17,
+      "materialID": 1,
+      "nodeIDs": [
+        16,
+        2
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 18,
+      "materialID": 1,
+      "nodeIDs": [
+        2,
+        14
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 19,
+      "materialID": 1,
+      "nodeIDs": [
+        14,
+        10
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 20,
+      "materialID": 1,
+      "nodeIDs": [
+        12,
+        14
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 21,
+      "materialID": 1,
+      "nodeIDs": [
+        16,
+        12
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 22,
+      "materialID": 1,
+      "nodeIDs": [
+        15,
+        11
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 23,
+      "materialID": 1,
+      "nodeIDs": [
+        11,
+        13
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 24,
+      "materialID": 1,
+      "nodeIDs": [
+        13,
+        14
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 25,
+      "materialID": 1,
+      "nodeIDs": [
+        11,
+        12
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 26,
+      "materialID": 1,
+      "nodeIDs": [
+        15,
+        16
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 27,
+      "materialID": 1,
+      "nodeIDs": [
+        15,
+        6
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 28,
+      "materialID": 1,
+      "nodeIDs": [
+        16,
+        5
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 29,
+      "materialID": 1,
+      "nodeIDs": [
+        11,
+        1
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 30,
+      "materialID": 1,
+      "nodeIDs": [
+        12,
+        2
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 31,
+      "materialID": 1,
+      "nodeIDs": [
+        13,
+        3
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 32,
+      "materialID": 1,
+      "nodeIDs": [
+        8,
+        14
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 33,
+      "materialID": 1,
+      "nodeIDs": [
+        9,
+        5
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 34,
+      "materialID": 1,
+      "nodeIDs": [
+        5,
+        1
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 35,
+      "materialID": 1,
+      "nodeIDs": [
+        1,
+        8
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 36,
+      "materialID": 1,
+      "nodeIDs": [
+        8,
+        4
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 37,
+      "materialID": 1,
+      "nodeIDs": [
+        8,
+        13
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 38,
+      "materialID": 1,
+      "nodeIDs": [
+        5,
+        15
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 39,
+      "materialID": 1,
+      "nodeIDs": [
+        15,
+        12
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    },
+    {
+      "id": 40,
+      "materialID": 1,
+      "nodeIDs": [
+        12,
+        13
+      ],
+      "nodeDOFs": 3,
+      "elementType": 0,
+      "bodyForce": [
+        0,
+        0,
+        0
+      ],
+      "tractionForce": [
+        0,
+        0,
+        0
+      ],
+      "elementArgs": [
+        1E-06
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "id": 1,
+      "name": "Aluminum 6061-T6",
+      "subtype": 1,
+      "e": 69000000000,
+      "v": 0.3,
+      "sy": 210000000,
+      "sut": 276000000
+    },
+    {
+      "id": 2,
+      "name": "1045 Steel",
+      "subtype": 0,
+      "e": 200000000000,
+      "v": 0.29,
+      "sy": 310000000,
+      "sut": 565000000
+    }
+  ],
+  "connectivityMatrix": {},
+  "problemType": 2
+}

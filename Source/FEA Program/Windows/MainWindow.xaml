@@ -1,0 +1,194 @@
+<Window x:Class="FEA_Program.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:FEA_Program.ViewModels"
+        xmlns:conv="clr-namespace:FEA_Program.Converters"
+        xmlns:v="clr-namespace:FEA_Program.Views"
+        xmlns:local="clr-namespace:FEA_Program.Windows"
+        mc:Ignorable="d"
+        Title="FEA Program" Height="450" Width="800" WindowStartupLocation="CenterScreen" Icon="/Resources/dna_icon_32px.ico">
+
+    <Window.DataContext>
+        <vm:MainVM/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <conv:BoolToVisibilityConverter x:Key="SidebarVisibilityConverter"
+                                        HiddenState="Collapsed" />
+
+        <!-- Simple ToolBar style that removes grip and overflow -->
+        <Style x:Key="ToolBarNoGripNoOverflow" TargetType="ToolBar">
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToolBar">
+                        <!-- Border for visuals; ToolBarPanel does the horizontal layout -->
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="2">
+                            <ToolBarPanel IsItemsHost="True" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Status bar text style -->
+        <Style TargetType="TextBlock" x:Key="StatusText">
+            <Setter Property="Foreground" Value="#555"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Upper ToolBar -->
+        <Grid DockPanel.Dock="Top" Height="25" VerticalAlignment="Top" Background="#EDEDED">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="_File" Height="20">
+                        <MenuItem Header="_New" Command="{Binding Project.NewProblem.CreateCommand}"/>
+                        <MenuItem Header="_Open" Command="{Binding Project.LoadFileCommand}"/>
+                        <MenuItem Header="_Save" Command="{Binding Project.SaveFileCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
+                    </MenuItem>
+                </Menu>
+
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="_View" Height="20">
+                        <MenuItem Header="_Reset" Command="{Binding ViewPort.ResetCameraCommand}"/>
+                        <MenuItem Header="_Zoom to Extents (Ctrl+E)" Command="{Binding ViewPort.ZoomToExtentsCommand}"/>
+                    </MenuItem>
+                </Menu>
+
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
+
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="Add Node" Height="20" Command="{Binding Project.Nodes.AddCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="/FEA Program;component/Resources/cube_icon_32px.png" Height="14" Width="14"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </Menu>
+
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
+                
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="Add Material" Height="20" Command="{Binding Project.Materials.AddCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="/FEA Program;component/Resources/material_icon_32px.png" Height="16" Width="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem> 
+                </Menu>
+
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
+
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="Add Element" Height="20" Command="{Binding Project.Elements.AddCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="/FEA Program;component/Resources/element_icon_32px.png" Height="12" Width="12"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </Menu>
+
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
+
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="Add Force" Height="20" Command="{Binding Project.Nodes.AddForceCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="/FEA Program;component/Resources/arrow_icon_32px.png" Height="18" Width="18"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </Menu>
+
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Height="10" Margin="3,0"/>
+
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="Solve" Height="20" Command="{Binding Project.SolveCommand}"/>
+                </Menu>
+            </StackPanel>
+
+            <Menu Grid.Column="2"  VerticalAlignment="Center">
+                <MenuItem Header="_Advanced" Height="20">
+                    <MenuItem Header="_View Problem Matricies" Command="{Binding Project.DebugMatrix.ShowWindowCommand}"/>
+                </MenuItem>
+            </Menu>
+        </Grid>
+        
+        <!-- Lower Status Bar -->
+        <StatusBar DockPanel.Dock="Bottom" Background="#F2F2F2" Height="24">
+            <StatusBarItem>
+                <TextBlock Text="{Binding Base.Status}" Style="{StaticResource StatusText}"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="{Binding Project.Problem.ProblemType}" Style="{StaticResource StatusText}"/>
+            </StatusBarItem>
+        </StatusBar>
+
+        <!-- Main Content Area -->
+        <Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width ="275" MinWidth="200"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Sidebar -->
+                <Grid>
+                    <!-- Base sidebar view -->
+                    <TabControl Grid.Column="0" Margin="0">
+                        <TabItem Header="Problem">
+                            <v:ProblemTreeControl DataContext="{Binding Project}"/>
+                        </TabItem>
+                        <TabItem Header="Results">
+                            <v:ResultsTreeControl DataContext="{Binding Project}"/>
+                        </TabItem>
+                        <TabItem Header="Display">
+                            <v:ResultsSettingsControl DataContext="{Binding Project}"/>
+                        </TabItem>
+                    </TabControl>
+
+                    <!-- Edit material view -->
+                    <v:EditMaterialControl DataContext="{Binding Project.Materials.Editor}" 
+                                           Visibility="{Binding DataContext.Project.Materials.Editor.ShowEditor,
+                                                RelativeSource={RelativeSource AncestorType=Window},
+                                                Converter={StaticResource SidebarVisibilityConverter}}"/>
+
+                    <!-- Edit node view -->
+                    <v:EditNodeControl DataContext="{Binding Project.Nodes.Editor}" 
+                                       Visibility="{Binding DataContext.Project.Nodes.Editor.ShowEditor,
+                                                  RelativeSource={RelativeSource AncestorType=Window},
+                                                  Converter={StaticResource SidebarVisibilityConverter}}"/>
+
+                    <!-- Edit force view -->
+                    <v:EditForceControl DataContext="{Binding Project.Nodes.ForceEditor}" 
+                                       Visibility="{Binding DataContext.Project.Nodes.ForceEditor.ShowEditor,
+                                                  RelativeSource={RelativeSource AncestorType=Window},
+                                                  Converter={StaticResource SidebarVisibilityConverter}}"/>
+
+                    <!-- Add element view -->
+                    <v:AddElementControl DataContext="{Binding Project.Elements.AddEditor}" 
+                                         Visibility="{Binding DataContext.Project.Elements.AddEditor.ShowEditor,
+                                                  RelativeSource={RelativeSource AncestorType=Window},
+                                                  Converter={StaticResource SidebarVisibilityConverter}}"/>
+                </Grid>
+
+                
+                <GridSplitter Grid.Column="0" Width="5"/>
+
+                <!-- 3D Viewer -->
+                <v:ProblemViewportControl Grid.Column="1" DataContext="{Binding}"/>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>
