@@ -103,7 +103,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="Nodes to Apply" Margin="5"/>
+                <TextBlock Grid.Row="0" Text="Node to Apply" Margin="5"/>
 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <ListBox ItemsSource="{Binding Nodes}">
