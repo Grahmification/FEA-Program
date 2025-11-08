@@ -40,3 +40,7 @@ The following external references are useful for learning about FEA theory:
 - [Introduction to Finite Element Analysis](https://www.engr.uvic.ca/~mech410/lectures/FEA_Theory.pdf) - Derivation of 2D truss elements (linear, quadratic) and beam elements, University of Victoria
 - [FEA For Plane Solids](https://web.mae.ufl.edu/nkim/IntroFEA/Chapter6.pdf) - Derivation for 2D triangular and rectangular elements, University of Florida
 - [Two Dimensional CST Elements](https://www.meil.pw.edu.pl/content/download/56403/294647/file/2D%20cases%20and%20CST%20triangle%20(lecture_3_part_3).pdf) - Derivation for 2D triangular CST element, Warsaw University of Technology
+
+### Changes
+
+See the [changelog](CHANGELOG.md) for changes.
