@@ -76,7 +76,7 @@ namespace FEA_Program.Models.SaveData
                 using (FileStream openStream = File.OpenRead(filePath))
                 {
                     // Deserialize the stream content asynchronously
-                    T data = await System.Text.Json.JsonSerializer.DeserializeAsync<T>(openStream, DefaultOptions);
+                    T? data = await System.Text.Json.JsonSerializer.DeserializeAsync<T>(openStream, DefaultOptions);
                     Console.WriteLine($"Deserialization successful. Data loaded from: {filePath}");
                     return data;
                 }
