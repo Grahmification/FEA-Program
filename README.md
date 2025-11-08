@@ -4,6 +4,10 @@ FEA Program is a piece of software for solving simple finite element analysis (F
 
 This software is written in C# and uses WPF for the GUI.
 
+<p align="center">
+  <img src="./Docs/images/gui-overview-animation.gif" alt="FEA Program GUI Overview" width="750">
+</p>
+
 ### License
 
 ![GitHub](https://img.shields.io/github/license/Grahmification/FEA-Program) FEA Program is available for free under the MIT license.
