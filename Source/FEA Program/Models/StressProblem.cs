@@ -88,8 +88,8 @@ namespace FEA_Program.Models
             if (_Nodes.ContainsKey(node.ID))
                 throw new ArgumentException($"Could not add node {node.ID} to problem. Problem already contains that ID.");
 
-            if (node.Dimension != AvailableNodeDOFs)
-                throw new ArgumentException($"Could not add node {node.ID} to problem. Node has {node.Dimension} DOFs, and problem only supports {AvailableNodeDOFs} DOFs.");
+            if (node.DOFs != AvailableNodeDOFs)
+                throw new ArgumentException($"Could not add node {node.ID} to problem. Node has {node.DOFs} DOFs, and problem only supports {AvailableNodeDOFs} DOFs.");
 
             // dont want to create node where one already is
             if (NodeExtensions.NodeExistsAtLocation(node.Coordinates, Nodes))
@@ -155,7 +155,7 @@ namespace FEA_Program.Models
         public bool Solve()
         {
             var K_Matricies = Elements.ToDictionary(element => element.ID, element => element.K_Matrix());
-            var nodeDOFS = Nodes.ToDictionary(n => n.ID, n => n.Dimension);
+            var nodeDOFS = Nodes.ToDictionary(n => n.ID, n => n.DOFs);
             var connectivityMatrix = ElementExtensions.Get_Connectivity_Matrix(Elements);
 
             SparseMatrix K_assembled = ElementExtensions.Assemble_K_Matrix(K_Matricies, nodeDOFS, connectivityMatrix);

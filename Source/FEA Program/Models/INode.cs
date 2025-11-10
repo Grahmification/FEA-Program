@@ -18,9 +18,9 @@
         public int ID { get; }
 
         /// <summary>
-        /// Number of DOFs in the node. 1 = 1D, 2 = 2D, 3 = 3D, 6 = 6D
+        /// Number of DOFs in the node.
         /// </summary>
-        public int Dimension { get; }
+        public int DOFs { get; }
 
         /// <summary>
         /// Coordinates of the node center in program units (m). Length depends on DOFs.

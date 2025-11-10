@@ -149,7 +149,7 @@ namespace FEA_Program.ViewModels
             if (scaleFactor < 0)
                 scaleFactor = 0;
             
-            var output = new double[Node.Model.Dimension];
+            var output = new double[Node.Model.DOFs];
 
             for (int i = 0; i < Node.Model.Coordinates.Length; i++)
             {

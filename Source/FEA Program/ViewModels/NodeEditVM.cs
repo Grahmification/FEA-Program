@@ -125,7 +125,7 @@ namespace FEA_Program.ViewModels
 
             EditCoordinates.Clear();
 
-            for (int i = 0; i < EditItem.Model.Dimension; i++)
+            for (int i = 0; i < EditItem.Model.DOFs; i++)
             {
                 var userCoord = App.Units.Length.ToUser(EditItem.Model.Coordinates[i]);  // Convert to user units
                 var coordVM = new CoordinateVM(i, userCoord, EditItem.Model.Fixity[i] == 1);

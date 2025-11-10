@@ -42,10 +42,10 @@ namespace FEA_Program.Models
 
             foreach (Node node in nodes)
             {
-                var nodeDisplacements = new double[node.Dimension];
-                var nodeReactions = new double[node.Dimension];
+                var nodeDisplacements = new double[node.DOFs];
+                var nodeReactions = new double[node.DOFs];
 
-                for (int i = 0; i < node.Dimension; i++)
+                for (int i = 0; i < node.DOFs; i++)
                 {
                     nodeDisplacements[i] = Q[index];
                     nodeReactions[i] = R[index];
@@ -88,7 +88,7 @@ namespace FEA_Program.Models
             foreach (Node node in existingNodes)
             {
                 // This should work regardless of dimension
-                if (node.Coordinates.Take(node.Dimension).SequenceEqual(coords.Take(node.Dimension)))
+                if (node.Coordinates.Take(node.DOFs).SequenceEqual(coords.Take(node.DOFs)))
                     return true;
             }
 

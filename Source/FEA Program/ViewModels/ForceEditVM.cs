@@ -188,7 +188,7 @@ namespace FEA_Program.ViewModels
             EditItem = new NodeVM((Node)editItem.Model.Clone());
             Editing = true;
 
-            for (int i = 0; i < EditItem.Model.Dimension; i++)
+            for (int i = 0; i < EditItem.Model.DOFs; i++)
             {
                 var coordVM = new CoordinateVM(i, EditItem.Force[i], false);
                 coordVM.ValueChanged += OnCoordinateValueChanged;

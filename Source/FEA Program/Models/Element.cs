@@ -225,8 +225,8 @@ namespace FEA_Program.Models
                 throw new ArgumentException($"Cannot create element. {nodes.Count} nodes were specified, but element requires {NumOfNodes}.");
 
             foreach(INode node in nodes)
-                if(node.Dimension != NodeDOFs)
-                    throw new ArgumentException($"Cannot create element. Node {node.ID} has {node.Dimension} DOFs, but element requires {NodeDOFs}.");
+                if(node.DOFs != NodeDOFs)
+                    throw new ArgumentException($"Cannot create element. Node {node.ID} has {node.DOFs} DOFs, but element requires {NodeDOFs}.");
         }
 
         /// <summary>

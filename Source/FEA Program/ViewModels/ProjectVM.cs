@@ -492,7 +492,7 @@ namespace FEA_Program.ViewModels
             {
                 output.Nodes.Add(new NodeProblemData
                 {
-                    Dimension = node.Dimension,
+                    Dimension = node.DOFs,
                     ID = node.ID,
                     Coords = node.Coordinates,
                     Fixity = node.Fixity,
