@@ -34,26 +34,6 @@ namespace FEA_Program.Models
         /// </summary>
         public double Sut { get; set; } = 0;
         
-        /// <summary>
-        /// Gets the material constutive matrix for a 2D material in program units
-        /// </summary>
-        public DenseMatrix D_Matrix_2D
-        {
-            get
-            {
-                var output = new DenseMatrix(3, 3);
-                output.Clear(); // set all vals to 0
-
-                output[0, 0] = 1;
-                output[0, 1] = V;
-                output[1, 0] = V;
-                output[1, 1] = 1;
-                output[2, 2] = (1 - V) / 2.0;
-
-                return (DenseMatrix)(output * E / (1.0 - V * V));
-            }
-        }
-
         // ---------------------- Public Methods ----------------------
 
         /// <summary>

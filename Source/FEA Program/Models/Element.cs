@@ -46,6 +46,11 @@ namespace FEA_Program.Models
         public bool SolutionValid { get; protected set; } = false;
 
         /// <summary>
+        /// The dimension of local coordinates inside the element, indicating the size of localCoordinates arguments. 1 = 1D, 2 = 2D, 3 = 3D.
+        /// </summary>
+        public abstract int LocalDimension { get; }
+
+        /// <summary>
         /// The number of nodes in the element
         /// </summary>
         public abstract int NumOfNodes { get; }
@@ -147,6 +152,40 @@ namespace FEA_Program.Models
             return N_Matrix(localCoords) * globalNodeQ;
         }
 
+        /// <summary>
+        /// Get the material's constitutive matrix for the given element
+        /// </summary>
+        /// <returns></returns>
+        protected DenseMatrix D_Matrix()
+        {
+            // Elements with 1D local coordinate space. D = [1x1]
+            if (LocalDimension == 1)
+            {
+                return new DenseMatrix(1, 1, [Material.E]);
+            }
+            // Elements with 2D local coordinate space. D = [3x3]
+            else if (LocalDimension == 2)
+            {
+                var V = Material.V;
+
+                var output = new DenseMatrix(3, 3);
+                output.Clear(); // Ensure all values are zero
+
+                output[0, 0] = 1;
+                output[0, 1] = V;
+                output[1, 0] = V;
+                output[1, 1] = 1;
+                output[2, 2] = (1 - V) / 2.0;
+
+                return (Material.E / (1.0 - V * V)) * output;
+            }
+            else
+            {
+                // TODO: Add the 3D case
+                throw new NotImplementedException();
+            }
+        }
+
         // ---------------- Matrix Methods which parent must define ----------------
 
         /// <summary>
@@ -159,12 +198,6 @@ namespace FEA_Program.Models
         /// </summary>
         /// <returns></returns>
         protected abstract DenseMatrix B_Matrix(double[]? localCoords = null);
-
-        /// <summary>
-        /// Get the material's constitutive matrix for the given element
-        /// </summary>
-        /// <returns></returns>
-        protected abstract DenseMatrix D_Matrix();
 
         /// <summary>
         /// Gets the element shape function (interpolation) matrix

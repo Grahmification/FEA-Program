@@ -24,6 +24,11 @@ namespace FEA_Program.Models
         public int GlobalDimension { get; private set; } = 1;
 
         /// <summary>
+        /// The dimension of local coordinates inside the element, indicating the size of localCoordinates arguments. 1 = 1D, 2 = 2D, 3 = 3D.
+        /// </summary>
+        public override int LocalDimension => 1;
+
+        /// <summary>
         /// The number of nodes in the element
         /// </summary>
         public override int NumOfNodes => 2;
@@ -247,15 +252,6 @@ namespace FEA_Program.Models
             n[0, 3] = n4;
     
             return n;
-        }
-
-        /// <summary>
-        /// Get the material's constitutive matrix for the given element
-        /// </summary>
-        /// <returns></returns>
-        protected override DenseMatrix D_Matrix()
-        {
-            return new DenseMatrix(1, 1, [Material.E]);
         }
 
         // ---------------- Private helpers ----------------
