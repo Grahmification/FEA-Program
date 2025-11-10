@@ -10,6 +10,9 @@ namespace FEA_Program.Models
     public enum ElementTypes
     {
         [Description("Linear Truss")]
-        TrussLinear
+        TrussLinear,
+
+        [Description("Linear Beam")]
+        BeamLinear
     }
 }

@@ -107,7 +107,7 @@ namespace FEA_Program.Models
         /// Gets the element stiffness matrix
         /// </summary>
         /// <returns></returns>
-        public DenseMatrix K_Matrix()
+        public virtual DenseMatrix K_Matrix()
         {
             var K_local = new DenseMatrix(2, 2);
             K_local[0, 0] = 1;
@@ -118,8 +118,9 @@ namespace FEA_Program.Models
             var B = B_Matrix();
             var D = D_Matrix();
 
+            // Note: This equation only works for elements where [B] is constant over the element's volume
             // K = Scaling * [B]^T * [D] * [B] 
-            return (DenseMatrix)(StiffnessScalingFactor() * B.TransposeThisAndMultiply(D * B));
+            return (DenseMatrix)(Volume() * B.TransposeThisAndMultiply(D * B));
         }
 
         /// <summary>
@@ -132,7 +133,7 @@ namespace FEA_Program.Models
             DenseVector globalNodeQ = NodeExtensions.BuildVector([.. _nodes], (n) => n.Displacement);
 
             // Stress = [D] * [B] * [Q]
-            return D_Matrix() * B_Matrix() * globalNodeQ;
+            return D_Matrix() * B_Matrix(localCoords) * globalNodeQ;
         }
 
         /// <summary>
@@ -149,15 +150,15 @@ namespace FEA_Program.Models
         // ---------------- Matrix Methods which parent must define ----------------
 
         /// <summary>
-        /// Gets the scaling factor for the element's K matrix
+        /// Gets the element's volume
         /// </summary>
-        protected abstract double StiffnessScalingFactor();
+        protected abstract double Volume();
 
         /// <summary>
         /// Gets the element strain / displacement matrix
         /// </summary>
         /// <returns></returns>
-        protected abstract DenseMatrix B_Matrix();
+        protected abstract DenseMatrix B_Matrix(double[]? localCoords = null);
 
         /// <summary>
         /// Get the material's constitutive matrix for the given element

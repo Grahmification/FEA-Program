@@ -179,9 +179,9 @@ namespace FEA_Program.Models
         }
 
         /// <summary>
-        /// Gets the scaling factor for the element's K matrix
+        /// Gets the element's volume
         /// </summary>
-        protected override double StiffnessScalingFactor()
+        protected override double Volume()
         {
             return Length() * _Area;
         }
@@ -190,7 +190,7 @@ namespace FEA_Program.Models
         /// Gets the element strain / displacement matrix
         /// </summary>
         /// <returns></returns>
-        protected override DenseMatrix B_Matrix()
+        protected override DenseMatrix B_Matrix(double[]? localCoords = null)
         {
             // Always B = [-1 1]*1/(x2-x1) for a 1D element
             var B_local = new DenseMatrix(1, 2); 
