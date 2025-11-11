@@ -393,7 +393,7 @@ namespace FEA_Program.ViewModels
 
             DebugMatrix.ResetMatricies();
             Draw.ResetCollections();
-            Nodes = new NodesVM(Problem.AvailableNodeDimensions, Problem.NodesHaveRotation);
+            Nodes = new NodesVM(Problem.Definition.Dimension, Problem.Definition.NodesHaveRotation);
             Nodes.SetBase(Base);
             Nodes.ItemAdding += OnNodeAdding;
             Nodes.ItemRemoving += OnNodeRemoving;
@@ -406,7 +406,7 @@ namespace FEA_Program.ViewModels
             Elements.ItemAdding += OnElementAdding;
             Elements.ItemRemoving += OnElementRemoving;
             Elements.LinkCollections(Nodes.Items, Materials.Items);
-            Elements.AddEditor.AvailableElementTypes = new(Problem.AvailableElements);
+            Elements.AddEditor.AvailableElementTypes = new(Problem.Definition.AvailableElements);
             Elements.AddEditor.SelectionManager = SelectionManager;
 
             ProblemReset?.Invoke(this, problemType);

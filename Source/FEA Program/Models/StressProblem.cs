@@ -25,6 +25,11 @@ namespace FEA_Program.Models
         public ProblemTypes ProblemType { get; private set; }
 
         /// <summary>
+        /// Basic properties of the problem for it's type
+        /// </summary>
+        public ProblemDefinition Definition => new(ProblemType);
+
+        /// <summary>
         /// Manages solving the solution
         /// </summary>
         public Solver Solver { get; private set; } = new Solver();
@@ -38,48 +43,6 @@ namespace FEA_Program.Models
         /// All nodes in the problem
         /// </summary>
         public List<Node> Nodes => _Nodes.Values.ToList();
-
-        /// <summary>
-        /// which elements are available depending on problem type
-        /// </summary>
-        public ElementTypes[] AvailableElements => ProblemType switch
-        {
-            ProblemTypes.Truss_1D => [ElementTypes.TrussLinear],
-            ProblemTypes.Truss_3D => [ElementTypes.TrussLinear],
-
-            // Default case: return empty
-            _ => []
-        };
-
-        /// <summary>
-        /// Which node dimensions can be used for given problem type
-        /// </summary>
-        public int AvailableNodeDimensions => ProblemType switch
-        {
-            // Case for 1 DOFs
-            ProblemTypes.Truss_1D or ProblemTypes.Beam_1D => 1,
-
-            // Case for 3 DOFs
-            ProblemTypes.Truss_3D => 3,
-
-            // Default case (return 0)
-            _ => 0
-        };
-
-        /// <summary>
-        /// Whether nodes have rotation for the given problem type
-        /// </summary>
-        public bool NodesHaveRotation => ProblemType switch
-        {
-            // Trusses - no rotation
-            ProblemTypes.Truss_1D or ProblemTypes.Truss_3D => false,
-
-            // Beams - rotation
-            ProblemTypes.Beam_1D => true,
-
-            // Default
-            _ => false
-        };
 
         // ---------------------- Public Methods ----------------------------
 
@@ -103,8 +66,8 @@ namespace FEA_Program.Models
             if (_Nodes.ContainsKey(node.ID))
                 throw new ArgumentException($"Could not add node {node.ID} to problem. Problem already contains that ID.");
 
-            if (node.DOFs != AvailableNodeDimensions)
-                throw new ArgumentException($"Could not add node {node.ID} to problem. Node has {node.DOFs} DOFs, and problem only supports {AvailableNodeDimensions} DOFs.");
+            if (node.DOFs != Definition.NodeDOFs)
+                throw new ArgumentException($"Could not add node {node.ID} to problem. Node has {node.DOFs} DOFs, and problem only supports {Definition.NodeDOFs} DOFs.");
 
             // dont want to create node where one already is
             if (NodeExtensions.NodeExistsAtLocation(node.Coordinates, Nodes))
@@ -139,7 +102,7 @@ namespace FEA_Program.Models
             if (_Elements.ContainsKey(element.ID))
                 throw new ArgumentException($"Could not add element {element.ID} to problem. Problem already contains that ID.");
 
-            if (!AvailableElements.Contains(element.ElementType))
+            if (!Definition.AvailableElements.Contains(element.ElementType))
                 throw new ArgumentException($"Could not add element {element.ID} to problem. Problem does not support element type {Enum.GetName(element.ElementType)}.");
 
             // Make sure we aren't adding a duplicate element

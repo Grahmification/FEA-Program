@@ -50,7 +50,7 @@ namespace FEA_Program.Models
         /// <summary>
         /// Number of DOFs in the node
         /// </summary>
-        public int DOFs => HasRotation ? 2 * Dimension : Dimension;
+        public int DOFs => NumberOfDOFs(Dimension, HasRotation);
 
         /// <summary>
         /// True if the solution for the node is current
@@ -255,5 +255,16 @@ namespace FEA_Program.Models
         /// </summary>
         /// <returns></returns>
         public static Node DummyNode(int dimension = 1) => new(InvalidID, dimension);
+
+        /// <summary>
+        /// Get the number of node DOFs for a given configuration
+        /// </summary>
+        /// <param name="dimension">The problem dimension</param>
+        /// <param name="hasRotation">Whether the node has rotation</param>
+        /// <returns>The number of DOFs a node should have</returns>
+        public static int NumberOfDOFs(int dimension, bool hasRotation)
+        {
+            return hasRotation ? 2 * dimension : dimension;
+        }
     }
 }
