@@ -463,7 +463,7 @@ namespace FEA_Program.ViewModels
                 switch (item.ElementType)
                 {
                     case ElementTypes.TrussLinear:
-                        element = new ElementTrussLinear(1, item.ID, elementNodes, elementMaterial, item.NodeDOFs)
+                        element = new ElementTrussLinear(1, item.ID, elementNodes, elementMaterial, item.Dimension)
                         {
                             ElementArgs = item.ElementArgs
                         };
@@ -492,7 +492,8 @@ namespace FEA_Program.ViewModels
             {
                 output.Nodes.Add(new NodeProblemData
                 {
-                    Dimension = node.DOFs,
+                    Dimension = node.Dimension,
+                    HasRotation = node.HasRotation,
                     ID = node.ID,
                     Coords = node.Coordinates,
                     Fixity = node.Fixity,
@@ -508,7 +509,7 @@ namespace FEA_Program.ViewModels
                     ID = element.ID,
                     MaterialID = element.Material.ID,
                     NodeIDs = element.Nodes.Select(n => n.ID).ToArray(),
-                    NodeDOFs = element.NodeDOFs,
+                    Dimension = element.Dimension,
                     ElementType = element.ElementType,
                     ElementArgs = element.ElementArgs,
                     BodyForce = [.. element.BodyForce],

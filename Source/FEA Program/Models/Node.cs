@@ -9,11 +9,6 @@ namespace FEA_Program.Models
     internal class Node : IDClass, INode, ICloneable
     {
         /// <summary>
-        /// Provides a list of available dimsensions for error checking
-        /// </summary>
-        public static int[] ValidDimensions = [1, 2, 3];
-
-        /// <summary>
         /// Coordinates of the node center in program units (m). Length depends on DOFs.
         /// </summary>
         private double[] _Coordinates;
@@ -38,9 +33,9 @@ namespace FEA_Program.Models
         // ---------------------- Properties ----------------------
 
         /// <summary>
-        /// The dimension of the node in global problem space. 1 = 1D, 2 = 2D, 3 = 3D
+        /// The dimension of the node in global problem space.
         /// </summary>
-        public int Dimension { get; private set; }
+        public Dimensions Dimension { get; private set; }
 
         /// <summary>
         /// True if the node includes rotary DOFs and moments
@@ -116,7 +111,7 @@ namespace FEA_Program.Models
         /// </summary>
         /// <param name="id">The idenfier for the class</param>
         /// <param name="dofs">Number of DOFs in the node</param>
-        public Node(int id, int dimension, bool hasRotation = false) : base(id)
+        public Node(int id, Dimensions dimension, bool hasRotation = false) : base(id)
         {
             Dimension = dimension;
             HasRotation = hasRotation;
@@ -136,14 +131,14 @@ namespace FEA_Program.Models
         /// <param name="id">The idenfier for the class</param>
         /// <param name="dofs">Number of DOFs in the node</param>
         /// <exception cref="Exception">A parameter was incorrect</exception>
-        public Node(double[] coords, int[] fixity, int id, int dimension, bool hasRotation = false) : base(id)
+        public Node(double[] coords, int[] fixity, int id, Dimensions dimension, bool hasRotation = false) : base(id)
         {
             Dimension = dimension;
             HasRotation = hasRotation;
 
-            if (!ValidDimensions.Contains(dimension))
+            if (dimension == Dimensions.Invalid)
             {
-                throw new Exception($"Attempted to create element, ID <{id}> with invalid number of dimensions: {dimension}.");
+                throw new Exception($"Attempted to create element, ID <{id}> with invalid number of dimensions.");
             }
 
             ValidateDOFs(coords, MethodBase.GetCurrentMethod()?.Name ?? "");
@@ -254,7 +249,7 @@ namespace FEA_Program.Models
         /// Gets an empty node for reference use
         /// </summary>
         /// <returns></returns>
-        public static Node DummyNode(int dimension = 1) => new(InvalidID, dimension);
+        public static Node DummyNode(Dimensions dimension = Dimensions.One) => new(InvalidID, dimension);
 
         /// <summary>
         /// Get the number of node DOFs for a given configuration
@@ -262,9 +257,9 @@ namespace FEA_Program.Models
         /// <param name="dimension">The problem dimension</param>
         /// <param name="hasRotation">Whether the node has rotation</param>
         /// <returns>The number of DOFs a node should have</returns>
-        public static int NumberOfDOFs(int dimension, bool hasRotation)
+        public static int NumberOfDOFs(Dimensions dimension, bool hasRotation)
         {
-            return hasRotation ? 2 * dimension : dimension;
+            return hasRotation ? 2 * (int)dimension : (int)dimension;
         }
     }
 }

@@ -18,9 +18,9 @@
         public int[] NodeIDs { get; set; } = [];
 
         /// <summary>
-        /// The number of DOFs for nodes in the element
+        /// The global dimension of the element
         /// </summary>
-        public int NodeDOFs { get; set; } = 1;
+        public Dimensions Dimension { get; set; } = Dimensions.Invalid;
         public ElementTypes ElementType { get; set; } = ElementTypes.TrussLinear;
 
         /// <summary>

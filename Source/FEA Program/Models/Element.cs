@@ -46,9 +46,9 @@ namespace FEA_Program.Models
         public bool SolutionValid { get; protected set; } = false;
 
         /// <summary>
-        /// The dimension of local coordinates inside the element, indicating the size of localCoordinates arguments. 1 = 1D, 2 = 2D, 3 = 3D.
+        /// The dimension of local coordinates inside the element, indicating the size of localCoordinates arguments.
         /// </summary>
-        public abstract int LocalDimension { get; }
+        public abstract Dimensions LocalDimension { get; }
 
         /// <summary>
         /// The number of nodes in the element
@@ -159,12 +159,12 @@ namespace FEA_Program.Models
         protected DenseMatrix D_Matrix()
         {
             // Elements with 1D local coordinate space. D = [1x1]
-            if (LocalDimension == 1)
+            if (LocalDimension == Dimensions.One)
             {
                 return new DenseMatrix(1, 1, [Material.E]);
             }
             // Elements with 2D local coordinate space. D = [3x3]
-            else if (LocalDimension == 2)
+            else if (LocalDimension == Dimensions.Two)
             {
                 var V = Material.V;
 
@@ -250,13 +250,13 @@ namespace FEA_Program.Models
         /// <param name="targetLength">The correct length of the collection</param>
         /// <param name="methodName">The calling method name</param>
         /// <exception cref="ArgumentOutOfRangeException">The length was invalid</exception>
-        protected void ValidateLength<T>(IReadOnlyCollection<T> coordinates, int targetLength, string? methodName)
+        protected void ValidateLength<T>(IReadOnlyCollection<T> coordinates, Dimensions targetLength, string? methodName)
         {
             methodName ??= "Unknown";
 
-            if (coordinates.Count != targetLength)
+            if (coordinates.Count != (int)targetLength)
             {
-                throw new ArgumentOutOfRangeException($"Wrong number of array values input to <{methodName}> for Element ID <{ID}>. Element has {NodeDOFs} node DOFs.");
+                throw new ArgumentOutOfRangeException($"Wrong number of array values input to <{methodName}> for Element ID <{ID}>. Element has {(int)targetLength} dimensions.");
             }
         }
     }

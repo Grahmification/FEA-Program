@@ -8,9 +8,9 @@
         public int ID { get; set; } = IDClass.InvalidID;
 
         /// <summary>
-        /// Number of DOFs in the node
+        /// Dimension of the node
         /// </summary>
-        public int Dimension { get; set; } = 1;
+        public Dimensions Dimension { get; set; } = Dimensions.Invalid;
 
         /// <summary>
         /// True if the node includes rotary DOFs and moments

@@ -19,14 +19,14 @@ namespace FEA_Program.Models
         public ElementTypes ElementType => ElementTypes.BeamLinear;
 
         /// <summary>
-        /// The dimension of the element in global problem coordinates. 1 = 1D, 2 = 2D, 3 = 3D.
+        /// The dimension of the element in global problem coordinates.
         /// </summary>
-        public int GlobalDimension { get; private set; } = 1;
+        public Dimensions Dimension { get; private set; }
 
         /// <summary>
-        /// The dimension of local coordinates inside the element, indicating the size of localCoordinates arguments. 1 = 1D, 2 = 2D, 3 = 3D.
+        /// The dimension of local coordinates inside the element, indicating the size of localCoordinates arguments.
         /// </summary>
-        public override int LocalDimension => 1;
+        public override Dimensions LocalDimension => Dimensions.One;
 
         /// <summary>
         /// The number of nodes in the element
@@ -62,17 +62,16 @@ namespace FEA_Program.Models
         /// <param name="nodes">All nodes in the element</param>
         /// <param name="material">The element's material</param>
         /// <exception cref="ArgumentException">Raised if a parameter is invalid</exception>
-        public ElementBeamLinear(int id, List<INode> nodes, Material material) : base(id, nodes, material, 2)
+        public ElementBeamLinear(int id, List<INode> nodes, Material material) : base(id, nodes, material, Node.NumberOfDOFs(Dimensions.One, true))
         {   
             // Only support 1D problems for now
-            GlobalDimension = 1;
+            Dimension = Dimensions.One;
             
-            // Creating the child instantiates NodeDOFs
-            if (NodeDOFs != 2 * GlobalDimension)
-                throw new ArgumentException($"Cannot create {ElementType} element with {NodeDOFs} DOFs. Unsupported");
+            if (Dimension != Dimensions.One)
+                throw new ArgumentException($"Cannot create {ElementType} element with {NodeDOFs} dimensions. Unsupported");
 
-            BodyForce = new DenseVector(NodeDOFs);
-            TractionForce = new DenseVector(NodeDOFs);
+            BodyForce = new DenseVector((int)Dimension);
+            TractionForce = new DenseVector((int)Dimension);
         }
 
         /// <summary>
@@ -81,7 +80,7 @@ namespace FEA_Program.Models
         /// <param name="forcePerVol">The body force matrix [Element Dimension x 1]</param>
         public void SetBodyForce(DenseVector forcePerVol)
         {
-            ValidateLength(forcePerVol.Values, GlobalDimension, MethodBase.GetCurrentMethod()?.Name);
+            ValidateLength(forcePerVol.Values, Dimension, MethodBase.GetCurrentMethod()?.Name);
             BodyForce = forcePerVol;
             InvalidateSolution();
         }
@@ -92,7 +91,7 @@ namespace FEA_Program.Models
         /// <param name="forcePerLength">The traction force matrix [Element Dimension x 1]</param>
         public void SetTractionForce(DenseVector forcePerLength)
         {
-            ValidateLength(forcePerLength.Values, GlobalDimension, MethodBase.GetCurrentMethod()?.Name);
+            ValidateLength(forcePerLength.Values, Dimension, MethodBase.GetCurrentMethod()?.Name);
             TractionForce = forcePerLength;
             InvalidateSolution();
         }
@@ -113,10 +112,10 @@ namespace FEA_Program.Models
         /// <returns></returns>
         public DenseVector BodyForceMatrix()
         {
-            var local_body = new DenseMatrix(ElementDOFs, GlobalDimension);
+            var local_body = new DenseMatrix(ElementDOFs, (int)Dimension);
             var l = Length();
 
-            if (GlobalDimension == 1)
+            if (Dimension == Dimensions.One)
             {
                 // [4x1] = [4x1] * [1x1]
                 local_body[0, 0] = 1 / 2.0;
@@ -210,12 +209,12 @@ namespace FEA_Program.Models
             // This type of element requires local coordinates for the B matrix
             ArgumentNullException.ThrowIfNull(localCoords);
 
-            ValidateLength(localCoords, 1, MethodBase.GetCurrentMethod()?.Name);
+            ValidateLength(localCoords, LocalDimension, MethodBase.GetCurrentMethod()?.Name);
             double eta = localCoords[0];
             double l = Length();
 
             // B is based on the derivative of N -> dN/de
-            var B = new DenseMatrix(GlobalDimension, ElementDOFs);
+            var B = new DenseMatrix((int)Dimension, ElementDOFs);
 
             // Element Dimension 1
             // B = [1 x 4]
@@ -234,7 +233,7 @@ namespace FEA_Program.Models
         /// <returns></returns>
         protected override DenseMatrix N_Matrix(double[] localCoords)
         {
-            ValidateLength(localCoords, 1, MethodBase.GetCurrentMethod()?.Name);
+            ValidateLength(localCoords, LocalDimension, MethodBase.GetCurrentMethod()?.Name);
             double eta = localCoords[0];
             double n1 = 0.25 * (1 - eta) * (1 - eta) * (2 + eta);
             double n2 = 0.25 * (1 - eta) * (1 - eta) * (1 + eta) * Length() / 2.0;
@@ -242,7 +241,7 @@ namespace FEA_Program.Models
             double n4 = 0.25 * (1 + eta) * (1 + eta) * (eta - 1) * Length() / 2.0;
 
             // u = Nq - size based element dimension
-            var n = new DenseMatrix(GlobalDimension, ElementDOFs);
+            var n = new DenseMatrix((int)Dimension, ElementDOFs);
 
             // Element Dimension 1
             // u[1x1] = N[1x4] * q[4x1]

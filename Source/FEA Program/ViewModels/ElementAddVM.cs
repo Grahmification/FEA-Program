@@ -393,7 +393,7 @@ namespace FEA_Program.ViewModels
                 switch (SelectedElementType)
                 {
                     case ElementTypes.TrussLinear:
-                        element = new ElementTrussLinear(1, _NewID, [.. elementNodes.Select(n => n.Model).Cast<INode>()], elementMaterial.Model, elementNodes[0].Model.DOFs);
+                        element = new ElementTrussLinear(1, _NewID, [.. elementNodes.Select(n => n.Model).Cast<INode>()], elementMaterial.Model, elementNodes[0].Model.Dimension);
                         break;
                 }
 

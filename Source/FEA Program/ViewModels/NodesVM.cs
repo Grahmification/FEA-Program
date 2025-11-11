@@ -20,7 +20,7 @@ namespace FEA_Program.ViewModels
         /// <summary>
         /// The problem dimension for creating new nodes
         /// </summary>
-        private readonly int _problemDimension = -1;
+        private readonly Dimensions _problemDimension = Dimensions.Invalid;
 
         /// <summary>
         /// Whether the problem has rotation for creating new nodes
@@ -86,7 +86,7 @@ namespace FEA_Program.ViewModels
         /// Primary constructor
         /// </summary>
         /// <param name="problemDOFs">Number of DOFs used for creating new nodes</param>
-        public NodesVM(int problemDOFs = -1, bool problemHasRotation = false)
+        public NodesVM(Dimensions problemDOFs = Dimensions.Invalid, bool problemHasRotation = false)
         {
             _problemDimension = problemDOFs;
             _problemHasRotation = problemHasRotation;

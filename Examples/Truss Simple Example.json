@@ -85,7 +85,7 @@
         1,
         4
       ],
-      "nodeDOFs": 3,
+      "dimension": 3,
       "elementType": 0,
       "bodyForce": [
         0,
@@ -108,7 +108,7 @@
         4,
         2
       ],
-      "nodeDOFs": 3,
+      "dimension": 3,
       "elementType": 0,
       "bodyForce": [
         0,
@@ -131,7 +131,7 @@
         3,
         4
       ],
-      "nodeDOFs": 3,
+      "dimension": 3,
       "elementType": 0,
       "bodyForce": [
         0,

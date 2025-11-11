@@ -23,16 +23,16 @@
         /// <summary>
         /// The dimension of the current problem
         /// </summary>
-        public int Dimension => _problemType switch
+        public Dimensions Dimension => _problemType switch
         {
             // Case for 1 DOFs
-            ProblemTypes.Truss_1D or ProblemTypes.Beam_1D => 1,
+            ProblemTypes.Truss_1D or ProblemTypes.Beam_1D => Dimensions.One,
 
             // Case for 3 DOFs
-            ProblemTypes.Truss_3D => 3,
+            ProblemTypes.Truss_3D => Dimensions.Three,
 
-            // Default case (return 0)
-            _ => 0
+            // Default case
+            _ => Dimensions.Invalid
         };
 
         /// <summary>

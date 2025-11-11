@@ -19,19 +19,14 @@ namespace FEA_Program.Models
         public Material Material { get; set; }
 
         /// <summary>
+        /// The dimension of the element in global problem coordinates
+        /// </summary>
+        public Dimensions Dimension { get; }
+
+        /// <summary>
         /// The number of nodes in the element
         /// </summary>
         public int NumOfNodes { get; }
-
-        /// <summary>
-        /// The DOFs in each nodes of the element
-        /// </summary>
-        public int NodeDOFs { get; }
-
-        /// <summary>
-        /// The total DOFs in the element
-        /// </summary>
-        public int ElementDOFs { get; }
 
         /// <summary>
         /// Type identifier for the element

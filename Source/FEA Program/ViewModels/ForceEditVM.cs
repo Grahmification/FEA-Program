@@ -148,7 +148,7 @@ namespace FEA_Program.ViewModels
         /// </summary>
         /// <param name="nodes"></param>
         /// <param name="dimension"></param>
-        public void DisplayEditorAdd(List<NodeVM> nodes, int dimension)
+        public void DisplayEditorAdd(List<NodeVM> nodes, Dimensions dimension)
         {
             Opening?.Invoke(this, EventArgs.Empty);
             SelectionManager.AllowMultiSelect = true;
@@ -160,7 +160,7 @@ namespace FEA_Program.ViewModels
             foreach (var node in nodes)
                 Nodes.Add(new(node));
 
-            for (int i = 0; i < dimension; i++)
+            for (int i = 0; i < (int)dimension; i++)
             {
                 var coordVM = new CoordinateVM(i, 0, false);
                 coordVM.ValueChanged += OnCoordinateValueChanged;

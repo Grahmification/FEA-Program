@@ -19,9 +19,14 @@ namespace FEA_Program.Models
         public ElementTypes ElementType => ElementTypes.TrussLinear;
 
         /// <summary>
-        /// The dimension of local coordinates inside the element, indicating the size of localCoordinates arguments. 1 = 1D, 2 = 2D, 3 = 3D.
+        /// The dimension of the element in global problem coordinates.
         /// </summary>
-        public override int LocalDimension => 1;
+        public Dimensions Dimension { get; private set; }
+
+        /// <summary>
+        /// The dimension of local coordinates inside the element, indicating the size of localCoordinates arguments.
+        /// </summary>
+        public override Dimensions LocalDimension => Dimensions.One;
 
         /// <summary>
         /// The number of nodes in the element
@@ -57,19 +62,21 @@ namespace FEA_Program.Models
         /// <param name="id">Element ID</param>
         /// <param name="nodes">All nodes in the element</param>
         /// <param name="material">The element's material</param>
-        /// <param name="nodeDOFs">The number of DOFs for nodes in the element</param>
+        /// <param name="dimension">The number of DOFs for nodes in the element</param>
         /// <exception cref="ArgumentException">Raised if a parameter is invalid</exception>
-        public ElementTrussLinear(double area, int id, List<INode> nodes, Material material, int nodeDOFs = 1) : base(id, nodes, material, nodeDOFs)
+        public ElementTrussLinear(double area, int id, List<INode> nodes, Material material, Dimensions dimension = Dimensions.One) : base(id, nodes, material, Node.NumberOfDOFs(dimension, false))
         {
+            Dimension = dimension;
+            
             if (area <= 0)
                 throw new ArgumentException($"Cannot create {ElementType} element with non-positive area.");
 
-            if (nodeDOFs != 1 & nodeDOFs != 2 & nodeDOFs != 3)
-                throw new ArgumentException($"Cannot create {ElementType} element with {nodeDOFs} DOFs. Unsupported");
+            if (Dimension == Dimensions.Invalid)
+                throw new ArgumentException($"Cannot create {ElementType} element with {Dimension} dimension. Unsupported");
 
             _Area = area;
-            BodyForce = new DenseVector(NodeDOFs);
-            TractionForce = new DenseVector(NodeDOFs);
+            BodyForce = new DenseVector((int)Dimension);
+            TractionForce = new DenseVector((int)Dimension);
         }
 
         /// <summary>
@@ -78,7 +85,7 @@ namespace FEA_Program.Models
         /// <param name="forcePerVol">The body force matrix [Node DOF x 1]</param>
         public void SetBodyForce(DenseVector forcePerVol)
         {
-            ValidateLength(forcePerVol.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
+            ValidateLength(forcePerVol.Values, Dimension, MethodBase.GetCurrentMethod()?.Name);
             BodyForce = forcePerVol;
             InvalidateSolution();
         }
@@ -89,7 +96,7 @@ namespace FEA_Program.Models
         /// <param name="forcePerLength">The traction force matrix [Node DOF x 1]</param>
         public void SetTractionForce(DenseVector forcePerLength)
         {
-            ValidateLength(forcePerLength.Values, NodeDOFs, MethodBase.GetCurrentMethod()?.Name);
+            ValidateLength(forcePerLength.Values, Dimension, MethodBase.GetCurrentMethod()?.Name);
             TractionForce = forcePerLength;
             InvalidateSolution();
         }
@@ -213,7 +220,7 @@ namespace FEA_Program.Models
         /// <returns></returns>
         protected override DenseMatrix N_Matrix(double[] localCoords)
         {
-            ValidateLength(localCoords, 1, MethodBase.GetCurrentMethod()?.Name);
+            ValidateLength(localCoords, LocalDimension, MethodBase.GetCurrentMethod()?.Name);
             double eta = localCoords[0];
             double n1 = (1 - eta) / 2.0;
             double n2 = (1 + eta) / 2.0;
