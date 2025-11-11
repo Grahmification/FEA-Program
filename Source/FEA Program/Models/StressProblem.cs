@@ -70,7 +70,7 @@ namespace FEA_Program.Models
                 throw new ArgumentException($"Could not add node {node.ID} to problem. Node has {node.DOFs} DOFs, and problem only supports {Definition.NodeDOFs} DOFs.");
 
             // dont want to create node where one already is
-            if (NodeExtensions.NodeExistsAtLocation(node.Coordinates, Nodes))
+            if (NodeExtensions.NodeExistsAtLocation(node.Position, Nodes))
                 throw new Exception("Tried to add a node at location where one already exists. Nodes cannot be in identical locations.");
 
             _Nodes[node.ID] = node;

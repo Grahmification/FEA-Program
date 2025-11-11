@@ -3,7 +3,7 @@
     {
       "dimension": 3,
       "id": 1,
-      "coords": [
+      "position": [
         0,
         0,
         0.001
@@ -22,7 +22,7 @@
     {
       "dimension": 3,
       "id": 2,
-      "coords": [
+      "position": [
         0,
         0,
         -0.001
@@ -41,7 +41,7 @@
     {
       "dimension": 3,
       "id": 3,
-      "coords": [
+      "position": [
         0.003,
         0,
         0.001
@@ -60,7 +60,7 @@
     {
       "dimension": 3,
       "id": 4,
-      "coords": [
+      "position": [
         0.006,
         0,
         0.001
@@ -79,7 +79,7 @@
     {
       "dimension": 3,
       "id": 5,
-      "coords": [
+      "position": [
         -0.003,
         0,
         -0.001
@@ -98,7 +98,7 @@
     {
       "dimension": 3,
       "id": 6,
-      "coords": [
+      "position": [
         -0.003,
         0,
         0.001
@@ -117,7 +117,7 @@
     {
       "dimension": 3,
       "id": 7,
-      "coords": [
+      "position": [
         -0.006,
         0,
         -0.001
@@ -136,7 +136,7 @@
     {
       "dimension": 3,
       "id": 8,
-      "coords": [
+      "position": [
         0.003,
         0,
         -0.001
@@ -155,7 +155,7 @@
     {
       "dimension": 3,
       "id": 9,
-      "coords": [
+      "position": [
         -0.006,
         0,
         0.001
@@ -174,7 +174,7 @@
     {
       "dimension": 3,
       "id": 10,
-      "coords": [
+      "position": [
         0.006,
         0,
         -0.001
@@ -193,7 +193,7 @@
     {
       "dimension": 3,
       "id": 11,
-      "coords": [
+      "position": [
         0,
         0.003,
         0.001
@@ -212,7 +212,7 @@
     {
       "dimension": 3,
       "id": 12,
-      "coords": [
+      "position": [
         0,
         0.003,
         -0.001
@@ -231,7 +231,7 @@
     {
       "dimension": 3,
       "id": 13,
-      "coords": [
+      "position": [
         0.003,
         0.003,
         0.001
@@ -250,7 +250,7 @@
     {
       "dimension": 3,
       "id": 14,
-      "coords": [
+      "position": [
         0.003,
         0.003,
         -0.001
@@ -269,7 +269,7 @@
     {
       "dimension": 3,
       "id": 15,
-      "coords": [
+      "position": [
         -0.003,
         0.003,
         0.001
@@ -288,7 +288,7 @@
     {
       "dimension": 3,
       "id": 16,
-      "coords": [
+      "position": [
         -0.003,
         0.003,
         -0.001

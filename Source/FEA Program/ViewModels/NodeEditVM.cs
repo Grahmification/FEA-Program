@@ -125,9 +125,9 @@ namespace FEA_Program.ViewModels
 
             EditCoordinates.Clear();
 
-            for (int i = 0; i < EditItem.Model.DOFs; i++)
+            for (int i = 0; i < (int)EditItem.Model.Dimension; i++)
             {
-                var userCoord = App.Units.Length.ToUser(EditItem.Model.Coordinates[i]);  // Convert to user units
+                var userCoord = App.Units.Length.ToUser(EditItem.Model.Position[i]);  // Convert to user units
                 var coordVM = new CoordinateVM(i, userCoord, EditItem.Model.Fixity[i] == 1);
                 coordVM.ValueChanged += OnCoordinateValueChanged;
                 EditCoordinates.Add(coordVM);
@@ -175,13 +175,13 @@ namespace FEA_Program.ViewModels
         {
             if (sender is CoordinateVM vm && EditItem is not null)
             {
-                EditItem.Model.Coordinates[e] = App.Units.Length.FromUser(vm.Value);  // Convert from user units
+                EditItem.Model.Position[e] = App.Units.Length.FromUser(vm.Value);  // Convert from user units
                 EditItem.Model.Fixity[e] = vm.Fixed ? 1 : 0;
 
                 // Set the whole array to itself to make sure PropertyChanged event gets raised.
                 // This will also invalidate the solution
                 EditItem.Model.Fixity = [.. EditItem.Model.Fixity.ToList()];
-                EditItem.Model.Coordinates = [.. EditItem.Model.Coordinates.ToList()];
+                EditItem.Model.Position = [.. EditItem.Model.Position.ToList()];
             }
         }
 

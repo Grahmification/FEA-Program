@@ -149,11 +149,11 @@ namespace FEA_Program.ViewModels
             if (scaleFactor < 0)
                 scaleFactor = 0;
             
-            var output = new double[Node.Model.DOFs];
+            var output = new double[(int)Node.Model.Dimension];
 
-            for (int i = 0; i < Node.Model.Coordinates.Length; i++)
+            for (int i = 0; i < Node.Model.Position.Length; i++)
             {
-                output[i] = Node.Model.Coordinates[i];
+                output[i] = Node.Model.Position[i];
 
                 // Don't show invalid displacements
                 if (Node.DisplacementIsValid)

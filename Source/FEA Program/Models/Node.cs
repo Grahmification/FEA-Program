@@ -9,12 +9,12 @@ namespace FEA_Program.Models
     internal class Node : IDClass, INode, ICloneable
     {
         /// <summary>
-        /// Coordinates of the node center in program units (m). Length depends on DOFs.
+        /// Position of the node center in program units (m). Length depends on Dimension.
         /// </summary>
-        private double[] _Coordinates;
+        private double[] _Position;
 
         /// <summary>
-        /// Whether each dimension of the node is fixed. 0 = floating, 1 = fixed. Length depends on DOFs.
+        /// Whether each DOF of the node is fixed. 0 = floating, 1 = fixed. Length depends on DOFs.
         /// </summary>
         private int[] _Fixity;
 
@@ -55,13 +55,15 @@ namespace FEA_Program.Models
         /// <summary>
         /// Coordinates of the node center in program units (m). Length depends on DOFs.
         /// </summary>
-        public double[] Coordinates
+        public double[] Position
         {
-            get { return _Coordinates; }
+            get { return _Position; }
             set
             {
-                ValidateDOFs<double>(value, MethodBase.GetCurrentMethod()?.Name ?? "");
-                _Coordinates = value;
+                if (value.Length != (int)Dimension)
+                    throw new ArgumentOutOfRangeException($"Attempted to set position for node ID <{ID}> with input params having different dimensions than specified node dimension.");
+
+                _Position = value;
                 InvalidateSolution();
             }
         }
@@ -116,7 +118,7 @@ namespace FEA_Program.Models
             Dimension = dimension;
             HasRotation = hasRotation;
 
-            _Coordinates = new double[DOFs];
+            _Position = new double[(int)dimension];
             _Fixity = new int[DOFs];
             _Force = new double[DOFs];
             Displacement = new double[DOFs];
@@ -126,12 +128,12 @@ namespace FEA_Program.Models
         /// <summary>
         /// Constructor with more parameters
         /// </summary>
-        /// <param name="coords">Coordinates of the node center in program units (m). Length depends on DOFs.</param>
+        /// <param name="position">Coordinates of the node center in program units (m). Length depends on DOFs.</param>
         /// <param name="fixity">Whether each dimension of the node is fixed. 0 = floating, 1 = fixed. Length depends on DOFs.</param>
         /// <param name="id">The idenfier for the class</param>
         /// <param name="dofs">Number of DOFs in the node</param>
         /// <exception cref="Exception">A parameter was incorrect</exception>
-        public Node(double[] coords, int[] fixity, int id, Dimensions dimension, bool hasRotation = false) : base(id)
+        public Node(double[] position, int[] fixity, int id, Dimensions dimension, bool hasRotation = false) : base(id)
         {
             Dimension = dimension;
             HasRotation = hasRotation;
@@ -141,10 +143,10 @@ namespace FEA_Program.Models
                 throw new Exception($"Attempted to create element, ID <{id}> with invalid number of dimensions.");
             }
 
-            ValidateDOFs(coords, MethodBase.GetCurrentMethod()?.Name ?? "");
+            ValidateDOFs(position, MethodBase.GetCurrentMethod()?.Name ?? "");
             ValidateDOFs(fixity, MethodBase.GetCurrentMethod()?.Name ?? "");
 
-            _Coordinates = coords;
+            _Position = position;
             _Fixity = fixity;
             _Force = new double[DOFs];
             Displacement = new double[DOFs];
@@ -172,7 +174,7 @@ namespace FEA_Program.Models
         /// <returns></returns>
         public object Clone()
         {
-            var output = new Node((double[])Coordinates.Clone(), (int[])Fixity.Clone(), ID, Dimension, HasRotation)
+            var output = new Node((double[])Position.Clone(), (int[])Fixity.Clone(), ID, Dimension, HasRotation)
             {
                 Force = (double[])Force.Clone(),
             };
@@ -182,7 +184,7 @@ namespace FEA_Program.Models
             if(!SolutionValid)
             {
                 // This will invalidate the solution
-                output.Coordinates = (double[])Coordinates.Clone();
+                output.Position = (double[])Position.Clone();
             }
 
             return output;
@@ -195,10 +197,10 @@ namespace FEA_Program.Models
         public void ImportParameters(Node other)
         {
             // Set these underlying so SolutionInvalidate event doesn't get called
-            _Coordinates = (double[])other.Coordinates.Clone();
+            _Position = (double[])other.Position.Clone();
             _Fixity = (int[])other.Fixity.Clone();
             _Force = (double[])other.Force.Clone();
-            OnPropertyChanged(nameof(Coordinates));
+            OnPropertyChanged(nameof(Position));
             OnPropertyChanged(nameof(Fixity));
             OnPropertyChanged(nameof(Force));
 
@@ -239,7 +241,7 @@ namespace FEA_Program.Models
         {
             if (collection.Count != DOFs)
             {
-                throw new ArgumentOutOfRangeException($"Attempted to execute operation <{methodName}> for node ID <{ID}> with input params having different dimensions than specified node dimension.");
+                throw new ArgumentOutOfRangeException($"Attempted to execute operation <{methodName}> for node ID <{ID}> with input params having different DOFs than specified node DOFs.");
             }
         }
 

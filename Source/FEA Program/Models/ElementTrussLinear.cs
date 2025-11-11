@@ -107,7 +107,7 @@ namespace FEA_Program.Models
         /// <returns></returns>
         public double Length()
         {
-            return Geometry.Length(Nodes[1].Coordinates, Nodes[0].Coordinates);
+            return Geometry.Length(Nodes[1].Position, Nodes[0].Position);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace FEA_Program.Models
         protected override void SortNodeOrder(ref List<INode> nodes)
         {
             //Order from smallest to largest X coordinate
-            nodes = nodes.OrderBy(n => n.Coordinates[0]).ToList();
+            nodes = nodes.OrderBy(n => n.Position[0]).ToList();
         }
 
         /// <summary>
@@ -270,7 +270,7 @@ namespace FEA_Program.Models
             }
             else if (NodeDOFs == 2) 
             {
-                (var l, var m, _) = Geometry.ComputeDirectionCosines(Nodes[1].Coordinates, Nodes[0].Coordinates);
+                (var l, var m, _) = Geometry.ComputeDirectionCosines(Nodes[1].Position, Nodes[0].Position);
                 var matrix = new DenseMatrix(2, 4);
                 matrix[0, 0] = l;
                 matrix[0, 1] = m;
@@ -280,7 +280,7 @@ namespace FEA_Program.Models
             }
             else // Node DOFs == 3
             {
-                (var l, var m, var n) = Geometry.ComputeDirectionCosines(Nodes[1].Coordinates, Nodes[0].Coordinates);
+                (var l, var m, var n) = Geometry.ComputeDirectionCosines(Nodes[1].Position, Nodes[0].Position);
                 var matrix = new DenseMatrix(2, 6);
                 matrix[0, 0] = l;
                 matrix[0, 1] = m;

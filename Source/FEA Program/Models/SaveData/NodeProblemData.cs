@@ -20,7 +20,7 @@
         /// <summary>
         /// The node coordinates in program units (m)
         /// </summary>
-        public double[] Coords { get; set; } = [0];
+        public double[] Position { get; set; } = [0];
 
         /// <summary>
         /// The fixity for each node dimension

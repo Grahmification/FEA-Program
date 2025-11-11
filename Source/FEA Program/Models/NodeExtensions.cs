@@ -81,14 +81,14 @@ namespace FEA_Program.Models
         /// <summary>
         /// Returns true if a node already exists at the given location
         /// </summary>
-        /// <param name="coords"></param>
+        /// <param name="position"></param>
         /// <returns></returns>
-        public static bool NodeExistsAtLocation(double[] coords, IEnumerable<Node> existingNodes)
+        public static bool NodeExistsAtLocation(double[] position, IEnumerable<Node> existingNodes)
         {
             foreach (Node node in existingNodes)
             {
                 // This should work regardless of dimension
-                if (node.Coordinates.Take(node.DOFs).SequenceEqual(coords.Take(node.DOFs)))
+                if (node.Position.Take((int)node.Dimension).SequenceEqual(position.Take((int)node.Dimension)))
                     return true;
             }
 

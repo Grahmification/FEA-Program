@@ -25,7 +25,7 @@
         /// <summary>
         /// Coordinates of the node center in program units (m). Length depends on DOFs.
         /// </summary>
-        public double[] Coordinates { get; set; }
+        public double[] Position { get; set; }
 
         /// <summary>
         /// Displacement of the node center in program units (m). Length depends on DOFs.

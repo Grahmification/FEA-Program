@@ -102,8 +102,7 @@ namespace FEA_Program.Models
         /// <returns></returns>
         public double Length()
         {
-            // This only works for the 1D case
-            return Math.Abs(Nodes[1].Coordinates[0] - Nodes[0].Coordinates[0]);
+            return Geometry.Length(Nodes[1].Position, Nodes[0].Position);
         }
 
         /// <summary>
@@ -188,7 +187,7 @@ namespace FEA_Program.Models
         protected override void SortNodeOrder(ref List<INode> nodes)
         {
             //Order from smallest to largest X coordinate
-            nodes = nodes.OrderBy(n => n.Coordinates[0]).ToList();
+            nodes = nodes.OrderBy(n => n.Position[0]).ToList();
         }
 
         /// <summary>

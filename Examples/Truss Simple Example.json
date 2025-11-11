@@ -3,7 +3,7 @@
     {
       "dimension": 3,
       "id": 1,
-      "coords": [
+      "position": [
         0,
         0,
         0
@@ -22,7 +22,7 @@
     {
       "dimension": 3,
       "id": 2,
-      "coords": [
+      "position": [
         0.01,
         0,
         0
@@ -41,7 +41,7 @@
     {
       "dimension": 3,
       "id": 3,
-      "coords": [
+      "position": [
         0,
         0.01,
         0
@@ -60,7 +60,7 @@
     {
       "dimension": 3,
       "id": 4,
-      "coords": [
+      "position": [
         0.005,
         0.007,
         0.013000000000000001

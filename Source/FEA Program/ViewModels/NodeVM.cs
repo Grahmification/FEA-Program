@@ -56,9 +56,9 @@ namespace FEA_Program.ViewModels
         public ObservableCollection<TreePropertyVM> ResultProperties { get; private set; } = [];
 
         /// <summary>
-        /// Get the node coordinates in user units
+        /// Get the node position in user units
         /// </summary>
-        public double[] UserCoordinates => Model.Coordinates.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
+        public double[] UserCoordinates => Model.Position.Select(coord => App.Units.Length.ToUser(coord)).ToArray();
 
         /// <summary>
         /// Get the node displacement in user units
@@ -213,7 +213,7 @@ namespace FEA_Program.ViewModels
         {
             if (sender is Node node)
             {
-                if (e.PropertyName == nameof(Node.Coordinates))
+                if (e.PropertyName == nameof(Node.Position))
                 {
                     OnPropertyChanged(nameof(UserCoordinates));
                     OnPropertyChanged(nameof(UserFinalPos));
