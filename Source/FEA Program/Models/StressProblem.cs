@@ -52,9 +52,9 @@ namespace FEA_Program.Models
         };
 
         /// <summary>
-        /// Which node DOF should be used for given problem type
+        /// Which node dimensions can be used for given problem type
         /// </summary>
-        public int AvailableNodeDOFs => ProblemType switch
+        public int AvailableNodeDimensions => ProblemType switch
         {
             // Case for 1 DOFs
             ProblemTypes.Truss_1D or ProblemTypes.Beam_1D => 1,
@@ -64,6 +64,21 @@ namespace FEA_Program.Models
 
             // Default case (return 0)
             _ => 0
+        };
+
+        /// <summary>
+        /// Whether nodes have rotation for the given problem type
+        /// </summary>
+        public bool NodesHaveRotation => ProblemType switch
+        {
+            // Trusses - no rotation
+            ProblemTypes.Truss_1D or ProblemTypes.Truss_3D => false,
+
+            // Beams - rotation
+            ProblemTypes.Beam_1D => true,
+
+            // Default
+            _ => false
         };
 
         // ---------------------- Public Methods ----------------------------
@@ -88,8 +103,8 @@ namespace FEA_Program.Models
             if (_Nodes.ContainsKey(node.ID))
                 throw new ArgumentException($"Could not add node {node.ID} to problem. Problem already contains that ID.");
 
-            if (node.DOFs != AvailableNodeDOFs)
-                throw new ArgumentException($"Could not add node {node.ID} to problem. Node has {node.DOFs} DOFs, and problem only supports {AvailableNodeDOFs} DOFs.");
+            if (node.DOFs != AvailableNodeDimensions)
+                throw new ArgumentException($"Could not add node {node.ID} to problem. Node has {node.DOFs} DOFs, and problem only supports {AvailableNodeDimensions} DOFs.");
 
             // dont want to create node where one already is
             if (NodeExtensions.NodeExistsAtLocation(node.Coordinates, Nodes))

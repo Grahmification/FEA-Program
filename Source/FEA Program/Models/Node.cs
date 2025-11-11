@@ -11,7 +11,7 @@ namespace FEA_Program.Models
         /// <summary>
         /// Provides a list of available dimsensions for error checking
         /// </summary>
-        public static int[] ValidDOFs = [1, 2, 3, 6];
+        public static int[] ValidDimensions = [1, 2, 3];
 
         /// <summary>
         /// Coordinates of the node center in program units (m). Length depends on DOFs.
@@ -38,9 +38,19 @@ namespace FEA_Program.Models
         // ---------------------- Properties ----------------------
 
         /// <summary>
+        /// The dimension of the node in global problem space. 1 = 1D, 2 = 2D, 3 = 3D
+        /// </summary>
+        public int Dimension { get; private set; }
+
+        /// <summary>
+        /// True if the node includes rotary DOFs and moments
+        /// </summary>
+        public bool HasRotation { get; private set; }
+
+        /// <summary>
         /// Number of DOFs in the node
         /// </summary>
-        public int DOFs { get; private set; }
+        public int DOFs => HasRotation ? 2 * Dimension : Dimension;
 
         /// <summary>
         /// True if the solution for the node is current
@@ -55,7 +65,7 @@ namespace FEA_Program.Models
             get { return _Coordinates; }
             set
             {
-                ValidateDimension<double>(value, MethodBase.GetCurrentMethod()?.Name ?? "");
+                ValidateDOFs<double>(value, MethodBase.GetCurrentMethod()?.Name ?? "");
                 _Coordinates = value;
                 InvalidateSolution();
             }
@@ -69,7 +79,7 @@ namespace FEA_Program.Models
             get { return _Fixity; }
             set
             {
-                ValidateDimension<int>(value, MethodBase.GetCurrentMethod()?.Name ?? "");
+                ValidateDOFs<int>(value, MethodBase.GetCurrentMethod()?.Name ?? "");
                 _Fixity = value;
                 InvalidateSolution();
             }
@@ -83,7 +93,7 @@ namespace FEA_Program.Models
             get { return _Force; }
             set
             {
-                ValidateDimension<double>(value, MethodBase.GetCurrentMethod()?.Name ?? "");
+                ValidateDOFs<double>(value, MethodBase.GetCurrentMethod()?.Name ?? "");
                 _Force = value;
                 InvalidateSolution();
             }
@@ -106,15 +116,16 @@ namespace FEA_Program.Models
         /// </summary>
         /// <param name="id">The idenfier for the class</param>
         /// <param name="dofs">Number of DOFs in the node</param>
-        public Node(int id, int dofs) : base(id)
+        public Node(int id, int dimension, bool hasRotation = false) : base(id)
         {
-            DOFs = dofs;
+            Dimension = dimension;
+            HasRotation = hasRotation;
 
-            _Coordinates = new double[dofs];
-            _Fixity = new int[dofs];
-            _Force = new double[dofs];
-            Displacement = new double[dofs];
-            ReactionForce = new double[dofs];
+            _Coordinates = new double[DOFs];
+            _Fixity = new int[DOFs];
+            _Force = new double[DOFs];
+            Displacement = new double[DOFs];
+            ReactionForce = new double[DOFs];
         }
 
         /// <summary>
@@ -125,23 +136,24 @@ namespace FEA_Program.Models
         /// <param name="id">The idenfier for the class</param>
         /// <param name="dofs">Number of DOFs in the node</param>
         /// <exception cref="Exception">A parameter was incorrect</exception>
-        public Node(double[] coords, int[] fixity, int id, int dofs) : base(id)
+        public Node(double[] coords, int[] fixity, int id, int dimension, bool hasRotation = false) : base(id)
         {
-            DOFs = dofs;
+            Dimension = dimension;
+            HasRotation = hasRotation;
 
-            if (!ValidDOFs.Contains(dofs))
+            if (!ValidDimensions.Contains(dimension))
             {
-                throw new Exception($"Attempted to create element, ID <{id}> with invalid number of dimensions: {dofs}.");
+                throw new Exception($"Attempted to create element, ID <{id}> with invalid number of dimensions: {dimension}.");
             }
 
-            ValidateDimension(coords, MethodBase.GetCurrentMethod()?.Name ?? "");
-            ValidateDimension(fixity, MethodBase.GetCurrentMethod()?.Name ?? "");
+            ValidateDOFs(coords, MethodBase.GetCurrentMethod()?.Name ?? "");
+            ValidateDOFs(fixity, MethodBase.GetCurrentMethod()?.Name ?? "");
 
             _Coordinates = coords;
             _Fixity = fixity;
-            _Force = new double[dofs];
-            Displacement = new double[dofs];
-            ReactionForce = new double[dofs];
+            _Force = new double[DOFs];
+            Displacement = new double[DOFs];
+            ReactionForce = new double[DOFs];
         }
 
         /// <summary>
@@ -151,8 +163,8 @@ namespace FEA_Program.Models
         /// <param name="reactionForce">The node reaction force + moment in program units. First 3 items  = force [N], last 3 = moments [Nm]. Length depends on DOFs.</param>
         public void Solve(double[] displacement, double[] reactionForce)
         {
-            ValidateDimension(displacement, MethodBase.GetCurrentMethod()?.Name ?? "");
-            ValidateDimension(reactionForce, MethodBase.GetCurrentMethod()?.Name ?? "");
+            ValidateDOFs(displacement, MethodBase.GetCurrentMethod()?.Name ?? "");
+            ValidateDOFs(reactionForce, MethodBase.GetCurrentMethod()?.Name ?? "");
 
             Displacement = displacement;
             ReactionForce = reactionForce;
@@ -165,7 +177,7 @@ namespace FEA_Program.Models
         /// <returns></returns>
         public object Clone()
         {
-            var output = new Node((double[])Coordinates.Clone(), (int[])Fixity.Clone(), ID, DOFs)
+            var output = new Node((double[])Coordinates.Clone(), (int[])Fixity.Clone(), ID, Dimension, HasRotation)
             {
                 Force = (double[])Force.Clone(),
             };
@@ -199,7 +211,8 @@ namespace FEA_Program.Models
             if (SolutionValid && !other.SolutionValid)
                 SolutionInvalidated?.Invoke(this, ID);
 
-            DOFs = other.DOFs;
+            Dimension = other.Dimension;
+            HasRotation = other.HasRotation;
             SolutionValid = other.SolutionValid;
             Displacement = (double[])other.Displacement.Clone();
             ReactionForce = (double[])other.ReactionForce.Clone();
@@ -227,7 +240,7 @@ namespace FEA_Program.Models
         /// <param name="collection">The collection to check</param>
         /// <param name="methodName">Name of the calling method</param>
         /// <exception cref="ArgumentOutOfRangeException">The length was incorrect</exception>
-        private void ValidateDimension<T>(IReadOnlyCollection<T> collection, string methodName)
+        private void ValidateDOFs<T>(IReadOnlyCollection<T> collection, string methodName)
         {
             if (collection.Count != DOFs)
             {

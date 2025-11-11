@@ -11,7 +11,12 @@
         /// Number of DOFs in the node
         /// </summary>
         public int Dimension { get; set; } = 1;
-        
+
+        /// <summary>
+        /// True if the node includes rotary DOFs and moments
+        /// </summary>
+        public bool HasRotation { get; set; } = false;
+
         /// <summary>
         /// The node coordinates in program units (m)
         /// </summary>

@@ -393,7 +393,7 @@ namespace FEA_Program.ViewModels
 
             DebugMatrix.ResetMatricies();
             Draw.ResetCollections();
-            Nodes = new NodesVM(Problem.AvailableNodeDOFs);
+            Nodes = new NodesVM(Problem.AvailableNodeDimensions, Problem.NodesHaveRotation);
             Nodes.SetBase(Base);
             Nodes.ItemAdding += OnNodeAdding;
             Nodes.ItemRemoving += OnNodeRemoving;
@@ -441,7 +441,7 @@ namespace FEA_Program.ViewModels
 
             foreach (var item in data.Nodes)
             {
-                nodes.Add(item.ID, new Node(item.Coords, item.Fixity, item.ID, item.Dimension)
+                nodes.Add(item.ID, new Node(item.Coords, item.Fixity, item.ID, item.Dimension, item.HasRotation)
                 {
                     Force = item.Force
                 });

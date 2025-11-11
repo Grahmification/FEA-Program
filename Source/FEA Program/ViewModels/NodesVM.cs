@@ -18,9 +18,14 @@ namespace FEA_Program.ViewModels
         private readonly CollectionViewSource _nonZeroForceCollection;
 
         /// <summary>
-        /// Number of DOFs used for creating new nodes
+        /// The problem dimension for creating new nodes
         /// </summary>
-        private readonly int _problemDOFs = -1;
+        private readonly int _problemDimension = -1;
+
+        /// <summary>
+        /// Whether the problem has rotation for creating new nodes
+        /// </summary>
+        private readonly bool _problemHasRotation = false;
 
         // ---------------------- Events ----------------------
 
@@ -81,10 +86,11 @@ namespace FEA_Program.ViewModels
         /// Primary constructor
         /// </summary>
         /// <param name="problemDOFs">Number of DOFs used for creating new nodes</param>
-        public NodesVM(int problemDOFs = -1)
+        public NodesVM(int problemDOFs = -1, bool problemHasRotation = false)
         {
-            _problemDOFs = problemDOFs;
-            AddForceCommand = new RelayCommand(() => ForceEditor.DisplayEditorAdd([.. Items], _problemDOFs));
+            _problemDimension = problemDOFs;
+            _problemHasRotation = problemHasRotation;
+            AddForceCommand = new RelayCommand(() => ForceEditor.DisplayEditorAdd([.. Items], _problemDimension));
             AddCommand = new RelayCommand(AddNodeWithEditor);
             Editor.AcceptEdits += OnAcceptEdits;
 
@@ -259,7 +265,7 @@ namespace FEA_Program.ViewModels
                 Base.ClearStatus();
 
                 int ID = IDClass.CreateUniqueId(Items.Select(m => m.Model).Cast<IHasID>().ToList());
-                var node = new Node(ID, _problemDOFs);
+                var node = new Node(ID, _problemDimension, _problemHasRotation);
 
                 var vm = new NodeVM(node);
                 Editor.DisplayEditor(vm, false);
