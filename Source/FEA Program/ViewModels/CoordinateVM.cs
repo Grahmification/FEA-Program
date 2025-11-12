@@ -10,6 +10,7 @@ namespace FEA_Program.ViewModels
     {
         private double _value = 0;
         private bool _fixed = false;
+        private bool _rotationFixed = false;
         private readonly int _index = -1;
 
         // ---------------------- Events ----------------------
@@ -36,6 +37,16 @@ namespace FEA_Program.ViewModels
         /// </summary>
         public bool Fixed { get => _fixed; set { _fixed = value; ValueChanged?.Invoke(this, _index); } }
 
+        /// <summary>
+        /// Whether the coordinate rotation is fixed
+        /// </summary>
+        public bool RotationFixed { get => _rotationFixed; set { _rotationFixed = value; ValueChanged?.Invoke(this, _index); } }
+
+        /// <summary>
+        /// Whether to display the control to fix/unfix the rotation
+        /// </summary>
+        public bool DisplayRotation { get; private set; }
+
         public CoordinateVM() { }
 
         /// <summary>
@@ -44,11 +55,15 @@ namespace FEA_Program.ViewModels
         /// <param name="index">Index of the coordinate</param>
         /// <param name="initialValue">The starting value</param>
         /// <param name="isFixed">True if the coordinate is fixed</param>
-        public CoordinateVM(int index, double initialValue, bool isFixed)
+        /// <param name="hasRotation">Whether the coordinate has a rotation assocated with it</param>
+        /// <param name="rotationFixed">Whether the rotation is fixed</param>
+        public CoordinateVM(int index, double initialValue, bool isFixed, bool hasRotation = false, bool rotationFixed = false)
         {
             _index = index;
             _value = initialValue;
             _fixed = isFixed;
+            RotationFixed = rotationFixed;
+            DisplayRotation = hasRotation;
         }
     }
 }

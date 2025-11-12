@@ -63,11 +63,12 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="" Width="20"/>
                 <TextBlock Grid.Column="1" Text="{Binding Source={StaticResource Units}, Path=Length.UnitString, StringFormat={}Position ({0}), Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <Label Grid.Column="2" Content="Fix" Width="40" HorizontalAlignment="Center"/>
-
+                <Label Grid.Column="3" Content="Fix Angle" Width="60" HorizontalAlignment="Center"/>
             </Grid>
 
             <!-- ===== Row 2: Value Fields ===== -->
@@ -78,6 +79,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
@@ -95,7 +97,17 @@
                             <CheckBox Grid.Column="2"
                                         Width="40"
                                         IsChecked="{Binding Fixed}" 
-                                        Margin="5 0 -5 0"
+                                        Margin="10 0 2 0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Content=""/>
+                            <CheckBox Grid.Column="3"
+                                        Width="40"
+                                        IsChecked="{Binding RotationFixed}"
+                                        IsEnabled="{Binding DisplayRotation}"
+                                        Margin="10 0 2 0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         HorizontalContentAlignment="Center"

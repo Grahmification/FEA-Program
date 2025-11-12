@@ -128,7 +128,9 @@ namespace FEA_Program.ViewModels
             for (int i = 0; i < (int)EditItem.Model.Dimension; i++)
             {
                 var userCoord = App.Units.Length.ToUser(EditItem.Model.Position[i]);  // Convert to user units
-                var coordVM = new CoordinateVM(i, userCoord, EditItem.Model.Fixity[i] == 1);
+
+                var rotationIsFixed = EditItem.Model.HasRotation ? EditItem.Model.RotationFixity[i] == 1 : false;
+                var coordVM = new CoordinateVM(i, userCoord, EditItem.Model.Fixity[i] == 1, EditItem.Model.HasRotation, rotationIsFixed);
                 coordVM.ValueChanged += OnCoordinateValueChanged;
                 EditCoordinates.Add(coordVM);
             }
@@ -182,6 +184,13 @@ namespace FEA_Program.ViewModels
                 // This will also invalidate the solution
                 EditItem.Model.Fixity = [.. EditItem.Model.Fixity.ToList()];
                 EditItem.Model.Position = [.. EditItem.Model.Position.ToList()];
+
+                // Update angular parameters if we have them
+                if (EditItem.Model.HasRotation)
+                {
+                    EditItem.Model.RotationFixity[e] = vm.RotationFixed ? 1 : 0;
+                    EditItem.Model.RotationFixity = [.. EditItem.Model.RotationFixity.ToList()];
+                }
             }
         }
 
@@ -231,6 +240,9 @@ namespace FEA_Program.ViewModels
                 foreach (var vm in EditCoordinates)
                 {
                     vm.Fixed = fix;
+
+                    if (vm.DisplayRotation)
+                        vm.RotationFixed = fix;
                 }
             }
             catch (Exception ex)
