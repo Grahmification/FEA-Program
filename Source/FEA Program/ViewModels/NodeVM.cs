@@ -171,7 +171,7 @@ namespace FEA_Program.ViewModels
                 () => $"{UserCoordinates[2]:F2}" + (Model.Fixity[2] == 1 ? " (Fixed)" : "")
              ];
 
-            for(int i = 0; i < Model.DOFs; i++)
+            for(int i = 0; i < (int)Model.Dimension; i++)
             {
                 var vm = new TreePropertyVM(this, nameof(UserCoordinates), valueFunctions[i])
                 {
@@ -268,7 +268,7 @@ namespace FEA_Program.ViewModels
         private void DeleteForce()
         {
             // Set all force components to zero
-            Model.Force = new double[Model.DOFs];
+            Model.Force = new double[(int)Model.Dimension];
         }
 
         // ---------------------- Static Methods ----------------------

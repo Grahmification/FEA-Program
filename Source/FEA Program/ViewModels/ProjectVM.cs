@@ -443,7 +443,9 @@ namespace FEA_Program.ViewModels
             {
                 nodes.Add(item.ID, new Node(item.Position, item.Fixity, item.ID, item.Dimension, item.HasRotation)
                 {
-                    Force = item.Force
+                    RotationFixity = item.RotationFixity,
+                    Force = item.Force,
+                    Moment = item.Moment,
                 });
             }
 
@@ -497,7 +499,9 @@ namespace FEA_Program.ViewModels
                     ID = node.ID,
                     Position = node.Position,
                     Fixity = node.Fixity,
-                    Force = node.Force
+                    RotationFixity = node.RotationFixity,
+                    Force = node.Force,
+                    Moment = node.Moment,
                 });
             }
 

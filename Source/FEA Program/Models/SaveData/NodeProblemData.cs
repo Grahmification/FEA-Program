@@ -28,8 +28,19 @@
         public int[] Fixity { get; set; } = [0];
 
         /// <summary>
+        /// Whether each rotary dimension of the node is fixed. 0 = floating, 1 = fixed.
+        /// </summary>
+        public int[] RotationFixity { get; set; } = []; // Default to empty for rotational parameters
+
+        /// <summary>
         /// The node force in program units (m)
         /// </summary>
         public double[] Force { get; set; } = [0];
+
+        /// <summary>
+        /// The node moment in program units [Nm].
+        /// </summary>
+        public double[] Moment { get; set; } = []; // Default to empty for rotational parameters
+
     }
 }

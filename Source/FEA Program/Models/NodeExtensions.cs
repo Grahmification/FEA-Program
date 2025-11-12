@@ -14,7 +14,7 @@ namespace FEA_Program.Models
         {
             // Sort nodes from smallest to largest ID
             nodes = [.. nodes.OrderBy(node => node.ID)];
-            return BuildVector(nodes, n => n.Force);
+            return BuildVector(nodes, n => n.ForceVector);
         }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace FEA_Program.Models
         {
             // Sort nodes from smallest to largest ID
             nodes = [.. nodes.OrderBy(node => node.ID)];
-            return BuildVector(nodes, n => Array.ConvertAll(n.Fixity, x => (double)x));
+            return BuildVector(nodes, n => Array.ConvertAll(n.FixityVector, x => (double)x));
         }
 
         /// <summary>

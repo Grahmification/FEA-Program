@@ -14,14 +14,24 @@ namespace FEA_Program.Models
         private double[] _Position;
 
         /// <summary>
-        /// Whether each DOF of the node is fixed. 0 = floating, 1 = fixed. Length depends on DOFs.
+        /// Whether each DOF of the node is fixed. 0 = floating, 1 = fixed. Length depends on Dimension.
         /// </summary>
         private int[] _Fixity;
 
         /// <summary>
-        /// The node force + moment in program units. First 3 items  = force [N], last 3 = moments [Nm]. Length depends on DOFs.
+        /// Whether each rotational DOF of the node is fixed. 0 = floating, 1 = fixed. Length depends on Dimension.
+        /// </summary>
+        private int[] _RotationFixity = [];
+
+        /// <summary>
+        /// The node force in program units [N]. Length depends on Dimension.
         /// </summary>
         private double[] _Force;
+
+        /// <summary>
+        /// The node moment in program units [Nm]. Length depends on Dimension.
+        /// </summary>
+        private double[] _Moment = [];
 
         // ---------------------- Events ----------------------
 
@@ -60,9 +70,7 @@ namespace FEA_Program.Models
             get { return _Position; }
             set
             {
-                if (value.Length != (int)Dimension)
-                    throw new ArgumentOutOfRangeException($"Attempted to set position for node ID <{ID}> with input params having different dimensions than specified node dimension.");
-
+                ValidateDimensions(value, MethodBase.GetCurrentMethod()?.Name ?? "");
                 _Position = value;
                 InvalidateSolution();
             }
@@ -76,35 +84,93 @@ namespace FEA_Program.Models
             get { return _Fixity; }
             set
             {
-                ValidateDOFs<int>(value, MethodBase.GetCurrentMethod()?.Name ?? "");
+                ValidateDimensions(value, MethodBase.GetCurrentMethod()?.Name ?? "");
                 _Fixity = value;
                 InvalidateSolution();
             }
         }
 
         /// <summary>
-        /// The node force + moment in program units. First 3 items  = force [N], last 3 = moments [Nm]. Length depends on DOFs.
+        /// Whether each rotary dimension of the node is fixed. 0 = floating, 1 = fixed. Length depends on DOFs.
+        /// </summary>
+        public int[] RotationFixity
+        {
+            get { return _RotationFixity; }
+            set
+            {
+                // Allow setting the value to blank without throwing an error
+                if (!HasRotation && value.Length == 0)
+                    return;
+
+                ValidateRotation(MethodBase.GetCurrentMethod()?.Name ?? "");
+                ValidateDimensions(value, MethodBase.GetCurrentMethod()?.Name ?? "");
+                _RotationFixity = value;
+                InvalidateSolution();
+            }
+        }
+
+        /// <summary>
+        /// Get the fixity vector with correct ordering for solving the FEA problem
+        /// </summary>
+        public int[] FixityVector => HasRotation ? InterleaveArrays(_Fixity, _RotationFixity) : _Fixity;
+
+        /// <summary>
+        /// The node force in program units [N]. Length depends on dimension.
         /// </summary>
         public double[] Force
         {
             get { return _Force; }
             set
             {
-                ValidateDOFs<double>(value, MethodBase.GetCurrentMethod()?.Name ?? "");
+                ValidateDimensions(value, MethodBase.GetCurrentMethod()?.Name ?? "");
                 _Force = value;
                 InvalidateSolution();
             }
         }
 
         /// <summary>
-        /// Displacement of the node center in program units (m). Length depends on DOFs.
+        /// The node moment in program units [Nm]. Length depends on dimension.
+        /// </summary>
+        public double[] Moment
+        {
+            get { return _Moment; }
+            set
+            {
+                // Allow setting the value to blank without throwing an error
+                if (!HasRotation && value.Length == 0)
+                    return;
+                
+                ValidateRotation(MethodBase.GetCurrentMethod()?.Name ?? "");
+                ValidateDimensions(value, MethodBase.GetCurrentMethod()?.Name ?? "");
+                _Moment = value;
+                InvalidateSolution();
+            }
+        }
+
+        /// <summary>
+        /// Get the force vector with correct ordering for solving the FEA problem
+        /// </summary>
+        public double[] ForceVector => HasRotation ? InterleaveArrays(_Force, _Moment) : _Force;
+
+        /// <summary>
+        /// Displacement of the node center in program units (m). Length depends on Dimension.
         /// </summary>
         public double[] Displacement { get; private set; }
 
         /// <summary>
-        /// The node reaction force + moment in program units. First 3 items  = force [N], last 3 = moments [Nm]. Length depends on DOFs.
+        /// Displacement of the node center in program units (rad). Length depends on Dimension.
+        /// </summary>
+        public double[] AngularDisplacement { get; private set; } = [];
+
+        /// <summary>
+        /// The node reaction force in program units [N]. Length depends on Dimension.
         /// </summary>
         public double[] ReactionForce { get; private set; }
+
+        /// <summary>
+        /// The node reaction moment in program units [Nm]. Length depends on Dimension.
+        /// </summary>
+        public double[] ReactionMoment { get; private set; } = [];
 
         // ---------------------- Public Methods ----------------------
 
@@ -119,10 +185,19 @@ namespace FEA_Program.Models
             HasRotation = hasRotation;
 
             _Position = new double[(int)dimension];
-            _Fixity = new int[DOFs];
-            _Force = new double[DOFs];
-            Displacement = new double[DOFs];
-            ReactionForce = new double[DOFs];
+            _Fixity = new int[(int)dimension];
+            _Force = new double[(int)dimension];
+            Displacement = new double[(int)dimension];
+            ReactionForce = new double[(int)dimension];
+
+            // These depend on the whether the element supports rotation
+            if (HasRotation)
+            {
+                _RotationFixity = new int[(int)dimension];
+                _Moment = new double[(int)dimension];
+                AngularDisplacement = new double[(int)dimension];
+                ReactionMoment = new double[(int)dimension];
+            }
         }
 
         /// <summary>
@@ -143,28 +218,48 @@ namespace FEA_Program.Models
                 throw new Exception($"Attempted to create element, ID <{id}> with invalid number of dimensions.");
             }
 
-            ValidateDOFs(position, MethodBase.GetCurrentMethod()?.Name ?? "");
-            ValidateDOFs(fixity, MethodBase.GetCurrentMethod()?.Name ?? "");
+            ValidateDimensions(position, MethodBase.GetCurrentMethod()?.Name ?? "");
+            ValidateDimensions(fixity, MethodBase.GetCurrentMethod()?.Name ?? "");
 
             _Position = position;
             _Fixity = fixity;
-            _Force = new double[DOFs];
-            Displacement = new double[DOFs];
-            ReactionForce = new double[DOFs];
+            _Force = new double[(int)dimension];
+            Displacement = new double[(int)dimension];
+            ReactionForce = new double[(int)dimension];
+
+            // These depend on the whether the element supports rotation
+            if (HasRotation)
+            {
+                _RotationFixity = new int[(int)dimension];
+                _Moment = new double[(int)dimension];
+                AngularDisplacement = new double[(int)dimension];
+                ReactionMoment = new double[(int)dimension];
+            }
         }
 
         /// <summary>
         /// Sets the node result fields and marks it as solved
         /// </summary>
-        /// <param name="displacement">Displacement of the node center in program units (m). Length depends on DOFs.</param>
-        /// <param name="reactionForce">The node reaction force + moment in program units. First 3 items  = force [N], last 3 = moments [Nm]. Length depends on DOFs.</param>
-        public void Solve(double[] displacement, double[] reactionForce)
+        /// <param name="displacementVector">Displacement of the node center in program units (m). Length depends on DOFs.</param>
+        /// <param name="reactionVector">The node reaction force + moment in program units. First 3 items  = force [N], last 3 = moments [Nm]. Length depends on DOFs.</param>
+        public void Solve(double[] displacementVector, double[] reactionVector)
         {
-            ValidateDOFs(displacement, MethodBase.GetCurrentMethod()?.Name ?? "");
-            ValidateDOFs(reactionForce, MethodBase.GetCurrentMethod()?.Name ?? "");
+            // These vectors will have length of the DOFs, not the dimension
+            ValidateDOFs(displacementVector, MethodBase.GetCurrentMethod()?.Name ?? "");
+            ValidateDOFs(reactionVector, MethodBase.GetCurrentMethod()?.Name ?? "");
 
-            Displacement = displacement;
-            ReactionForce = reactionForce;
+            if (HasRotation)
+            {
+                // Decompose the vectors into linear and rotation
+                (Displacement, AngularDisplacement) = Deinterleave(displacementVector);
+                (ReactionForce, ReactionMoment) = Deinterleave(reactionVector);
+            }
+            else
+            {
+                Displacement = displacementVector;
+                ReactionForce = reactionVector;
+            }
+
             SolutionValid = true;
         }
 
@@ -174,12 +269,19 @@ namespace FEA_Program.Models
         /// <returns></returns>
         public object Clone()
         {
-            var output = new Node((double[])Position.Clone(), (int[])Fixity.Clone(), ID, Dimension, HasRotation)
+            var output = new Node(ID, Dimension, HasRotation)
             {
+                Position = (double[])Position.Clone(),
+                Fixity = (int[])Fixity.Clone(),
+                RotationFixity = (int[])RotationFixity.Clone(),
                 Force = (double[])Force.Clone(),
+                Moment = (double[])Moment.Clone(),
             };
 
-            output.Solve((double[])Displacement.Clone(), (double[])ReactionForce.Clone());
+            double[] displacementVector = HasRotation ? InterleaveArrays(Displacement, AngularDisplacement) : Displacement;
+            double[] reactionVector = HasRotation ? InterleaveArrays(ReactionForce, ReactionMoment) : ReactionForce;
+
+            output.Solve(displacementVector, reactionVector);
 
             if(!SolutionValid)
             {
@@ -199,10 +301,18 @@ namespace FEA_Program.Models
             // Set these underlying so SolutionInvalidate event doesn't get called
             _Position = (double[])other.Position.Clone();
             _Fixity = (int[])other.Fixity.Clone();
+            _RotationFixity = (int[])other.RotationFixity.Clone();
             _Force = (double[])other.Force.Clone();
+            _Moment = (double[])other.Moment.Clone();
             OnPropertyChanged(nameof(Position));
             OnPropertyChanged(nameof(Fixity));
             OnPropertyChanged(nameof(Force));
+
+            if (other.HasRotation)
+            {
+                OnPropertyChanged(nameof(RotationFixity));
+                OnPropertyChanged(nameof(Moment));
+            }
 
             // Need to alert parents the state has changed
             if (SolutionValid && !other.SolutionValid)
@@ -212,7 +322,9 @@ namespace FEA_Program.Models
             HasRotation = other.HasRotation;
             SolutionValid = other.SolutionValid;
             Displacement = (double[])other.Displacement.Clone();
+            AngularDisplacement = (double[])other.AngularDisplacement.Clone();
             ReactionForce = (double[])other.ReactionForce.Clone();
+            ReactionMoment = (double[])other.ReactionMoment.Clone();
         }
 
         // ---------------------- Private Helpers ----------------------
@@ -243,6 +355,98 @@ namespace FEA_Program.Models
             {
                 throw new ArgumentOutOfRangeException($"Attempted to execute operation <{methodName}> for node ID <{ID}> with input params having different DOFs than specified node DOFs.");
             }
+        }
+
+        /// <summary>
+        /// Checks the length of a collection is correct for the dimension of the node
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection">The collection to check</param>
+        /// <param name="methodName">Name of the calling method</param>
+        /// <exception cref="ArgumentOutOfRangeException">The length was incorrect</exception>
+        private void ValidateDimensions<T>(IReadOnlyCollection<T> collection, string methodName)
+        {
+            if (collection.Count != (int)Dimension)
+            {
+                throw new ArgumentOutOfRangeException($"Attempted to execute operation <{methodName}> for node ID <{ID}> with input params having different length than the node dimension.");
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the element supports rotation
+        /// </summary>
+        /// <param name="methodName">The calling method name</param>
+        /// <exception cref="InvalidOperationException">Thrown if rotation isn't supported</exception>
+        private void ValidateRotation(string methodName)
+        {
+            if (!HasRotation)
+                throw new InvalidOperationException($"Cannot set parameter {methodName}. Node does not support rotation.");
+        }
+
+        /// <summary>
+        /// Combines two arrays of the same length and type by interleaving their elements.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the arrays</typeparam>
+        /// <param name="array1">The first array.</param>
+        /// <param name="array2">The second array.</param>
+        /// <returns>A new array containing the interleaved elements.</returns>
+        /// <exception cref="ArgumentException">Thrown if the arrays are null or have different lengths.</exception>
+        public static T[] InterleaveArrays<T>(T[] array1, T[] array2)
+        {
+            // Input validation
+            if (array1 == null || array2 == null)
+            {
+                throw new ArgumentException("Both arrays must be non-null.");
+            }
+            if (array1.Length != array2.Length)
+            {
+                throw new ArgumentException("Both arrays must have the same length.");
+            }
+
+            int length = array1.Length;
+            T[] interleavedArray = new T[length * 2];
+
+            for (int i = 0; i < length; i++)
+            {
+                interleavedArray[2 * i] = array1[i];
+                interleavedArray[(2 * i) + 1] = array2[i];
+            }
+
+            return interleavedArray;
+        }
+
+        /// <summary>
+        /// Decomposes a single interleaved array back into two separate arrays.
+        /// Array 1 contains elements from the even indices (0, 2, 4, ...).
+        /// Array 2 contains elements from the odd indices (1, 3, 5, ...).
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the array.</typeparam>
+        /// <param name="interleavedArray">The single array to be split.</param>
+        /// <returns>A ValueTuple containing the two decomposed arrays (array1, array2).</returns>
+        /// <exception cref="ArgumentException">Thrown if the array is null or has an odd length.</exception>
+        public static (T[] array1, T[] array2) Deinterleave<T>(T[] interleavedArray)
+        {
+            if (interleavedArray == null)
+            {
+                throw new ArgumentException("Input array must be non-null.");
+            }
+            // An interleaved array must have an even length.
+            if (interleavedArray.Length % 2 != 0)
+            {
+                throw new ArgumentException("Input array must have an even number of elements to be perfectly deinterleaved.");
+            }
+
+            int halfLength = interleavedArray.Length / 2;
+            T[] array1 = new T[halfLength]; // Elements from even indices
+            T[] array2 = new T[halfLength]; // Elements from odd indices
+
+            for (int i = 0; i < halfLength; i++)
+            {
+                array1[i] = interleavedArray[2 * i];
+                array2[i] = interleavedArray[2 * i + 1];
+            }
+
+            return (array1, array2);
         }
 
         // ---------------------- Static Methods ----------------------
