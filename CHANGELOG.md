@@ -1,5 +1,10 @@
 ## Changelog
 
+### V2.0.1
+
+2025-11-11
+* Fix bug with TreeView blocking multi-selection
+
 ### V2.0.0
 
 2025-11-07
