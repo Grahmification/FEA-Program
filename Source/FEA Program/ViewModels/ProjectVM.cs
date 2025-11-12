@@ -441,8 +441,10 @@ namespace FEA_Program.ViewModels
 
             foreach (var item in data.Nodes)
             {
-                nodes.Add(item.ID, new Node(item.Position, item.Fixity, item.ID, item.Dimension, item.HasRotation)
+                nodes.Add(item.ID, new Node(item.ID, item.Dimension, item.HasRotation)
                 {
+                    Position = item.Position,
+                    Fixity = item.Fixity,
                     RotationFixity = item.RotationFixity,
                     Force = item.Force,
                     Moment = item.Moment,

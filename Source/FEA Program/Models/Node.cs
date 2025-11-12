@@ -178,7 +178,8 @@ namespace FEA_Program.Models
         /// Default constructor
         /// </summary>
         /// <param name="id">The idenfier for the class</param>
-        /// <param name="dofs">Number of DOFs in the node</param>
+        /// <param name="dimension">The dimension of the node</param>
+        /// <param name="hasRotation">Whether the node supports rotation</param>
         public Node(int id, Dimensions dimension, bool hasRotation = false) : base(id)
         {
             Dimension = dimension;
@@ -186,43 +187,6 @@ namespace FEA_Program.Models
 
             _Position = new double[(int)dimension];
             _Fixity = new int[(int)dimension];
-            _Force = new double[(int)dimension];
-            Displacement = new double[(int)dimension];
-            ReactionForce = new double[(int)dimension];
-
-            // These depend on the whether the element supports rotation
-            if (HasRotation)
-            {
-                _RotationFixity = new int[(int)dimension];
-                _Moment = new double[(int)dimension];
-                AngularDisplacement = new double[(int)dimension];
-                ReactionMoment = new double[(int)dimension];
-            }
-        }
-
-        /// <summary>
-        /// Constructor with more parameters
-        /// </summary>
-        /// <param name="position">Coordinates of the node center in program units (m). Length depends on DOFs.</param>
-        /// <param name="fixity">Whether each dimension of the node is fixed. 0 = floating, 1 = fixed. Length depends on DOFs.</param>
-        /// <param name="id">The idenfier for the class</param>
-        /// <param name="dofs">Number of DOFs in the node</param>
-        /// <exception cref="Exception">A parameter was incorrect</exception>
-        public Node(double[] position, int[] fixity, int id, Dimensions dimension, bool hasRotation = false) : base(id)
-        {
-            Dimension = dimension;
-            HasRotation = hasRotation;
-
-            if (dimension == Dimensions.Invalid)
-            {
-                throw new Exception($"Attempted to create element, ID <{id}> with invalid number of dimensions.");
-            }
-
-            ValidateDimensions(position, MethodBase.GetCurrentMethod()?.Name ?? "");
-            ValidateDimensions(fixity, MethodBase.GetCurrentMethod()?.Name ?? "");
-
-            _Position = position;
-            _Fixity = fixity;
             _Force = new double[(int)dimension];
             Displacement = new double[(int)dimension];
             ReactionForce = new double[(int)dimension];
