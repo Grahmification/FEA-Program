@@ -38,6 +38,11 @@
             Unit.GPa => 1000 * 1000 * 1000,
             Unit.Psi => 6894.76,
             Unit.Bar => 100000,
+            // ------------- Torque ---------------
+            Unit.Nm => 1,
+            Unit.ft_lb => ConversionFactor(Unit.ft) * ConversionFactor(Unit.lb),
+            // ------------- Angle ---------------
+            Unit.deg => Math.PI / 180,
             //Default
             _ => 1.0
         };
@@ -73,6 +78,11 @@
             Unit.GPa => ["GPa", "gpa", "Gpa"],
             Unit.Psi => ["psi", "Psi"],
             Unit.Bar => ["bar", "Bar"],
+            // ------------- Torque ---------------
+            Unit.Nm => ["Nm"],
+            Unit.ft_lb => ["ft-lb"],
+            // ------------- Angle ---------------
+            Unit.deg => ["°"],
             //Default
             _ => ["-"]
         };
@@ -88,6 +98,8 @@
             UnitType.Area => Unit.m_squared,
             UnitType.Force => Unit.N,
             UnitType.Pressure => Unit.Pa,
+            UnitType.Torque => Unit.Nm,
+            UnitType.Angle => Unit.deg,
             UnitType.Unitless => Unit.Unitless,
             _ => Unit.Unitless
         };
@@ -103,8 +115,10 @@
             UnitType.Area => [5, 9],
             UnitType.Force => [10, 11],
             UnitType.Pressure => [12, 17],
-            UnitType.Unitless => [18, 18],
-            _ => [18, 18]
+            UnitType.Torque => [18, 19],
+            UnitType.Angle => [20, 20],
+            UnitType.Unitless => [21, 21],
+            _ => [21, 21]
         };
 
         // ----------------------------------------------------------------------------

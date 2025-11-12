@@ -19,9 +19,19 @@ namespace FEA_Program.ViewModels
         public UnitVM Area { get; private set; } = new(UnitType.Area, Unit.mm_squared);
 
         /// <summary>
+        /// Angle Units
+        /// </summary>
+        public UnitVM Angle { get; private set; } = new(UnitType.Angle, Unit.deg);
+
+        /// <summary>
         /// Force units
         /// </summary>
         public UnitVM Force { get; private set; } = new(UnitType.Force, Unit.N);
+
+        /// <summary>
+        /// Torque units
+        /// </summary>
+        public UnitVM Torque { get; private set; } = new(UnitType.Torque, Unit.Nm);
 
         /// <summary>
         /// Stress units

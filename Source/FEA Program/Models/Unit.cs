@@ -9,7 +9,9 @@
         Area = 1, // m^2
         Force = 2, // N
         Pressure = 3, // Pa
-        Unitless = 4 // [-]
+        Torque = 4, // Nm
+        Angle = 5, // rad
+        Unitless = 6 // [-]
     }
 
     /// <summary>
@@ -39,6 +41,11 @@
         Pa,
         Psi,
         Bar,
+        // ------------- Torque ---------------
+        Nm,
+        ft_lb,
+        // ------------- Angle ---------------
+        deg,
         // ------------- Unitless ---------------
         Unitless,
     }
